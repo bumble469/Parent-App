@@ -13,11 +13,16 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart/index";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart/index"; // Assuming you have this component
+import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart/index"; // Make sure this is set up to handle line charts
 
 import attendanceData from "./data/AttendancData";
 import marksData from "./data/MarksData";
+
+// Chart.js imports
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend);
 
 function Performance() {
   const [semester, setSemester] = useState("semester1");
@@ -29,19 +34,16 @@ function Performance() {
   const currentData = attendanceData[semester] || [];
   const currentMarksData = marksData[semester] || [];
 
-  // Debug: Check marks data
-  console.log("Current Marks Data:", currentMarksData);
-
   // Calculate average attendance percentage
   const totalClasses = currentData.reduce((acc, data) => acc + data.attendance.length, 0);
   const totalPresent = currentData.reduce((acc, data) => acc + data.attendance.filter(record => record.status === "Present").length, 0);
   const averageAttendance = totalClasses ? (totalPresent / totalClasses) * 100 : 0;
 
-  // Calculate overall average grade (assuming grades are available in attendanceData)
+  // Calculate overall average grade
   const grades = currentData.flatMap(data => data.attendance.map(record => record.grade || 0));
   const overallMarks = grades.length ? grades.reduce((acc, grade) => acc + grade, 0) / grades.length : 0;
 
-  // Calculate student's rank (example logic, replace with actual calculation)
+  // Calculate student's rank
   const studentRank = 5; // Replace with your logic to calculate rank
 
   const uniqueDates = useMemo(() => {
@@ -76,11 +78,6 @@ function Performance() {
   ], []);
 
   const marksTableData = useMemo(() => {
-    console.log("Marks Table Data Computed:", currentMarksData);
-    if (!currentMarksData || currentMarksData.length === 0) {
-      return [];
-    }
-
     return currentMarksData.map((data) => ({
       subject: data.subject,
       interim: data.interim,
@@ -92,53 +89,36 @@ function Performance() {
     }));
   }, [currentMarksData]);
 
-  // Prepare line graph data for the line chart
-  const lineChartData = useMemo(() => {
-    return {
-      labels: currentMarksData.map((data) => data.subject), // Labels for X-axis
-      datasets: [
-        {
-          label: "Total Marks",
-          data: currentMarksData.map((data) => data.total), // Y-axis values
-          borderColor: "#42A5F5",
-          backgroundColor: "rgba(66, 165, 245, 0.2)",
-          fill: true,
-        },
-      ],
-    };
-  }, [currentMarksData]);
-
-  // Prepare bar graph data for the marks chart
-  const barChartData = useMemo(() => {
-    return {
-      labels: currentMarksData.map((data) => data.subject), // Labels for X-axis
-      datasets: [
-        {
-          label: "Total Marks",
-          data: currentMarksData.map((data) => data.total), // Y-axis values
-          backgroundColor: "#42A5F5",
-        },
-      ],
-    };
-  }, [currentMarksData]);
-
-  // Prepare comparison graph data for multiple semesters
-  const semesterComparisonData = useMemo(() => {
-    const semesters = ["semester1", "semester2", "semester3", "semester4"];
-    return {
-      labels: semesters,
-      datasets: semesters.map((sem) => {
-        const data = marksData[sem] || [];
-        return {
-          label: `Semester ${sem.slice(-1)}`,
-          data: data.map((d) => d.total), // Example, adjust as needed
-          backgroundColor: "#42A5F5",
-          borderColor: "#1E88E5",
-          borderWidth: 1,
-        };
+  // Prepare line graph data for attendance
+  const attendanceLineChartData = useMemo(() => {
+    const datasets = currentData.map((data) => ({
+      label: data.subject,
+      data: uniqueDates.map(date => {
+        const record = data.attendance.find(rec => rec.date === date);
+        return record ? (record.status === 'Present' ? 1 : 0) : 0;
       }),
+      borderColor: "#FF5733", // Example color, adjust as needed
+      backgroundColor: "rgba(255, 87, 51, 0.2)",
+      fill: true,
+    }));
+
+    return {
+      labels: uniqueDates,
+      datasets,
     };
-  }, [marksData]);
+  }, [currentData, uniqueDates]);
+
+  // Prepare line graph data for marks
+  const marksLineChartData = useMemo(() => ({
+    labels: currentMarksData.map((data) => data.subject),
+    datasets: [{
+      label: 'Total Marks',
+      data: currentMarksData.map((data) => data.total),
+      borderColor: "#42A5F5",
+      backgroundColor: "rgba(66, 165, 245, 0.2)",
+      fill: true,
+    }],
+  }), [currentMarksData]);
 
   return (
     <DashboardLayout>
@@ -257,6 +237,36 @@ function Performance() {
                 />
               </MDBox>
             </Card>
+          </Grid>
+
+          {/* Attendance Line Chart */}
+          <Grid item xs={12} md={6} lg={6}>
+            <MDBox mb={3} borderRadius='3px'>
+              <ReportsLineChart
+                color="info"
+                title="Subject Wise Attendance"
+                description="Lectures Attended / Lectures Occurred"
+                date="Data updated"
+                chart={attendanceLineChartData}
+              />
+            </MDBox>
+          </Grid>
+
+          {/* Marks Line Chart */}
+          <Grid item xs={12} md={6} lg={6}>
+            <MDBox mb={3} borderRadius='3px'>
+              <ReportsLineChart
+                color="success"
+                title="Marks Graphical"
+                description={
+                  <>
+                    (<strong>+15%</strong>) increase since last semester
+                  </>
+                }
+                date="Updated 4 min ago"
+                chart={marksLineChartData}
+              />
+            </MDBox>
           </Grid>
 
           {/* Marks Table */}
