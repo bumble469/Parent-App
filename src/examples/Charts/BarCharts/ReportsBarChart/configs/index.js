@@ -1,0 +1,101 @@
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+
+// Register necessary chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+function configs(labels, datasets) {
+  return {
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Lectures Attended',
+          backgroundColor: 'rgb(60,179,113)', // Light White
+          borderColor: '#dcdcdc', // Slightly Darker White
+          borderWidth: 1,
+          data: datasets.attended,
+          maxBarThickness: 10,
+          borderRadius: 10,
+        },
+        {
+          label: 'Total Lectures',
+          backgroundColor: 'rgb(230, 230, 230)', // Solid White
+          borderColor: '#e0e0e0', // Slightly Darker White
+          borderWidth: 1,
+          data: datasets.total,
+          maxBarThickness: 10,
+          borderRadius: 10,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            color: '#fff', // Set label color to white
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return context.dataset.label + ': ' + context.raw;
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          min: 1, // Set minimum value of y-axis to 1
+          max: 35, // Set maximum value of y-axis to 50
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: "rgba(255, 255, 255, .2)",
+          },
+          ticks: {
+            stepSize: 5, // Adjust step size for y-axis ticks
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: "normal",
+              lineHeight: 2,
+            },
+            color: "#fff",
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: false, // Hide x-axis grid lines
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: "rgba(255, 255, 255, .2)",
+          },
+          ticks: {
+            display: true,
+            color: "#f8f9fa",
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: "normal",
+              lineHeight: 2,
+            },
+          },
+        },
+      },
+    },
+  };
+}
+
+export default configs;
