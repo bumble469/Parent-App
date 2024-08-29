@@ -120,6 +120,12 @@ function Faculty() {
                                                     {staff.currentSem ? "Currently Teaching" : "Not Teaching This Semester"}
                                                 </Typography>
                                             )}
+                                            {/* Subjects List */}
+                                            {staff.subjects && staff.subjects.length > 0 && (
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Subjects: {staff.subjects.join(', ')}
+                                                </Typography>
+                                            )}
                                         </Box>
                                     </Box>
                                 </Grid>

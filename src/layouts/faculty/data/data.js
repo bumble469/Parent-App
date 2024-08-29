@@ -1,5 +1,3 @@
-// data.js
-
 // Import images directly
 import imgBruceMars from '../../../assets/images/bruce-mars.jpg';
 import imgIvanaSquare from '../../../assets/images/ivana-square.jpg';
@@ -10,7 +8,7 @@ import imgTeam3 from '../../../assets/images/team-3.jpg';
 import imgTeam4 from '../../../assets/images/team-4.jpg';
 import imgTeam5 from '../../../assets/images/team-5.jpg';
 
-// Faculty data with updated image imports
+// Faculty data with updated image imports and single subjects
 const facultyData = {
     teachingStaff: [
         {
@@ -20,6 +18,7 @@ const facultyData = {
             type: "Regular",
             image: imgBruceMars, // Updated path
             currentSem: true,
+            subjects: ["Linux"] // Only one subject
         },
         {
             name: "Dr. Jane Smith",
@@ -28,6 +27,7 @@ const facultyData = {
             type: "Regular",
             image: imgIvanaSquare, // Updated path
             currentSem: true,
+            subjects: ["INS"] // Only one subject
         },
         {
             name: "Dr. Michael Johnson",
@@ -36,6 +36,7 @@ const facultyData = {
             type: "Regular",
             image: imgKalVisuals, // Updated path
             currentSem: false,
+            subjects: ["DataMining"] // Only one subject
         },
         {
             name: "Dr. Emily Davis",
@@ -44,6 +45,7 @@ const facultyData = {
             type: "Regular",
             image: imgMarie, // Updated path
             currentSem: true,
+            subjects: ["ASP.NET"] // Only one subject
         },
         {
             name: "Dr. William Brown",
@@ -52,6 +54,7 @@ const facultyData = {
             type: "Regular",
             image: imgTeam2, // Updated path
             currentSem: false,
+            subjects: ["Java"] // Only one subject
         },
         {
             name: "Dr. Olivia Wilson",
@@ -60,6 +63,7 @@ const facultyData = {
             type: "Regular",
             image: imgTeam3, // Updated path
             currentSem: true,
+            subjects: ["Android"] // Only one subject
         },
         {
             name: "Dr. Alan Turing",
@@ -68,6 +72,7 @@ const facultyData = {
             type: "Visiting",
             image: imgTeam4, // Updated path
             currentSem: false,
+            subjects: ["COD"] // Only one subject
         },
         {
             name: "Dr. Ada Lovelace",
@@ -76,6 +81,7 @@ const facultyData = {
             type: "Visiting",
             image: imgTeam5, // Updated path
             currentSem: true,
+            subjects: ["Statistics"] // Only one subject
         },
         {
             name: "Dr. Grace Hopper",
@@ -84,6 +90,7 @@ const facultyData = {
             type: "Visiting",
             image: imgBruceMars, // Updated path
             currentSem: false,
+            subjects: ["C Programming"] // Only one subject
         },
     ],
     nonTeachingStaff: [

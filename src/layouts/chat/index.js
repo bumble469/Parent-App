@@ -31,283 +31,217 @@ function Chat() {
     setSelectedTeacher(teacher);
   };
 
+  const chatMessages = [
+    {
+      sender: "student",
+      message: "Hey, how is it going?",
+      time: "09:30",
+    },
+    {
+      sender: "teacher",
+      message: "Hello! All good here, how about you?",
+      time: "09:31",
+    },
+    {
+      sender: "student",
+      message: "I wanted to ask about the project submission.",
+      time: "09:32",
+    },
+    {
+      sender: "teacher",
+      message: "The deadline is next Friday. Do you need any help?",
+      time: "09:33",
+    },
+    {
+      sender: "student",
+      message: "Yes, I'm struggling with the report format.",
+      time: "09:34",
+    },
+    {
+      sender: "teacher",
+      message: "No worries, I'll send you a template.",
+      time: "09:35",
+    },
+  ];
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Grid
-        container
-        component={Paper}
+      <Paper
         elevation={3}
         sx={{
-          padding: 2,
-          margin: "20px 0",
-          backgroundColor: "#fff",
-          height: "calc(100vh - 180px)",
+          padding: 1,
+          margin: "10px 0",
+          height: "calc(100vh - 150px)", // Responsive height
           overflow: "hidden",
         }}
       >
         {/* Teacher List Section */}
         <Grid
-          item
-          xs={12}
+          container
           sx={{
             borderBottom: "1px solid #ddd",
             overflowX: "auto",
-            whiteSpace: "nowrap",
+            padding: "4px 0",
+            gap: 1,
+            flexWrap: "nowrap", // Ensures horizontal scrolling if needed
           }}
         >
-          <Box sx={{ display: "flex", overflowX: "auto", padding: 1 }}>
-            {currentSemesterTeachers.map((teacher, index) => (
-              <ListItem
-                button
-                key={index}
-                selected={selectedTeacher === teacher}
-                onClick={() => handleTeacherSelect(teacher)}
-                sx={{ minWidth: "200px", marginRight: "8px", whiteSpace: "normal" }}
-              >
-                <ListItemIcon>
-                  <Avatar alt={teacher.name} src={teacher.image} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={teacher.name}
-                  secondary={`${teacher.title} - Teaches: ${
-                    Array.isArray(teacher.subjects)
-                      ? teacher.subjects.join(", ")
-                      : "N/A"
-                  }`}
+          {currentSemesterTeachers.map((teacher, index) => (
+            <ListItem
+              button
+              key={index}
+              selected={selectedTeacher === teacher}
+              onClick={() => handleTeacherSelect(teacher)}
+              sx={{
+                minWidth: "100px", // Smaller width
+                maxWidth: "120px", // Limiting max width for consistency
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <ListItemIcon sx={{ justifyContent: "center" }}>
+                <Avatar
+                  alt={teacher.name}
+                  src={teacher.image}
+                  sx={{ width: 50, height: 50 }} // Smaller avatar size
                 />
-              </ListItem>
-            ))}
-          </Box>
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{
+                  fontSize: "0.9rem", // Smaller font size
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                }}
+                secondaryTypographyProps={{
+                  fontSize: "0.75rem", // Smaller font size for secondary text
+                  textAlign: "center",
+                  lineHeight: 1.1,
+                }}
+                primary={teacher.name}
+                secondary={
+                  Array.isArray(teacher.subjects)
+                    ? teacher.subjects.join(", ")
+                    : "N/A"
+                }
+                sx={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              />
+            </ListItem>
+          ))}
         </Grid>
 
-        <Grid
-          item
-          xs={12}
-          sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+        {/* Chat Section */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+            overflow: "hidden",
+            padding: "8px 0",
+            height: "calc(100vh - 230px)", // Ensures the chat section fills the remaining space
+          }}
         >
           <Box
             sx={{
               flexGrow: 1,
               overflowY: "auto",
-              maxHeight: "calc(100vh - 250px)", // Adjust height to ensure space for the message input bar
-              scrollbarWidth: "thin",
-              "&::-webkit-scrollbar": {
-                width: "8px",
-              },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: "rgba(0, 0, 0, 0.1)", // Light track color
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "rgba(0, 0, 0, 0.3)", // Darker thumb color
-                borderRadius: "10px", // Rounded scrollbar thumb
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                backgroundColor: "#555",
-              },
+              maxHeight: "100%", // Full use of available space
             }}
           >
-            <List sx={{ paddingBottom: "56px" }}> {/* Ensure space for the input bar */}
+            <List sx={{ paddingBottom: "56px" }}>
               {selectedTeacher ? (
-                <>
-                  <ListItem key="1" sx={{ justifyContent: "flex-end" }}>
+                chatMessages.map((msg, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      justifyContent:
+                        msg.sender === "student" ? "flex-end" : "flex-start",
+                    }}
+                  >
                     <Box
                       sx={{
-                        backgroundColor: "#e0f7fa",
+                        backgroundColor:
+                          msg.sender === "student" ? "#e0f7fa" : "#f1f8e9",
                         borderRadius: 2,
                         padding: 1,
                         maxWidth: "60%",
                       }}
                     >
-                      <Typography variant="body1">Hey, how is it going?</Typography>
                       <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
+                        variant="body2" // Smaller text for chat bubbles
+                        sx={{ fontSize: "0.9rem" }}
                       >
-                        09:30
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem key="2" sx={{ justifyContent: "flex-start" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#f1f8e9",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        Hello! All good here, how about you? - {selectedTeacher.name}
+                        {msg.message}{" "}
+                        {msg.sender === "teacher" && `- ${selectedTeacher.name}`}
                       </Typography>
                       <Typography
                         variant="caption"
                         sx={{ textAlign: "right", display: "block" }}
                       >
-                        09:31
+                        {msg.time}
                       </Typography>
                     </Box>
                   </ListItem>
-                  <ListItem key="3" sx={{ justifyContent: "flex-end" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#e0f7fa",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">Doing great, thanks!</Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
-                      >
-                        09:35
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem key="4" sx={{ justifyContent: "flex-start" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#f1f8e9",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        Actually, I have a question about the upcoming exam.
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
-                      >
-                        09:40
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem key="5" sx={{ justifyContent: "flex-end" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#e0f7fa",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        No, just wanted to check in. Thanks!
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
-                      >
-                        09:45
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem key="6" sx={{ justifyContent: "flex-start" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#f1f8e9",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        I’m unsure about the topics covered. Could you provide some guidance?
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
-                      >
-                        09:50
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem key="7" sx={{ justifyContent: "flex-end" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#e0f7fa",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">Sure, what do you need to know?</Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
-                      >
-                        09:55
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem key="8" sx={{ justifyContent: "flex-start" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#f1f8e9",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        I’m unsure about the topics covered. Could you provide some guidance?
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
-                      >
-                        10:00
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem key="9" sx={{ justifyContent: "flex-end" }}>
-                    <Box
-                      sx={{
-                        backgroundColor: "#e0f7fa",
-                        borderRadius: 2,
-                        padding: 1,
-                        maxWidth: "60%",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        I’ll send you an outline. Check your email for details.
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ textAlign: "right", display: "block" }}
-                      >
-                        10:05
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                </>
+                ))
               ) : (
-                <Typography sx={{ padding: 2 }}>
+                <Typography
+                  sx={{
+                    padding: 2,
+                    fontSize: "0.75rem",
+                    textAlign: "center",
+                  }}
+                >
                   Select a teacher to start chatting.
                 </Typography>
               )}
             </List>
           </Box>
           <Divider />
+          {/* Message Input Section */}
           <Grid
             container
-            sx={{ padding: 2, position: "sticky", bottom: 0, backgroundColor: "#fff" }}
+            sx={{
+              padding: 1,
+              position: "sticky",
+              bottom: 15,
+              backgroundColor: "#fff",
+            }}
           >
             <Grid item xs={11}>
-              <TextField id="outlined-basic-message" label="Type Something" fullWidth />
+              <TextField
+                id="outlined-basic-message"
+                label="Type Something"
+                fullWidth
+                sx={{
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: 1,
+                  "& .MuiInputBase-input": {
+                    fontSize: "0.75rem", // Smaller input text size
+                  },
+                }}
+              />
             </Grid>
             <Grid item xs={1} align="right">
-              <Fab color="primary" aria-label="send">
-                <SendIcon />
+              <Fab
+                size="small" // Smaller button size
+                color="primary"
+                aria-label="send"
+                sx={{
+                  minWidth: 36,
+                  height: 36,
+                }}
+              >
+                <SendIcon fontSize="small" />
               </Fab>
             </Grid>
           </Grid>
-        </Grid>
-      </Grid>
+        </Box>
+      </Paper>
       <Footer />
     </DashboardLayout>
   );

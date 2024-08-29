@@ -167,7 +167,7 @@ function Performance() {
           </Grid>
 
           {/* Attendance Percentage Card */}
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6} lg={4} mb={2}>
             <MDBox>
               <ComplexStatisticsCard
                 color="success"
@@ -231,7 +231,7 @@ function Performance() {
           </Grid>
 
           {/* Attendance Table */}
-          <Grid item xs={12}>
+          <Grid item xs={12} mb={2}>
             <Card>
               <MDBox
                 mx={2}
@@ -260,7 +260,7 @@ function Performance() {
           </Grid>
 
           {/* Marks Table */}
-          <Grid item xs={12}>
+          <Grid item xs={12} mb={2}>
             <Card>
               <MDBox
                 mx={2}

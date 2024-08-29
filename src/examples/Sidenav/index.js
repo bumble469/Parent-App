@@ -193,10 +193,8 @@ function Sidenav({ color, brand, brandName, parentName, routes, ...rest }) {
         sx={{
           color: "#000000 !important",
           width: "100%",
-          display: "block",
           textAlign: "center",
           borderRadius: "3px",
-          overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
           fontSize: "0.875rem",
@@ -204,7 +202,7 @@ function Sidenav({ color, brand, brandName, parentName, routes, ...rest }) {
           pointerEvents: "none",
           padding:'5px',
           fontStyle:'italic',
-          marginTop: 'auto' // Ensures this box is pushed to the bottom
+          marginTop: 'auto'
         }}
       >
         A Parent-Oriented Initiative!
