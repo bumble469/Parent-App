@@ -19,10 +19,10 @@ import attendanceData from "./data/AttendancData";
 import marksData from "./data/MarksData";
 
 // Chart.js imports
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line, Pie } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, ArcElement);
 
 function Performance() {
   const [semester, setSemester] = useState("semester1");
@@ -120,6 +120,20 @@ function Performance() {
     }],
   }), [currentMarksData]);
 
+  // Pie Chart Data for Marks Distribution
+  const pieChartData = useMemo(() => {
+    return {
+      labels: currentMarksData.map((data) => data.subject),
+      datasets: [
+        {
+          data: currentMarksData.map((data) => data.total),
+          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+          hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+        },
+      ],
+    };
+  }, [currentMarksData]);
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -146,72 +160,93 @@ function Performance() {
             </Grid>
           </Grid>
 
-          {/* Attendance Percentage Card */}
-          <Grid item xs={12} md={6} lg={4} mb={2}>
-            <MDBox>
-              <ComplexStatisticsCard
-                color="success"
-                icon="weekend"
-                title="Overall Attendance"
-                count={`${averageAttendance.toFixed(2)}%`}
-                percentage={{
-                  color: "success",
-                  amount: "+5%",
-                  label: "than last semester",
-                }}
-              >
-                <MDBox width="100%">
-                  <progress
-                    value={Math.min(Math.max(averageAttendance, 0), 100)}
-                    max={100}
-                    style={{ width: '100%' }}
-                  ></progress>
+          {/* Statistics Cards in One Row */}
+          <Grid item xs={12}>
+            <Grid container spacing={3}>
+              {/* Overall Attendance Card */}
+              <Grid item xs={12} md={3}>
+                <MDBox>
+                  <ComplexStatisticsCard
+                    color="success"
+                    icon="weekend"
+                    title="Overall Attendance"
+                    count={`${averageAttendance.toFixed(2)}%`}
+                    percentage={{
+                      color: "success",
+                      amount: "+5%",
+                      label: "than last semester",
+                    }}
+                  >
+                    <MDBox width="100%">
+                      <progress
+                        value={Math.min(Math.max(averageAttendance, 0), 100)}
+                        max={100}
+                        style={{ width: '100%' }}
+                      ></progress>
+                    </MDBox>
+                  </ComplexStatisticsCard>
                 </MDBox>
-              </ComplexStatisticsCard>
-            </MDBox>
-          </Grid>
+              </Grid>
 
-          {/* Average Grade Card */}
-          <Grid item xs={12} md={6} lg={4}>
-            <MDBox>
-              <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Average Grade"
-                count={`${overallMarks.toFixed(2)}%`}
-                percentage={{
-                  color: "success",
-                  amount: "+3%",
-                  label: "than last semester",
-                }}
-              >
-                <MDBox width="100%">
-                  <progress
-                    value={overallMarks}
-                    max={100}
-                    style={{ width: '100%' }}
-                  ></progress>
+              {/* Average Grade Card */}
+              <Grid item xs={12} md={3}>
+                <MDBox>
+                  <ComplexStatisticsCard
+                    icon="leaderboard"
+                    title="Average Grade"
+                    count={`${overallMarks.toFixed(2)}%`}
+                    percentage={{
+                      color: "success",
+                      amount: "+3%",
+                      label: "than last semester",
+                    }}
+                  >
+                    <MDBox width="100%">
+                      <progress
+                        value={overallMarks}
+                        max={100}
+                        style={{ width: '100%' }}
+                      ></progress>
+                    </MDBox>
+                  </ComplexStatisticsCard>
                 </MDBox>
-              </ComplexStatisticsCard>
-            </MDBox>
-          </Grid>
+              </Grid>
 
-          {/* Student Rank Card */}
-          <Grid item xs={12} md={6} lg={4}>
-            <MDBox>
-              <ComplexStatisticsCard
-                icon="emoji_events"
-                title="Class Rank"
-                count={`#${studentRank}`}
-                percentage={{
-                  color: "info",
-                  label: "Current Semester Rank",
-                }}
-              />
-            </MDBox>
+              {/* Student Rank Card */}
+              <Grid item xs={12} md={3}>
+                <MDBox>
+                  <ComplexStatisticsCard
+                    icon="emoji_events"
+                    title="Class Rank"
+                    count={`#${studentRank}`}
+                    percentage={{
+                      color: "info",
+                      label: "Current Semester Rank",
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+
+              {/* Extracurricular Activities Card */}
+              <Grid item xs={12} md={3}>
+                <MDBox>
+                  <ComplexStatisticsCard
+                    color="primary"
+                    icon="sports"
+                    title="Extracurricular Activities"
+                    count="3"
+                    percentage={{
+                      color: "success",
+                      label: "Member: Tech Club"
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+            </Grid>
           </Grid>
 
           {/* Attendance Table */}
-          <Grid item xs={12} mb={2}>
+          <Grid item xs={12}>
             <Card>
               <MDBox
                 mx={2}
@@ -227,9 +262,9 @@ function Performance() {
                   Attendance Table
                 </MDTypography>
               </MDBox>
-              <MDBox pt={3} sx={{ maxHeight: '500px', overflowY: 'auto' }}>
+              <MDBox pt={3}>
                 <DataTable
-                  table={{ columns, rows: tableData }}
+                  table={{ columns: columns, rows: tableData }}
                   isSorted={false}
                   entriesPerPage={false}
                   showTotalEntries={false}
@@ -239,63 +274,83 @@ function Performance() {
             </Card>
           </Grid>
 
-          {/* Attendance Line Chart */}
+          {/* Attendance Line Graph */}
           <Grid item xs={12} md={6} lg={6}>
-            <MDBox mb={3} borderRadius='3px'>
+            <MDBox mt={3} mb={3}>
               <ReportsLineChart
-                color="info"
-                title="Subject Wise Attendance"
-                description="Lectures Attended / Lectures Occurred"
-                date="Data updated"
+                title="Attendance Graph"
+                description="Subject-wise Attendance"
                 chart={attendanceLineChartData}
               />
             </MDBox>
           </Grid>
 
-          {/* Marks Line Chart */}
+          {/* Marks Line Graph */}
           <Grid item xs={12} md={6} lg={6}>
-            <MDBox mb={3} borderRadius='3px'>
+            <MDBox mt={3} mb={3}>
               <ReportsLineChart
-                color="success"
-                title="Marks Graphical"
-                description={
-                  <>
-                    (<strong>+15%</strong>) increase since last semester
-                  </>
-                }
-                date="Updated 4 min ago"
+                title="Marks Graph"
+                description="Marks in Each Subject"
                 chart={marksLineChartData}
               />
             </MDBox>
           </Grid>
 
-          {/* Marks Table */}
-          <Grid item xs={12} mb={2}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="white">
-                  Marks Table
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                <DataTable
-                  table={{ columns: marksColumns, rows: marksTableData }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
-              </MDBox>
-            </Card>
+          {/* Marks Table and Pie Chart in the Same Row */}
+          <Grid item xs={12}>
+            <Grid container spacing={3}>
+              {/* Marks Table */}
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="info"
+                    borderRadius="lg"
+                    coloredShadow="info"
+                  >
+                    <MDTypography variant="h6" color="white">
+                      Marks Table
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox pt={3}>
+                    <DataTable
+                      table={{ columns: marksColumns, rows: marksTableData }}
+                      isSorted={false}
+                      entriesPerPage={false}
+                      showTotalEntries={false}
+                      noEndBorder
+                    />
+                  </MDBox>
+                </Card>
+              </Grid>
+
+              {/* Pie Chart */}
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="warning"
+                    borderRadius="lg"
+                    coloredShadow="warning"
+                  >
+                    <MDTypography variant="h6" color="white">
+                      Marks Distribution
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox pt={3} pb={3}>
+                    <Pie data={pieChartData} />
+                  </MDBox>
+                </Card>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </MDBox>
