@@ -52,7 +52,7 @@ function Dashboard() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={2} mt={3} mb={2}>
-        <Grid container spacing={3}>
+        <Grid container spacing={1}>
           <Grid item xs={12} md={6} lg={4}>
             <MDBox>
               <ComplexStatisticsCard

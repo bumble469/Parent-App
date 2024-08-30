@@ -1,8 +1,5 @@
 import React from 'react';
 import Grid from "@mui/material/Grid";
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { Divider } from '@mui/material';
 
 // @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -94,50 +91,6 @@ function Overview() {
               />
             </Grid>
           </Grid>
-        </MDBox>
-        <Divider sx={{ bgcolor: 'gray', my:0.5,mb:-3 }} />
-        <MDBox mt={5} sx={{ width: '100%' }}>
-          <Typography variant="h5" sx={{ mb: 2 }}>Achievements & Projects</Typography>
-          <Box sx={{ display: 'flex', overflowX: 'auto', padding: '10px', whiteSpace: 'nowrap' }}>
-            {student.achievements.map((achievement, index) => (
-              <Box key={index} sx={{ 
-                mr: 2, 
-                minWidth: '200px', 
-                textAlign: 'center', 
-                p: 2, 
-                border: '1px solid #ddd', 
-                borderRadius: '4px',
-                backgroundColor: '#f9f9f9',
-                overflow: 'hidden'  // Ensures that overflowing content is hidden
-              }}>
-                <Typography variant="body2" sx={{ 
-                  fontWeight: 'bold',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  mb: 1 // Space between title and description
-                }}>
-                  {achievement.title}
-                </Typography>
-                <Typography variant="body2" sx={{ 
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'normal' // Allows for wrapping in description
-                }}>
-                  {achievement.description}
-                </Typography>
-                <Typography variant="caption" sx={{ 
-                  color: 'gray',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  mt: 1 // Space between description and date
-                }}>
-                  {achievement.date}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
         </MDBox>
       </Header>
       <Footer />
