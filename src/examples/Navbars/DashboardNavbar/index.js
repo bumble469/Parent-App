@@ -4,16 +4,18 @@ import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import Badge from "@mui/material/Badge";
+import Menu from "@mui/material/Menu"; // Add this import
+import MenuItem from "@mui/material/MenuItem"; // Add this import
+import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from 'components/MDTypography';
 import Breadcrumbs from "examples/Breadcrumbs";
-import NotificationItem from "examples/Items/NotificationItem";
-import { Icon } from "@mui/material";
+import NotificationMenu from "./components/notification"; // Ensure this import is correct
 import profileImage from "../../../assets/images/marie.jpg";
 import "../../../Global";
+import LogoutDialog from "./components/logoutdialog";
+import {notifications} from "./data/notificationdata";
 import {
   navbar,
   navbarContainer,
@@ -27,12 +29,14 @@ import {
   setMiniSidenav,
 } from "context";
 
-function DashboardNavbar({ absolute, light, isMini }) {
+
+function DashboardNavbar({ absolute, light, isMini, currentSemester }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(null);
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false); // State for Logout Dialog
   const route = useLocation().pathname.split("/").slice(1);
   const navigate = useNavigate(); // Initialize navigate
 
@@ -64,40 +68,28 @@ function DashboardNavbar({ absolute, light, isMini }) {
   };
 
   const handleLogout = () => {
-    // Add logout logic here
-    console.log('Logout clicked');
+    setLogoutDialogOpen(true); // Open the confirm dialog
   };
 
   const handleOpenNavbar = () => setMiniSidenav(dispatch, !miniSidenav);
 
+  const handleConfirmLogout = () => {
+    alert('Logged out'); // Show alert message
+    setLogoutDialogOpen(false); // Close the dialog after confirming
+  };
+
+  const handleCancelLogout = () => {
+    setLogoutDialogOpen(false); // Close the dialog if user cancels
+  };
+
   const renderNotificationMenu = () => (
-    <Menu
-      anchorEl={openMenu}
-      anchorReference={null}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "left",
-      }}
-      open={Boolean(openMenu)}
-      onClose={handleCloseMenu}
-      sx={{ mt: 2, minWidth: 250 }}
-    >
-      <NotificationItem 
-        icon={<Icon sx={{ color: 'black', fontSize: '2rem' }}>email</Icon>} 
-        title="Check new messages" 
-      />
-      <NotificationItem 
-        icon={<Icon sx={{ color: 'black', fontSize: '2rem' }}>podcasts</Icon>} 
-        title="Manage Podcast sessions" 
-      />
-      <NotificationItem 
-        icon={<Icon sx={{ color: 'black', fontSize: '2rem' }}>shopping_cart</Icon>} 
-        title="Payment successfully completed" 
-      />
-    </Menu>
+    <NotificationMenu 
+      open={Boolean(openMenu)} 
+      onClose={handleCloseMenu} 
+      notifications={notifications} // Use the imported notification data
+    />
   );
   
-
   const renderProfileMenu = () => (
     <Menu
       anchorEl={profileMenuAnchor}
@@ -120,8 +112,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       </MenuItem>
     </Menu>
   );
-  
-  
+
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
       let colorValue = light || darkMode ? white.main : dark.main;
@@ -214,6 +205,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
           </MDBox>
         )}
       </Toolbar>
+      <LogoutDialog 
+        open={logoutDialogOpen} 
+        handleClose={handleCancelLogout} 
+        handleConfirm={handleConfirmLogout} 
+      />
     </AppBar>
   );
 }
@@ -228,7 +224,7 @@ DashboardNavbar.propTypes = {
   absolute: PropTypes.bool,
   light: PropTypes.bool,
   isMini: PropTypes.bool,
-  currentSemester: PropTypes.number.isRequired,
+  currentSemester: PropTypes.string.isRequired,
 };
 
 export default DashboardNavbar;

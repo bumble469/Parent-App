@@ -6,23 +6,23 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import DataTable from "examples/Tables/DataTable";
-
+import achievements from "./data/achievementsData";
+import CardContent from "@mui/material/CardContent";
 import MDBox from "components/MDBox";
+import Typography from '@mui/material/Typography';
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart/index"; // Make sure this is set up to handle line charts
-
 import attendanceData from "./data/AttendancData";
 import marksData from "./data/MarksData";
-
+import { Box } from "@mui/material";
 // Chart.js imports
-import { Line, Pie } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
+import { Radar,Line } from "react-chartjs-2";
+import { Chart as ChartJS, RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, ArcElement);
+ChartJS.register(RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 function Performance() {
   const [semester, setSemester] = useState("semester1");
@@ -33,15 +33,21 @@ function Performance() {
 
   const currentData = attendanceData[semester] || [];
   const currentMarksData = marksData[semester] || [];
-
   // Calculate average attendance percentage
   const totalClasses = currentData.reduce((acc, data) => acc + data.attendance.length, 0);
   const totalPresent = currentData.reduce((acc, data) => acc + data.attendance.filter(record => record.status === "Present").length, 0);
   const averageAttendance = totalClasses ? (totalPresent / totalClasses) * 100 : 0;
 
   // Calculate overall average grade
-  const grades = currentData.flatMap(data => data.attendance.map(record => record.grade || 0));
-  const overallMarks = grades.length ? grades.reduce((acc, grade) => acc + grade, 0) / grades.length : 0;
+  const grades = currentMarksData.flatMap((data) => [
+    data.interim,
+    data.sle,
+    data.internals,
+    data.practicals,
+    data.theory,
+  ]);
+  const totalMarks = grades.length;
+  const overallMarks = totalMarks ? grades.reduce((acc, grade) => acc + grade, 0) / totalMarks : 0;
 
   // Calculate student's rank
   const studentRank = 5; // Replace with your logic to calculate rank
@@ -89,48 +95,62 @@ function Performance() {
     }));
   }, [currentMarksData]);
 
-  // Prepare line graph data for attendance
-  const attendanceLineChartData = useMemo(() => {
-    const datasets = currentData.map((data) => ({
-      label: data.subject,
-      data: uniqueDates.map(date => {
-        const record = data.attendance.find(rec => rec.date === date);
-        return record ? (record.status === 'Present' ? 1 : 0) : 0;
-      }),
-      borderColor: "#FF5733", // Example color, adjust as needed
-      backgroundColor: "rgba(255, 87, 51, 0.2)",
-      fill: true,
-    }));
-
-    return {
-      labels: uniqueDates,
-      datasets,
-    };
-  }, [currentData, uniqueDates]);
-
   // Prepare line graph data for marks
   const marksLineChartData = useMemo(() => ({
     labels: currentMarksData.map((data) => data.subject),
-    datasets: [{
-      label: 'Total Marks',
-      data: currentMarksData.map((data) => data.total),
+    datasets: ['interim', 'sle', 'internals', 'practicals', 'theory'].map(field => ({
+      label: field.charAt(0).toUpperCase() + field.slice(1),
+      data: currentMarksData.map((data) => data[field]),
       borderColor: "#42A5F5",
       backgroundColor: "rgba(66, 165, 245, 0.2)",
-      fill: true,
-    }],
+      fill: false,
+    })),
   }), [currentMarksData]);
 
   // Pie Chart Data for Marks Distribution
-  const pieChartData = useMemo(() => {
+  const radarChartData = useMemo(() => {
+    const subjects = currentMarksData.map((data) => data.subject);
+    const datasets = [
+      {
+        label: "Interim",
+        data: currentMarksData.map((data) => data.interim),
+        borderColor: "#FF5733",
+        backgroundColor: "rgba(255, 87, 51, 0.2)",
+        pointBackgroundColor: "#FF5733",
+      },
+      {
+        label: "SLE",
+        data: currentMarksData.map((data) => data.sle),
+        borderColor: "#33FF57",
+        backgroundColor: "rgba(51, 255, 87, 0.2)",
+        pointBackgroundColor: "#33FF57",
+      },
+      {
+        label: "Internals",
+        data: currentMarksData.map((data) => data.internals),
+        borderColor: "#3357FF",
+        backgroundColor: "rgba(51, 87, 255, 0.2)",
+        pointBackgroundColor: "#3357FF",
+      },
+      {
+        label: "Practicals",
+        data: currentMarksData.map((data) => data.practicals),
+        borderColor: "#FF33A1",
+        backgroundColor: "rgba(255, 51, 161, 0.2)",
+        pointBackgroundColor: "#FF33A1",
+      },
+      {
+        label: "Theory",
+        data: currentMarksData.map((data) => data.theory),
+        borderColor: "#FFCC33",
+        backgroundColor: "rgba(255, 204, 51, 0.2)",
+        pointBackgroundColor: "#FFCC33",
+      },
+    ];
+
     return {
-      labels: currentMarksData.map((data) => data.subject),
-      datasets: [
-        {
-          data: currentMarksData.map((data) => data.total),
-          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
-          hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
-        },
-      ],
+      labels: subjects,
+      datasets,
     };
   }, [currentMarksData]);
 
@@ -141,39 +161,77 @@ function Performance() {
         <Grid container spacing={3}>
           {/* Semester Filter */}
           <Grid item xs={12} container spacing={3} justifyContent="flex-end">
-            <Grid item>
-              <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                <InputLabel id="semester-select-label">Semester</InputLabel>
-                <Select
-                  labelId="semester-select-label"
-                  id="semester-select"
-                  value={semester}
-                  onChange={handleSemesterChange}
-                  label="Semester"
-                >
-                  <MenuItem value="semester1">Semester 1</MenuItem>
-                  <MenuItem value="semester2">Semester 2</MenuItem>
-                  <MenuItem value="semester3">Semester 3</MenuItem>
-                  <MenuItem value="semester4">Semester 4</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+  <Grid item>
+    <FormControl
+      variant="outlined"
+      sx={{
+        minWidth: 220,
+        m: 1,
+        bgcolor: 'background.paper',
+        borderRadius: 1,
+        boxShadow: 1,
+        padding: '8px', // Outer padding around the component
+      }}
+    >
+      <InputLabel
+        id="semester-select-label"
+        sx={{
+          fontSize: '1rem',
+          color: 'text.secondary',
+          padding: '0 8px', // Padding inside the label
+        }}
+      >
+        Semester
+      </InputLabel>
+      <Select
+        labelId="semester-select-label"
+        id="semester-select"
+        value={semester}
+        onChange={handleSemesterChange}
+        label="Semester"
+        sx={{
+          '& .MuiSelect-outlined': {
+            padding: '12px 16px', // Padding inside the select box
+            fontSize: '1rem',
+            color: 'text.primary',
+          },
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'divider',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'primary.main',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'primary.dark',
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'text.secondary',
+          },
+        }}
+      >
+        <MenuItem value="semester1">Semester 1</MenuItem>
+        <MenuItem value="semester2">Semester 2</MenuItem>
+        <MenuItem value="semester3">Semester 3</MenuItem>
+        <MenuItem value="semester4">Semester 4</MenuItem>
+      </Select>
+    </FormControl>
+  </Grid>
+</Grid>
+
 
           {/* Statistics Cards in One Row */}
           <Grid item xs={12}>
             <Grid container spacing={3}>
-              {/* Overall Attendance Card */}
-              <Grid item xs={12} md={3}>
-                <MDBox>
+              <Grid item xs={12} md={4}>
+                <MDBox sx={{ height: "100%" }}>
                   <ComplexStatisticsCard
                     color="success"
-                    icon="weekend"
-                    title="Overall Attendance"
+                    icon="school"
+                    title="Average Attendance"
                     count={`${averageAttendance.toFixed(2)}%`}
                     percentage={{
-                      color: "success",
-                      amount: "+5%",
+                      color: averageAttendance < 75 ? "error" : "success",
+                      amount: averageAttendance < 75 ? "-10%" : "+5%",
                       label: "than last semester",
                     }}
                   >
@@ -187,14 +245,13 @@ function Performance() {
                   </ComplexStatisticsCard>
                 </MDBox>
               </Grid>
-
-              {/* Average Grade Card */}
-              <Grid item xs={12} md={3}>
-                <MDBox>
+              <Grid item xs={12} md={4}>
+                <MDBox sx={{ height: "100%" }}>
                   <ComplexStatisticsCard
+                    color="info"
                     icon="leaderboard"
                     title="Average Grade"
-                    count={`${overallMarks.toFixed(2)}%`}
+                    count={`${Math.min(Math.max(overallMarks, 0), 100).toFixed(2)}%`}
                     percentage={{
                       color: "success",
                       amount: "+3%",
@@ -203,7 +260,7 @@ function Performance() {
                   >
                     <MDBox width="100%">
                       <progress
-                        value={overallMarks}
+                        value={Math.min(Math.max(overallMarks, 0), 100)}
                         max={100}
                         style={{ width: '100%' }}
                       ></progress>
@@ -211,96 +268,121 @@ function Performance() {
                   </ComplexStatisticsCard>
                 </MDBox>
               </Grid>
-
-              {/* Student Rank Card */}
-              <Grid item xs={12} md={3}>
-                <MDBox>
+              <Grid item xs={12} md={4}>
+                <MDBox sx={{ height: "100%" }}>
                   <ComplexStatisticsCard
-                    icon="emoji_events"
-                    title="Class Rank"
-                    count={`#${studentRank}`}
+                    color="warning"
+                    icon="star"
+                    title="Extra Curricular Activities"
                     percentage={{
-                      color: "info",
-                      label: "Current Semester Rank",
+                      label: `Rank: #${studentRank}`,
                     }}
-                  />
+                  >
+                    <MDBox
+                      sx={{
+                        maxHeight: "50px", // Set a maximum height for the scrollable area
+                        overflowY: "auto",  // Enable vertical scrolling
+                        padding: "8px",     // Optional: Add padding to ensure content is not flush with the edges
+                      }}
+                    >
+                      <MDTypography variant="body2" color="textSecondary" fontSize="0.9rem">
+                        Debate Club, Chess Club, Volunteer Work, Art Workshop, Soccer, Coding Club, Music Band, Drama Society, Student Council, Photography Club
+                      </MDTypography>
+                    </MDBox>
+                  </ComplexStatisticsCard>
                 </MDBox>
               </Grid>
-
-              {/* Extracurricular Activities Card */}
-              <Grid item xs={12} md={3}>
-                <MDBox>
-                  <ComplexStatisticsCard
-                    color="primary"
-                    icon="sports"
-                    title="Extracurricular Activities"
-                    count="3"
-                    percentage={{
-                      color: "success",
-                      label: "Member: Tech Club"
-                    }}
-                  />
-                </MDBox>
+              <Grid item xs={12}>
+                <Card sx={{ width: '100%', overflow: 'hidden' }}>
+                  <CardContent>
+                    <Typography sx={{ mb: 2, color:"grey", mt:2 }}>Achievements & Projects</Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        overflowX: 'auto', // Enables horizontal scrolling
+                        padding: '10px',
+                        gap: 2, // Adds space between cards
+                      }}
+                    >
+                      {achievements.map((achievement, index) => (
+                        <Box 
+                          key={index} 
+                          sx={{ 
+                            minWidth: '200px',  // Ensures cards have a minimum width
+                            textAlign: 'center', 
+                            p: 2, 
+                            border: '1px solid #ddd', 
+                            borderRadius: '4px',
+                            backgroundColor: '#f9f9f9',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ 
+                            fontWeight: 'bold',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            mb: 1 // Space between title and description
+                          }}>
+                            {achievement.title}
+                          </Typography>
+                          <Typography variant="body2" sx={{ 
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'normal' // Allows for wrapping in description
+                          }}>
+                            {achievement.description}
+                          </Typography>
+                          <Typography variant="caption" sx={{ 
+                            color: 'gray',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            mt: 1 // Space between description and date
+                          }}>
+                            {achievement.date}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
               </Grid>
             </Grid>
           </Grid>
 
-          {/* Attendance Table */}
-          <Grid item xs={12}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="white">
-                  Attendance Table
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                <DataTable
-                  table={{ columns: columns, rows: tableData }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
-              </MDBox>
-            </Card>
-          </Grid>
+          {/* Graphs and Tables */}
+          <Grid item xs={12} mt={2}>
+            <Grid item xs={12}>
+              <Card>
+                <MDBox
+                  mx={2}
+                  mt={-3}
+                  py={3}
+                  px={2}
+                  variant="gradient"
+                  bgColor="info"
+                  borderRadius="lg"
+                  coloredShadow="info"
+                >
+                  <MDTypography variant="h6" color="white">
+                    Attendance Table
+                  </MDTypography>
+                </MDBox>
+                <MDBox pt={3}>
+                  <DataTable
+                    table={{ columns: columns, rows: tableData }}
+                    isSorted={false}
+                    entriesPerPage={false}
+                    showTotalEntries={false}
+                    noEndBorder
+                  />
+                </MDBox>
+              </Card>
+            </Grid>
 
-          {/* Attendance Line Graph */}
-          <Grid item xs={12} md={6} lg={6}>
-            <MDBox mt={3} mb={3}>
-              <ReportsLineChart
-                title="Attendance Graph"
-                description="Subject-wise Attendance"
-                chart={attendanceLineChartData}
-              />
-            </MDBox>
-          </Grid>
-
-          {/* Marks Line Graph */}
-          <Grid item xs={12} md={6} lg={6}>
-            <MDBox mt={3} mb={3}>
-              <ReportsLineChart
-                title="Marks Graph"
-                description="Marks in Each Subject"
-                chart={marksLineChartData}
-              />
-            </MDBox>
-          </Grid>
-
-          {/* Marks Table and Pie Chart in the Same Row */}
-          <Grid item xs={12}>
-            <Grid container spacing={3}>
-              {/* Marks Table */}
-              <Grid item xs={12} md={6}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6} mt={4} mb={2}>
                 <Card>
                   <MDBox
                     mx={2}
@@ -327,9 +409,7 @@ function Performance() {
                   </MDBox>
                 </Card>
               </Grid>
-
-              {/* Pie Chart */}
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={6} mt={4} mb={2}>
                 <Card>
                   <MDBox
                     mx={2}
@@ -337,19 +417,40 @@ function Performance() {
                     py={3}
                     px={2}
                     variant="gradient"
-                    bgColor="warning"
+                    bgColor="info"
                     borderRadius="lg"
-                    coloredShadow="warning"
+                    coloredShadow="info"
                   >
                     <MDTypography variant="h6" color="white">
-                      Marks Distribution
+                      Marks Radar Chart
                     </MDTypography>
                   </MDBox>
-                  <MDBox pt={3} pb={3}>
-                    <Pie data={pieChartData} />
+                  <MDBox pt={3}>
+                    <Radar data={radarChartData} />
                   </MDBox>
                 </Card>
               </Grid>
+            </Grid>
+            <Grid item xs={12} mt={4}>
+              <Card>
+                <MDBox
+                  mx={2}
+                  mt={-3}
+                  py={3}
+                  px={2}
+                  variant="gradient"
+                  bgColor="info"
+                  borderRadius="lg"
+                  coloredShadow="info"
+                >
+                  <MDTypography variant="h6" color="white">
+                    Marks Line Chart
+                  </MDTypography>
+                </MDBox>
+                <MDBox pt={3}>
+                  <Line data={marksLineChartData} />
+                </MDBox>
+              </Card>
             </Grid>
           </Grid>
         </Grid>
