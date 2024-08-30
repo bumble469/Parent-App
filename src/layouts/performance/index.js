@@ -61,7 +61,7 @@ function Performance() {
       const row = { subject: data.subject };
       uniqueDates.forEach((date) => {
         const record = data.attendance.find((rec) => rec.date === date);
-        row[date] = record ? record.status : "N/A";
+        row[date] = record ? record.status : "No Lectures";
       });
       return row;
     })
