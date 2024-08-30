@@ -1,139 +1,122 @@
 import React, { useState } from 'react';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import { Box, Button, TextField, Typography, Grid, Paper } from '@mui/material';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
-import MDBox from 'components/MDBox';
-import MDTypography from 'components/MDTypography';
 
-// Sample data for student reports
-const studentReports = [
-  {
-    name: "John Doe",
-    id: "12345",
-    totalAttendance: "95%",
-    totalMarks: "88%",
-    subjects: [
-      { name: "Mathematics", internal: "Midterm: 85%, Final: 90%", external: "Entrance Exam: 80%" },
-      { name: "Science", internal: "Midterm: 90%, Final: 92%", external: "Entrance Exam: 85%" },
-      { name: "History", internal: "Midterm: 80%, Final: 88%", external: "Entrance Exam: 78%" }
-    ],
-    passFail: "Pass"
-  },
-  
-  // Add more student data as needed
-];
-
-function Reporting() {
+function FeedbackPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [feedbackType, setFeedbackType] = useState('General Feedback');
   const [feedback, setFeedback] = useState('');
+  const [rating, setRating] = useState('');
 
-  const handleFeedbackChange = (event) => {
-    setFeedback(event.target.value);
-  };
-
-  const handleSubmitFeedback = () => {
-    if (feedback.trim()) {
-      // Handle feedback submission (e.g., send to an API)
-      console.log("Feedback submitted:", feedback);
-      setFeedback('');
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert('Thank you for your feedback!');
+    setName('');
+    setEmail('');
+    setFeedbackType('General Feedback');
+    setFeedback('');
+    setRating('');
   };
 
   return (
-    <DashboardLayout>
+    <DashboardLayout sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <DashboardNavbar />
-      <MDBox pt={3} pb={3}>
-        <Grid container spacing={3}>
-          {/* Reporting Section */}
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                boxShadow: 3,
-                p: 3,
-                mb: 3,
-              }}
-            >
-              <Typography variant="h4" gutterBottom>
-                Student Report - Current Semester
-              </Typography>
-              <Grid container spacing={2}>
-                {studentReports.map((report, index) => (
-                  <Grid item xs={12} md={6} lg={4} key={index}>
-                    <Box
-                      sx={{
-                        border: '1px solid #ddd',
-                        borderRadius: '8px',
-                        p: 2,
-                        mb: 2,
-                        backgroundColor: '#f9f9f9',
-                        boxShadow: 2,
-                      }}
-                    >
-                      <Typography variant="h6">{report.name} (ID: {report.id})</Typography>
-                      <Typography variant="body1"><strong>Total Attendance:</strong> {report.totalAttendance}</Typography>
-                      <Typography variant="body1"><strong>Total Marks:</strong> {report.totalMarks}</Typography>
-                      {report.subjects.map((subject, idx) => (
-                        <Box key={idx} sx={{ mb: 1 }}>
-                          <Typography variant="body1"><strong>Subject:</strong> {subject.name}</Typography>
-                          <Typography variant="body2"><strong>Internal Exams:</strong> {subject.internal}</Typography>
-                          <Typography variant="body2"><strong>External Exams:</strong> {subject.external}</Typography>
-                        </Box>
-                      ))}
-                      <Typography variant="body1" sx={{ mt: 2, fontWeight: 'bold' }}>
-                        <strong>Status:</strong> {report.passFail}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Grid>
-
-          {/* Feedback Section */}
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                boxShadow: 3,
-                p: 3,
-              }}
-            >
-              <Typography variant="h4" gutterBottom>
-                Parent Feedback
-              </Typography>
-              <Box component="form" noValidate autoComplete="off">
+      <Box sx={{ flex: 1, padding: 3 }}>
+        <Typography variant="h4" gutterBottom align="center">
+          Share Your Feedback
+        </Typography>
+        <Paper elevation={3} sx={{ padding: 3, maxWidth: 800, margin: 'auto' }}>
+          <Box
+            component="form"
+            noValidate
+            autoComplete="off"
+            onSubmit={handleSubmit}
+          >
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
+                  label="Name (Optional)"
+                  variant="outlined"
+                  margin="normal"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Email (Optional)"
+                  type="email"
+                  variant="outlined"
+                  margin="normal"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Feedback Type"
+                  variant="outlined"
+                  margin="normal"
+                  select
+                  value={feedbackType}
+                  onChange={(e) => setFeedbackType(e.target.value)}
+                  SelectProps={{
+                    native: true,
+                  }}
+                >
+                  <option value="General Feedback">General Feedback</option>
+                  <option value="Feature Suggestion">Feature Suggestion</option>
+                  <option value="Bug Report">Bug Report</option>
+                  <option value="Testimonial">Testimonial</option>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Rating (1-5)"
+                  type="number"
+                  variant="outlined"
+                  margin="normal"
+                  inputProps={{ min: 1, max: 5 }}
+                  value={rating}
+                  onChange={(e) => setRating(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Your Feedback"
+                  variant="outlined"
+                  margin="normal"
                   multiline
                   rows={4}
-                  variant="outlined"
-                  label="Your Feedback"
                   value={feedback}
-                  onChange={handleFeedbackChange}
-                  sx={{ mb: 2 }}
+                  onChange={(e) => setFeedback(e.target.value)}
                 />
+              </Grid>
+              <Grid item xs={12}>
                 <Button
+                  type="submit"
                   variant="contained"
                   color="primary"
-                  onClick={handleSubmitFeedback}
+                  sx={{ marginTop: 2, width: '100%' }}
                 >
                   Submit Feedback
                 </Button>
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
-      </MDBox>
+              </Grid>
+            </Grid>
+          </Box>
+        </Paper>
+      </Box>
       <Footer />
     </DashboardLayout>
   );
 }
 
-export default Reporting;   
+export default FeedbackPage;

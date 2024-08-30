@@ -66,7 +66,7 @@ function Predictions() {
     labels: ["Nov", "Dec", "Jan", "Feb", "March", "Jun", "July", "Aug", "Sep", "Oct"],
     datasets: [
       {
-        label: "Historical Performance",
+        label: "Performance Sem-4",
         data: [65, 59, 80, 81, 56],
         fill: false,
         backgroundColor: "#42A5F5",
@@ -88,7 +88,7 @@ function Predictions() {
     labels: ["Nov", "Dec", "Jan", "Feb", "March", "Jun", "July", "Aug", "Sep", "Oct"],
     datasets: [
       {
-        label: "Historical Attendance",
+        label: "Attendance Sem-4",
         data: [50, 60, 70, 90, 60],
         fill: false,
         backgroundColor: "#66BB6A",
