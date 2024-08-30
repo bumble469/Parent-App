@@ -18,11 +18,13 @@ import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatist
 import attendanceData from "./data/AttendancData";
 import marksData from "./data/MarksData";
 import { Box } from "@mui/material";
-// Chart.js imports
-import { Radar,Line } from "react-chartjs-2";
-import { Chart as ChartJS, RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import ApexCharts from 'react-apexcharts';
 
-ChartJS.register(RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+// Chart.js imports
+import { Radar, Line, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js";
+
+ChartJS.register(RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 function Performance() {
   const [semester, setSemester] = useState("semester1");
@@ -61,7 +63,7 @@ function Performance() {
     { Header: "Subject", accessor: "subject" },
     ...uniqueDates.map((date) => ({ Header: date, accessor: date })),
   ], [uniqueDates]);
-
+  
   const tableData = useMemo(() => 
     currentData.map((data) => {
       const row = { subject: data.subject };
@@ -95,17 +97,81 @@ function Performance() {
     }));
   }, [currentMarksData]);
 
-  // Prepare line graph data for marks
-  const marksLineChartData = useMemo(() => ({
-    labels: currentMarksData.map((data) => data.subject),
-    datasets: ['interim', 'sle', 'internals', 'practicals', 'theory'].map(field => ({
-      label: field.charAt(0).toUpperCase() + field.slice(1),
-      data: currentMarksData.map((data) => data[field]),
-      borderColor: "#42A5F5",
-      backgroundColor: "rgba(66, 165, 245, 0.2)",
-      fill: false,
-    })),
+  const marksBarChartData = useMemo(() => ({
+    series: [{
+      name: 'Total Marks',
+      data: currentMarksData.map((data) => ({
+        x: data.subject,
+        y: data.total
+      })),
+    }],
+    chartOptions: {
+      chart: {
+        type: 'bar',
+        height: 350,
+        stacked: false,
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+        },
+      },
+      xaxis: {
+        title: {
+          text: 'Total Marks'
+        },
+      },
+      yaxis: {
+        title: {
+          text: 'Subjects'
+        },
+      },
+      colors: ['#FF5733'],
+      dataLabels: {
+        enabled: true
+      }
+    },
   }), [currentMarksData]);
+
+  const averageAttendanceBySubject = useMemo(() => {
+    return currentData.map((data) => {
+      const totalClasses = data.attendance.length;
+      const totalPresent = data.attendance.filter(record => record.status === "Present").length;
+      const averageAttendance = totalClasses ? (totalPresent / totalClasses) * 100 : 0;
+      return { 
+        subject: data.subject, 
+        averageAttendance: Math.round(averageAttendance * 100) / 100 // Rounds to 2 decimal places
+      };
+    });
+  }, [currentData]);  
+
+  const attendanceDumbbellChartData = useMemo(() => ({
+    series: [{
+      name: 'Average Attendance',
+      data: averageAttendanceBySubject.map((data) => ({
+        x: data.subject,
+        y: data.averageAttendance,
+        y2: data.averageAttendance - 10, // Example: subtracting 10 for visualization
+      })),
+    }],
+    chartOptions: {
+      chart: {
+        type: 'scatter',
+        zoom: { enabled: false },
+      },
+      xaxis: { type: 'category' },
+      yaxis: { title: { text: 'Attendance (%)' } },
+      plotOptions: {
+        scatter: {
+          dataLabels: { enabled: true },
+        },
+      },
+    },
+  }), [averageAttendanceBySubject]);
+  
+
+  // Prepare bar graph data for marks
+  
 
   // Pie Chart Data for Marks Distribution
   const radarChartData = useMemo(() => {
@@ -161,63 +227,62 @@ function Performance() {
         <Grid container spacing={3}>
           {/* Semester Filter */}
           <Grid item xs={12} container spacing={3} justifyContent="flex-end">
-  <Grid item>
-    <FormControl
-      variant="outlined"
-      sx={{
-        minWidth: 220,
-        m: 1,
-        bgcolor: 'background.paper',
-        borderRadius: 1,
-        boxShadow: 1,
-        padding: '8px', // Outer padding around the component
-      }}
-    >
-      <InputLabel
-        id="semester-select-label"
-        sx={{
-          fontSize: '1rem',
-          color: 'text.secondary',
-          padding: '0 8px', // Padding inside the label
-        }}
-      >
-        Semester
-      </InputLabel>
-      <Select
-        labelId="semester-select-label"
-        id="semester-select"
-        value={semester}
-        onChange={handleSemesterChange}
-        label="Semester"
-        sx={{
-          '& .MuiSelect-outlined': {
-            padding: '12px 16px', // Padding inside the select box
-            fontSize: '1rem',
-            color: 'text.primary',
-          },
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'divider',
-          },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'primary.main',
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'primary.dark',
-          },
-          '& .MuiSvgIcon-root': {
-            color: 'text.secondary',
-          },
-        }}
-      >
-        <MenuItem value="semester1">Semester 1</MenuItem>
-        <MenuItem value="semester2">Semester 2</MenuItem>
-        <MenuItem value="semester3">Semester 3</MenuItem>
-        <MenuItem value="semester4">Semester 4</MenuItem>
-      </Select>
-    </FormControl>
-  </Grid>
-</Grid>
-
+            <Grid item>
+              <FormControl
+                variant="outlined"
+                sx={{
+                  minWidth: 220,
+                  m: 1,
+                  bgcolor: 'background.paper',
+                  borderRadius: 1,
+                  boxShadow: 1,
+                  padding: '8px', // Outer padding around the component
+                }}
+              >
+                <InputLabel
+                  id="semester-select-label"
+                  sx={{
+                    fontSize: '1rem',
+                    color: 'text.secondary',
+                    padding: '0 8px', // Padding inside the label
+                  }}
+                >
+                  Semester
+                </InputLabel>
+                <Select
+                  labelId="semester-select-label"
+                  id="semester-select"
+                  value={semester}
+                  onChange={handleSemesterChange}
+                  label="Semester"
+                  sx={{
+                    '& .MuiSelect-outlined': {
+                      padding: '12px 16px', // Padding inside the select box
+                      fontSize: '1rem',
+                      color: 'text.primary',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.dark',
+                    },
+                    '& .MuiSvgIcon-root': {
+                      color: 'text.secondary',
+                    },
+                  }}
+                >
+                  <MenuItem value="semester1">Semester 1</MenuItem>
+                  <MenuItem value="semester2">Semester 2</MenuItem>
+                  <MenuItem value="semester3">Semester 3</MenuItem>
+                  <MenuItem value="semester4">Semester 4</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
 
           {/* Statistics Cards in One Row */}
           <Grid item xs={12}>
@@ -350,37 +415,63 @@ function Performance() {
               </Grid>
             </Grid>
           </Grid>
-
           {/* Graphs and Tables */}
           <Grid item xs={12} mt={2}>
-            <Grid item xs={12}>
-              <Card>
-                <MDBox
-                  mx={2}
-                  mt={-3}
-                  py={3}
-                  px={2}
-                  variant="gradient"
-                  bgColor="info"
-                  borderRadius="lg"
-                  coloredShadow="info"
-                >
-                  <MDTypography variant="h6" color="white">
-                    Attendance Table
-                  </MDTypography>
-                </MDBox>
-                <MDBox pt={3}>
-                  <DataTable
-                    table={{ columns: columns, rows: tableData }}
-                    isSorted={false}
-                    entriesPerPage={false}
-                    showTotalEntries={false}
-                    noEndBorder
-                  />
-                </MDBox>
-              </Card>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12} mt={3} mb={3}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="info"
+                    borderRadius="lg"
+                    coloredShadow="info"
+                  >
+                    <MDTypography variant="h6" color="white">
+                      Attendance Table
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox pt={3}>
+                    <DataTable
+                      table={{ columns: columns, rows: tableData }}
+                      isSorted={false}
+                      entriesPerPage={false}
+                      showTotalEntries={false}
+                      noEndBorder
+                    />
+                  </MDBox>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={12} mt={3} mb={3}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="info"
+                    borderRadius="lg"
+                    coloredShadow="info"
+                  >
+                    <MDTypography variant="h6" color="white">
+                      Attendance Dumbell Representation
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox pt={3}>
+                    <ApexCharts
+                      options={attendanceDumbbellChartData.chartOptions}
+                      series={attendanceDumbbellChartData.series}
+                      type="scatter"
+                      height={350}
+                    />
+                  </MDBox>
+                </Card>
+              </Grid>
             </Grid>
-
             <Grid container spacing={2}>
               <Grid item xs={12} md={6} mt={4} mb={2}>
                 <Card>
@@ -431,7 +522,7 @@ function Performance() {
                 </Card>
               </Grid>
             </Grid>
-            <Grid item xs={12} mt={4}>
+            <Grid item xs={12} md={12} mt={4} mb={2}>
               <Card>
                 <MDBox
                   mx={2}
@@ -444,14 +535,20 @@ function Performance() {
                   coloredShadow="info"
                 >
                   <MDTypography variant="h6" color="white">
-                    Marks Line Chart
+                    Marks Distribution
                   </MDTypography>
                 </MDBox>
                 <MDBox pt={3}>
-                  <Line data={marksLineChartData} />
+                  <ApexCharts
+                    type="bar"
+                    series={marksBarChartData.series}
+                    options={marksBarChartData.chartOptions}
+                    height={350}
+                  />
                 </MDBox>
               </Card>
             </Grid>
+
           </Grid>
         </Grid>
       </MDBox>

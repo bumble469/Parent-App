@@ -105,12 +105,12 @@ const routes = [
     type: "collapse",
     name: (
       <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: "0.9rem" }}>
-        Reporting and Feedback
+        Feedback
       </Typography>
     ),
-    key: "reporting",
+    key: "feedback",
     icon: <Icon fontSize="small">feedback</Icon>,
-    route: "/reporting",
+    route: "/feedback",
     component: <Reporting />,
   },
 ];

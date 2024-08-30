@@ -105,7 +105,13 @@ function FeedbackPage() {
                   type="submit"
                   variant="contained"
                   color="primary"
-                  sx={{ marginTop: 2, width: '100%' }}
+                  sx={{ 
+                    marginTop: 2, 
+                    width: '100%',
+                    '&.MuiButton-containedPrimary': {
+                      color: 'white',
+                    }
+                  }}
                 >
                   Submit Feedback
                 </Button>
