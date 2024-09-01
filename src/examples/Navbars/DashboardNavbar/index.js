@@ -5,14 +5,17 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
-import Menu from "@mui/material/Menu"; // Add this import
-import MenuItem from "@mui/material/MenuItem"; // Add this import
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Icon from "@mui/material/Icon";
+import Avatar from "@mui/material/Avatar"; // Add this import
+import Typography from "@mui/material/Typography"; // Add this import
+import Divider from "@mui/material/Divider"; // Add this import
 import MDBox from "components/MDBox";
 import MDTypography from 'components/MDTypography';
 import Breadcrumbs from "examples/Breadcrumbs";
 import NotificationMenu from "./components/notification"; // Ensure this import is correct
-import profileImage from "../../../assets/images/marie.jpg";
+import profileImage from "../../../assets/images/bruce-mars.jpg";
 import "../../../Global";
 import LogoutDialog from "./components/logoutdialog";
 import {notifications} from "./data/notificationdata";
@@ -30,7 +33,8 @@ import {
 } from "context";
 
 
-function DashboardNavbar({ absolute, light, isMini, currentSemester }) {
+
+function DashboardNavbar({ absolute, light, isMini}) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
@@ -100,18 +104,36 @@ function DashboardNavbar({ absolute, light, isMini, currentSemester }) {
       }}
       open={Boolean(profileMenuAnchor)}
       onClose={handleCloseProfileMenu}
-      sx={{ mt: 2, minWidth: 220, borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }} // Styled for better look
+      sx={{
+        mt: 2,
+        minWidth: 220,
+        borderRadius: '8px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+      }}
     >
-      <MenuItem onClick={handleRedirectToProfile} sx={{ fontSize: '1rem', py: 1.25, display: 'flex', alignItems: 'center', borderBottom: '1px solid #ddd' }}>
+      {/* User Details */}
+      <MenuItem sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
+        <Avatar sx={{ width: 56, height: 56, mb: 1 }} alt="User Name" src={profileImage} />
+        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>John Doe</Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Roll No: 123456</Typography>
+      </MenuItem>
+  
+      <Divider sx={{ my: 1 }} />
+  
+      {/* Profile Button */}
+      <MenuItem onClick={handleRedirectToProfile} sx={{ fontSize: '1rem', py: 1.25, display: 'flex', alignItems: 'center' }}>
         <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem', color: 'text.secondary' }}>account_circle</Icon>
         Student Profile
       </MenuItem>
-      <MenuItem onClick={handleLogout} sx={{ fontSize: '1rem', py: 1.25, display: 'flex', alignItems: 'center' }}>
-        <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem', color: 'text.secondary' }}>logout</Icon>
+  
+      {/* Logout Button */}
+      <MenuItem onClick={handleLogout} sx={{ fontSize: '1rem', py: 1.25, display: 'flex', alignItems: 'center', color: 'error.main' }}>
+        <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem' }}>logout</Icon>
         Logout
       </MenuItem>
     </Menu>
   );
+  
 
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {

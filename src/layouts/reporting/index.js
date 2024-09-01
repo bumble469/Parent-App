@@ -109,7 +109,7 @@ function FeedbackPage() {
                     marginTop: 2, 
                     width: '100%',
                     '&.MuiButton-containedPrimary': {
-                      color: 'white',
+                      color: 'white !important',
                     }
                   }}
                 >
