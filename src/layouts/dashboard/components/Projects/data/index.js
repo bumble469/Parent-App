@@ -2,11 +2,11 @@
 /* eslint-disable react/function-component-definition */
 
 // @mui material components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from 'components/MDBox';
+import MDTypography from 'components/MDTypography';
 
 // Import the event data from eventData.js
-import events from "./eventData";
+import events from './eventData';
 
 export default function data() {
   // Event component to display each event
@@ -40,10 +40,10 @@ export default function data() {
 
   return {
     columns: [
-      { Header: "Event", accessor: "event", width: "45%", align: "left" },
-      { Header: "Date", accessor: "date", width: "10%", align: "left" },
-      { Header: "Time", accessor: "time", align: "center" },
-      { Header: "Venue", accessor: "venue", align: "center" },
+      { Header: 'Event', accessor: 'event', width: '45%', align: 'left' },
+      { Header: 'Date', accessor: 'date', width: '10%', align: 'left' },
+      { Header: 'Time', accessor: 'time', align: 'center' },
+      { Header: 'Venue', accessor: 'venue', align: 'center' },
     ],
 
     rows,

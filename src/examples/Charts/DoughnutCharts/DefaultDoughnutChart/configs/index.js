@@ -29,7 +29,7 @@ export default function configs(labels, datasets) {
         },
         tooltip: {
           callbacks: {
-            label: function(tooltipItem) {
+            label: function (tooltipItem) {
               return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
             },
           },

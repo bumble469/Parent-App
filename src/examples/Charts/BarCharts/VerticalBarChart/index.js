@@ -1,16 +1,18 @@
 import React from 'react';
 import { Grid } from '@mui/material';
 import VerticalBarChart from 'components/Charts/VerticalBarChart/VerticalBarChart';
-import { attendanceData } from "../../../../layouts/performance/data/AttendancData";
-
+import { attendanceData } from '../../../../layouts/performance/data/AttendancData';
+import Card from '@mui/material';
+import MDBox from 'components/MDBox';
+import MDTypography from 'components/MDTypography';
 const calculateAttendancePercentage = (attendance) => {
   const totalClasses = attendance.length;
-  const presentClasses = attendance.filter(item => item.status === "Present").length;
+  const presentClasses = attendance.filter((item) => item.status === 'Present').length;
   return (presentClasses / totalClasses) * 100;
 };
 
 const transformAttendanceData = (semesterData) => {
-  return semesterData.map(subjectData => ({
+  return semesterData.map((subjectData) => ({
     label: subjectData.subject,
     data: [calculateAttendancePercentage(subjectData.attendance)], // Only one data point per subject
     color: getRandomColor(),
@@ -29,7 +31,7 @@ const getRandomColor = () => {
 const semester4Data = transformAttendanceData(attendanceData.semester4);
 
 const attendanceBarChartData = {
-  labels: attendanceData.semester4.map(subject => subject.subject),
+  labels: attendanceData.semester4.map((subject) => subject.subject),
   datasets: semester4Data,
 };
 

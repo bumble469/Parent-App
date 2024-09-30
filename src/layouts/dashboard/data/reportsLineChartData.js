@@ -21,8 +21,8 @@ export const calculateOverallMarks = (marksArray) => {
 // Data for charts
 const data = {
   marks: {
-    labels: ["Linux", "DevOps", "SPM", "DWM", "INS"],
-    datasets: { label: "Marks", data: [81, 90, 57, 67, 90] },
+    labels: ['Linux', 'DevOps', 'SPM', 'DWM', 'INS'],
+    datasets: { label: 'Marks', data: [81, 90, 57, 67, 90] },
   },
 };
 

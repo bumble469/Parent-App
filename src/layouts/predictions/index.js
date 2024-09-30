@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Line } from "react-chartjs-2";
+import { useState } from 'react';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   LineElement,
@@ -8,27 +8,27 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
+} from 'chart.js';
 
 // @mui material components
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
 
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import MDBox from 'components/MDBox';
+import MDTypography from 'components/MDTypography';
 
 // Material Dashboard 2 React example components
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
+import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
+import Footer from 'examples/Footer';
+import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 
 // Initialize ChartJS
 ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 // Sample marks data
-import marksData from "../performance/data/MarksData";
+import marksData from '../performance/data/MarksData';
 
 function Predictions() {
   // Extract and process data to determine strong and weak subjects
@@ -36,11 +36,7 @@ function Predictions() {
 
   const averageMarks = (subject) => {
     const total =
-      subject.interim +
-      subject.sle +
-      subject.internals +
-      subject.practicals +
-      subject.theory;
+      subject.interim + subject.sle + subject.internals + subject.practicals + subject.theory;
     return (total / 500) * 100; // Assuming total marks are out of 500
   };
 
@@ -63,44 +59,44 @@ function Predictions() {
 
   // Data for Performance and Predicted Performance Chart
   const performanceData = {
-    labels: ["Nov", "Dec", "Jan", "Feb", "March", "Jun", "July", "Aug", "Sep", "Oct"],
+    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'March', 'Jun', 'July', 'Aug', 'Sep', 'Oct'],
     datasets: [
       {
-        label: "Performance Sem-4",
+        label: 'Performance Sem-4',
         data: [65, 59, 80, 81, 56],
         fill: false,
-        backgroundColor: "#42A5F5",
-        borderColor: "#42A5F5",
+        backgroundColor: '#42A5F5',
+        borderColor: '#42A5F5',
         borderDash: [5, 5], // Dashed line for historical data
       },
       {
-        label: "Predicted Performance (Sem 5)",
+        label: 'Predicted Performance (Sem 5)',
         data: [65, 59, 80, 81, 56, 55, 40, 70, 85, 90], // Extended to include predictions
         fill: false,
-        backgroundColor: "#FF7043",
-        borderColor: "#FF7043",
+        backgroundColor: '#FF7043',
+        borderColor: '#FF7043',
       },
     ],
   };
 
   // Data for Attendance and Predicted Attendance Chart
   const attendanceData = {
-    labels: ["Nov", "Dec", "Jan", "Feb", "March", "Jun", "July", "Aug", "Sep", "Oct"],
+    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'March', 'Jun', 'July', 'Aug', 'Sep', 'Oct'],
     datasets: [
       {
-        label: "Attendance Sem-4",
+        label: 'Attendance Sem-4',
         data: [50, 60, 70, 90, 60],
         fill: false,
-        backgroundColor: "#66BB6A",
-        borderColor: "#66BB6A",
+        backgroundColor: '#66BB6A',
+        borderColor: '#66BB6A',
         borderDash: [5, 5], // Dashed line for historical data
       },
       {
-        label: "Predicted Attendance (Sem 5)",
+        label: 'Predicted Attendance (Sem 5)',
         data: [50, 60, 70, 90, 60, 80, 70, 75, 85, 80], // Extended to include predictions
         fill: false,
-        backgroundColor: "#FFAB40",
-        borderColor: "#FFAB40",
+        backgroundColor: '#FFAB40',
+        borderColor: '#FFAB40',
       },
     ],
   };
@@ -110,7 +106,7 @@ function Predictions() {
     maintainAspectRatio: false, // Important to allow chart to grow with container
     plugins: {
       legend: {
-        position: "top",
+        position: 'top',
       },
       tooltip: {
         callbacks: {
@@ -136,9 +132,9 @@ function Predictions() {
                   color="success"
                   title="Strong Subjects"
                   icon="check_circle"
-                  sx={{ borderRadius: "12px", boxShadow: 3, p: 2 }}
+                  sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
                   percentage={{
-                    label: "Great work, keep it up!",
+                    label: 'Great work, keep it up!',
                   }}
                 >
                   <MDBox
@@ -151,15 +147,15 @@ function Predictions() {
                     pb={1}
                     px={1}
                     sx={{
-                      "::-webkit-scrollbar": {
-                        width: "8px",
+                      '::-webkit-scrollbar': {
+                        width: '8px',
                       },
-                      "::-webkit-scrollbar-thumb": {
-                        backgroundColor: "#888",
-                        borderRadius: "4px",
+                      '::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#888',
+                        borderRadius: '4px',
                       },
-                      "::-webkit-scrollbar-thumb:hover": {
-                        backgroundColor: "#555",
+                      '::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: '#555',
                       },
                     }}
                   >
@@ -173,24 +169,20 @@ function Predictions() {
                           mb={1}
                           width="100%"
                         >
-                          <MDTypography
-                            variant="button"
-                            fontWeight="medium"
-                            sx={{ flexGrow: 1 }}
-                          >
+                          <MDTypography variant="button" fontWeight="medium" sx={{ flexGrow: 1 }}>
                             {subject.name}
                           </MDTypography>
                           <MDBox width="60%" mx={2}>
                             <progress
                               value={subject.percentage}
                               max={100}
-                              style={{ width: "100%" }}
+                              style={{ width: '100%' }}
                             ></progress>
                           </MDBox>
                           <MDTypography
                             variant="button"
                             fontWeight="medium"
-                            sx={{ minWidth: "35px" }}
+                            sx={{ minWidth: '35px' }}
                           >
                             {`${subject.percentage.toFixed(2)}%`}
                           </MDTypography>
@@ -213,9 +205,9 @@ function Predictions() {
                   color="error"
                   title="Weak Subjects"
                   icon="warning"
-                  sx={{ borderRadius: "12px", boxShadow: 3, p: 2 }}
+                  sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
                   percentage={{
-                    label: "Needs improvement",
+                    label: 'Needs improvement',
                   }}
                 >
                   <MDBox
@@ -228,15 +220,15 @@ function Predictions() {
                     pb={1}
                     px={1}
                     sx={{
-                      "::-webkit-scrollbar": {
-                        width: "8px",
+                      '::-webkit-scrollbar': {
+                        width: '8px',
                       },
-                      "::-webkit-scrollbar-thumb": {
-                        backgroundColor: "#888",
-                        borderRadius: "4px",
+                      '::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#888',
+                        borderRadius: '4px',
                       },
-                      "::-webkit-scrollbar-thumb:hover": {
-                        backgroundColor: "#555",
+                      '::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: '#555',
                       },
                     }}
                   >
@@ -250,24 +242,20 @@ function Predictions() {
                           mb={1}
                           width="100%"
                         >
-                          <MDTypography
-                            variant="button"
-                            fontWeight="medium"
-                            sx={{ flexGrow: 1 }}
-                          >
+                          <MDTypography variant="button" fontWeight="medium" sx={{ flexGrow: 1 }}>
                             {subject.name}
                           </MDTypography>
                           <MDBox width="60%" mx={2}>
                             <progress
                               value={subject.percentage}
                               max={100}
-                              style={{ width: "100%" }}
+                              style={{ width: '100%' }}
                             ></progress>
                           </MDBox>
                           <MDTypography
                             variant="button"
                             fontWeight="medium"
-                            sx={{ minWidth: "35px" }}
+                            sx={{ minWidth: '35px' }}
                           >
                             {`${subject.percentage.toFixed(2)}%`}
                           </MDTypography>
@@ -290,9 +278,9 @@ function Predictions() {
                   color="warning"
                   icon="trending_up"
                   title="Improvement Recommendations"
-                  sx={{ borderRadius: "12px", boxShadow: 3, p: 2 }}
+                  sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
                   percentage={{
-                    label: "N/A",
+                    label: 'N/A',
                   }}
                 >
                   <MDBox
@@ -305,15 +293,15 @@ function Predictions() {
                     pb={1}
                     px={1}
                     sx={{
-                      "::-webkit-scrollbar": {
-                        width: "8px",
+                      '::-webkit-scrollbar': {
+                        width: '8px',
                       },
-                      "::-webkit-scrollbar-thumb": {
-                        backgroundColor: "#888",
-                        borderRadius: "4px",
+                      '::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#888',
+                        borderRadius: '4px',
                       },
-                      "::-webkit-scrollbar-thumb:hover": {
-                        backgroundColor: "#555",
+                      '::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: '#555',
                       },
                     }}
                   >
@@ -336,9 +324,9 @@ function Predictions() {
                   color="info"
                   icon="school"
                   title="Recommended Career Pathways"
-                  sx={{ borderRadius: "12px", boxShadow: 3, p: 2 }}
+                  sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
                   percentage={{
-                    label: "N/A",
+                    label: 'N/A',
                   }}
                 >
                   <MDBox
@@ -351,15 +339,15 @@ function Predictions() {
                     pb={1}
                     px={1}
                     sx={{
-                      "::-webkit-scrollbar": {
-                        width: "8px",
+                      '::-webkit-scrollbar': {
+                        width: '8px',
                       },
-                      "::-webkit-scrollbar-thumb": {
-                        backgroundColor: "#888",
-                        borderRadius: "4px",
+                      '::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#888',
+                        borderRadius: '4px',
                       },
-                      "::-webkit-scrollbar-thumb:hover": {
-                        backgroundColor: "#555",
+                      '::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: '#555',
                       },
                     }}
                   >
@@ -378,16 +366,11 @@ function Predictions() {
 
           {/* Performance Chart */}
           <Grid item xs={12} md={6} lg={6}>
-            <Card sx={{ borderRadius: "12px", boxShadow: 3, p: 2, height: "400px" }}>
-              <MDTypography
-                variant="h6"
-                fontWeight="medium"
-                textAlign="center"
-                gutterBottom
-              >
+            <Card sx={{ borderRadius: '12px', boxShadow: 3, p: 2, height: '400px' }}>
+              <MDTypography variant="h6" fontWeight="medium" textAlign="center" gutterBottom>
                 Performance and Predicted Performance (Sem 5)
               </MDTypography>
-              <MDBox sx={{ height: "100%", p: 2 }}>
+              <MDBox sx={{ height: '100%', p: 2 }}>
                 <Line data={performanceData} options={options} />
               </MDBox>
             </Card>
@@ -395,16 +378,11 @@ function Predictions() {
 
           {/* Attendance Chart */}
           <Grid item xs={12} md={6} lg={6}>
-            <Card sx={{ borderRadius: "12px", boxShadow: 3, p: 2, height: "400px" }}>
-              <MDTypography
-                variant="h6"
-                fontWeight="medium"
-                textAlign="center"
-                gutterBottom
-              >
+            <Card sx={{ borderRadius: '12px', boxShadow: 3, p: 2, height: '400px' }}>
+              <MDTypography variant="h6" fontWeight="medium" textAlign="center" gutterBottom>
                 Attendance and Predicted Attendance (Sem 5)
               </MDTypography>
-              <MDBox sx={{ height: "100%", p: 2 }}>
+              <MDBox sx={{ height: '100%', p: 2 }}>
                 <Line data={attendanceData} options={options} />
               </MDBox>
             </Card>

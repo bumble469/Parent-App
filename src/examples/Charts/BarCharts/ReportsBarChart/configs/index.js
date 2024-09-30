@@ -1,4 +1,12 @@
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 
 // Register necessary chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -56,7 +64,7 @@ function configs(labels, datasets) {
             drawOnChartArea: true,
             drawTicks: false,
             borderDash: [5, 5],
-            color: "rgba(255, 255, 255, .2)",
+            color: 'rgba(255, 255, 255, .2)',
           },
           ticks: {
             stepSize: 5, // Adjust step size for y-axis ticks
@@ -64,11 +72,11 @@ function configs(labels, datasets) {
             font: {
               size: 14,
               weight: 300,
-              family: "Roboto",
-              style: "normal",
+              family: 'Roboto',
+              style: 'normal',
               lineHeight: 2,
             },
-            color: "#fff",
+            color: '#fff',
           },
         },
         x: {
@@ -78,17 +86,17 @@ function configs(labels, datasets) {
             drawOnChartArea: false,
             drawTicks: false,
             borderDash: [5, 5],
-            color: "rgba(255, 255, 255, .2)",
+            color: 'rgba(255, 255, 255, .2)',
           },
           ticks: {
             display: true,
-            color: "#f8f9fa",
+            color: '#f8f9fa',
             padding: 10,
             font: {
               size: 14,
               weight: 300,
-              family: "Roboto",
-              style: "normal",
+              family: 'Roboto',
+              style: 'normal',
               lineHeight: 2,
             },
           },

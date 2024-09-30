@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 // @mui material components
-import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import Card from '@mui/material/Card';
+import Switch from '@mui/material/Switch';
+import MDBox from 'components/MDBox';
+import MDTypography from 'components/MDTypography';
 
 function PlatformSettings() {
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -12,17 +12,16 @@ function PlatformSettings() {
 
   const handleChangePassword = () => {
     // Logic to handle password change
-    alert("Change Password clicked");
+    alert('Change Password clicked');
   };
 
   const handleChangeEmail = () => {
     // Logic to handle email change
-    alert("Change Email clicked");
+    alert('Change Email clicked');
   };
 
-
   return (
-    <Card sx={{ boxShadow: "none" }}>
+    <Card sx={{ boxShadow: 'none' }}>
       <MDBox p={2}>
         <MDTypography variant="h5" fontWeight="medium" textTransform="capitalize">
           Account Settings
@@ -34,7 +33,10 @@ function PlatformSettings() {
         </MDTypography>
         <MDBox display="flex" alignItems="center" mb={0.5} ml={-1.5}>
           <MDBox mt={0.5}>
-            <Switch checked={emailNotifications} onChange={() => setEmailNotifications(!emailNotifications)} />
+            <Switch
+              checked={emailNotifications}
+              onChange={() => setEmailNotifications(!emailNotifications)}
+            />
           </MDBox>
           <MDBox width="80%" ml={0.5}>
             <MDTypography variant="button" fontWeight="regular" color="text">
@@ -48,12 +50,22 @@ function PlatformSettings() {
           </MDTypography>
           <MDBox display="flex" flexDirection="column" mt={2}>
             <MDBox mb={1}>
-              <MDTypography variant="button" fontWeight="regular" color="primary" onClick={handleChangePassword}>
+              <MDTypography
+                variant="button"
+                fontWeight="regular"
+                color="primary"
+                onClick={handleChangePassword}
+              >
                 Change Password
               </MDTypography>
             </MDBox>
             <MDBox mb={1}>
-              <MDTypography variant="button" fontWeight="regular" color="primary" onClick={handleChangeEmail}>
+              <MDTypography
+                variant="button"
+                fontWeight="regular"
+                color="primary"
+                onClick={handleChangeEmail}
+              >
                 Change Email
               </MDTypography>
             </MDBox>

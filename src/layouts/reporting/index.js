@@ -29,12 +29,7 @@ function FeedbackPage() {
           Share Your Feedback
         </Typography>
         <Paper elevation={3} sx={{ padding: 3, maxWidth: 800, margin: 'auto' }}>
-          <Box
-            component="form"
-            noValidate
-            autoComplete="off"
-            onSubmit={handleSubmit}
-          >
+          <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -105,12 +100,12 @@ function FeedbackPage() {
                   type="submit"
                   variant="contained"
                   color="primary"
-                  sx={{ 
-                    marginTop: 2, 
+                  sx={{
+                    marginTop: 2,
                     width: '100%',
                     '&.MuiButton-containedPrimary': {
                       color: 'white !important',
-                    }
+                    },
                   }}
                 >
                   Submit Feedback

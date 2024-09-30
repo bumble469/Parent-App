@@ -1,13 +1,13 @@
-import PropTypes from "prop-types";
-import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import colors from "assets/theme/base/colors";
-import typography from "assets/theme/base/typography";
+import PropTypes from 'prop-types';
+import Card from '@mui/material/Card';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import MDBox from 'components/MDBox';
+import MDTypography from 'components/MDTypography';
+import colors from 'assets/theme/base/colors';
+import typography from 'assets/theme/base/typography';
 
-function ProfileInfoCard({ title, description, info, social, action, shadow }) {
+function ProfileInfoCard({ title, description, info, social, shadow }) {
   const { socialMediaColors } = colors;
   const { size } = typography;
 
@@ -24,10 +24,20 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
               {Object.entries(details).map(([label, value], idx) => (
                 <Grid item xs={12} md={6} key={idx}>
                   <MDBox display="flex" py={0.5}>
-                    <MDTypography variant="button" fontWeight="bold" textTransform="capitalize" sx={{ flex: '1' }}>
+                    <MDTypography
+                      variant="button"
+                      fontWeight="bold"
+                      textTransform="capitalize"
+                      sx={{ flex: '1' }}
+                    >
                       {label}:
                     </MDTypography>
-                    <MDTypography variant="button" fontWeight="regular" color="text" sx={{ flex: '2' }}>
+                    <MDTypography
+                      variant="button"
+                      fontWeight="regular"
+                      color="text"
+                      sx={{ flex: '2' }}
+                    >
                       {value}
                     </MDTypography>
                   </MDBox>
@@ -58,7 +68,7 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
   ));
 
   return (
-    <Card sx={{ height: "100%", boxShadow: !shadow && "none" }}>
+    <Card sx={{ height: '100%', boxShadow: !shadow && 'none' }}>
       <MDBox display="flex" justifyContent="space-between" alignItems="center" pt={2} px={2}>
         <MDTypography variant="h5" fontWeight="medium" textTransform="capitalize">
           {title}

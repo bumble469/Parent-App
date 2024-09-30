@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import PropTypes from "prop-types";
-import { Line } from "react-chartjs-2";
+import { useMemo } from 'react';
+import PropTypes from 'prop-types';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,13 +11,13 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from "chart.js";
-import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
-import Icon from "@mui/material/Icon";
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import configs from "examples/Charts/LineCharts/ReportsLineChart/configs";
+} from 'chart.js';
+import Card from '@mui/material/Card';
+import Divider from '@mui/material/Divider';
+import Icon from '@mui/material/Icon';
+import MDBox from 'components/MDBox';
+import MDTypography from 'components/MDTypography';
+import configs from 'examples/Charts/LineCharts/ReportsLineChart/configs';
 
 ChartJS.register(
   CategoryScale,
@@ -27,15 +27,15 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 
 function ReportsLineChart({ color, title, description, date, chart }) {
   const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   return (
-    <Card sx={{ height: "100%", borderRadius: "5px" }}>
-      <MDBox padding="1rem" sx={{ borderRadius: "5px" }}>
+    <Card sx={{ height: '100%', borderRadius: '5px' }}>
+      <MDBox padding="1rem" sx={{ borderRadius: '5px' }}>
         {useMemo(
           () => (
             <MDBox
@@ -51,9 +51,9 @@ function ReportsLineChart({ color, title, description, date, chart }) {
               <Line data={data} options={options} redraw />
             </MDBox>
           ),
-          [chart, color]
+          [chart, color],
         )}
-        <MDBox pt={3} pb={1} px={1} sx={{ borderRadius: "5px", backgroundColor: "white" }}>
+        <MDBox pt={3} pb={1} px={1} sx={{ borderRadius: '5px', backgroundColor: 'white' }}>
           <MDTypography variant="h6" textTransform="capitalize">
             {title}
           </MDTypography>
@@ -77,13 +77,13 @@ function ReportsLineChart({ color, title, description, date, chart }) {
 
 // Setting default values for the props of ReportsLineChart
 ReportsLineChart.defaultProps = {
-  color: "info",
-  description: "",
+  color: 'info',
+  description: '',
 };
 
 // Typechecking props for the ReportsLineChart
 ReportsLineChart.propTypes = {
-  color: PropTypes.oneOf(["primary", "secondary", "info", "success", "warning", "error", "dark"]),
+  color: PropTypes.oneOf(['primary', 'secondary', 'info', 'success', 'warning', 'error', 'dark']),
   title: PropTypes.string.isRequired,
   description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   date: PropTypes.string.isRequired,

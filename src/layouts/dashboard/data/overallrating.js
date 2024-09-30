@@ -1,7 +1,7 @@
 // Utility function to calculate star rating and provide messages
 export function calculateStarRating(overallMarks, averageAttendance) {
   // Calculate overall rating with weights
-  const weightedRating = (overallMarks * 0.8) + (averageAttendance * 0.2);
+  const weightedRating = overallMarks * 0.8 + averageAttendance * 0.2;
 
   // Convert to star rating out of 5
   const starRating = (weightedRating / 100) * 5;

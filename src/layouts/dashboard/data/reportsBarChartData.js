@@ -1,5 +1,5 @@
 const data = {
-  labels: ["Linux", "DevOps", "SPM", "DWM", "INS"],
+  labels: ['Linux', 'DevOps', 'SPM', 'DWM', 'INS'],
   datasets: {
     attended: [10, 14, 10, 18, 15],
     total: [12, 15, 10, 25, 22],

@@ -1,25 +1,25 @@
-import PropTypes from "prop-types";
-import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
-import Icon from "@mui/material/Icon";
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+import PropTypes from 'prop-types';
+import Card from '@mui/material/Card';
+import Divider from '@mui/material/Divider';
+import Icon from '@mui/material/Icon';
+import MDBox from 'components/MDBox';
+import MDTypography from 'components/MDTypography';
 
 function ComplexStatisticsCard({ color, title, count, percentage, icon, children }) {
   return (
     <Card
-    sx={{
-      borderRadius: '5px',
-      boxShadow: 1, 
-    }}
+      sx={{
+        borderRadius: '5px',
+        boxShadow: 1,
+      }}
     >
       <MDBox display="flex" justifyContent="space-between" pt={1} px={2}>
         <MDBox
           variant="gradient"
           bgColor={color}
-          color={color === "light" ? "dark" : "white"}
+          color={color === 'light' ? 'dark' : 'white'}
           coloredShadow={color}
-          borderRadius='5px'
+          borderRadius="5px"
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -61,37 +61,37 @@ function ComplexStatisticsCard({ color, title, count, percentage, icon, children
 }
 
 ComplexStatisticsCard.defaultProps = {
-  color: "info",
+  color: 'info',
   percentage: {
-    color: "success",
-    amount: "",
-    label: "",
+    color: 'success',
+    amount: '',
+    label: '',
   },
 };
 
 ComplexStatisticsCard.propTypes = {
   color: PropTypes.oneOf([
-    "primary",
-    "secondary",
-    "info",
-    "success",
-    "warning",
-    "error",
-    "light",
-    "dark",
+    'primary',
+    'secondary',
+    'info',
+    'success',
+    'warning',
+    'error',
+    'light',
+    'dark',
   ]),
   title: PropTypes.string.isRequired,
   count: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   percentage: PropTypes.shape({
     color: PropTypes.oneOf([
-      "primary",
-      "secondary",
-      "info",
-      "success",
-      "warning",
-      "error",
-      "dark",
-      "white",
+      'primary',
+      'secondary',
+      'info',
+      'success',
+      'warning',
+      'error',
+      'dark',
+      'white',
     ]),
     amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     label: PropTypes.string,

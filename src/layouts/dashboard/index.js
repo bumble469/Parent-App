@@ -9,13 +9,17 @@ import Footer from 'examples/Footer';
 import ReportsBarChart from 'examples/Charts/BarCharts/ReportsBarChart';
 import ReportsLineChart from 'examples/Charts/LineCharts/ReportsLineChart';
 import Projects from 'layouts/dashboard/components/Projects';
-import reportsBarChartData, { calculateOverallAttendance } from 'layouts/dashboard/data/reportsBarChartData';
-import reportsLineChartData, { calculateOverallMarks } from 'layouts/dashboard/data/reportsLineChartData';
+import reportsBarChartData, {
+  calculateOverallAttendance,
+} from 'layouts/dashboard/data/reportsBarChartData';
+import reportsLineChartData, {
+  calculateOverallMarks,
+} from 'layouts/dashboard/data/reportsLineChartData';
 import { calculateStarRating } from './data/overallrating'; // Import the utility function
 import StarIcon from '@mui/icons-material/Star'; // Import star icon
 import StarBorderIcon from '@mui/icons-material/StarBorder'; // Import empty star icon
 import StarHalfIcon from '@mui/icons-material/StarHalf';
-import { analyzeSubjects } from "./data/strongweaksubjects"
+import { analyzeSubjects } from './data/strongweaksubjects';
 
 function Dashboard() {
   const { marks } = reportsLineChartData;
@@ -33,7 +37,10 @@ function Dashboard() {
   ).toFixed(2);
 
   // Get star rating data using the utility function
-  const { starRating, fullStars, halfStar, emptyStars, ratingMessage } = calculateStarRating(overallMarks, averageAttendance);
+  const { starRating, fullStars, halfStar, emptyStars, ratingMessage } = calculateStarRating(
+    overallMarks,
+    averageAttendance,
+  );
 
   const { datasets, labels } = marks;
 
@@ -42,11 +49,11 @@ function Dashboard() {
 
   // Filter subjects with attendance below 75%
   const lowAttendanceSubjects = reportsBarChartData.labels
-  .map((subject, index) => ({
-    name: subject,
-    percentage: Math.round(overallAttendancePercentages[index]), // Rounding to the nearest whole number
-  }))
-  .filter((subject) => subject.percentage < 75);
+    .map((subject, index) => ({
+      name: subject,
+      percentage: Math.round(overallAttendancePercentages[index]), // Rounding to the nearest whole number
+    }))
+    .filter((subject) => subject.percentage < 75);
 
   return (
     <DashboardLayout>
@@ -61,9 +68,9 @@ function Dashboard() {
                 title="Overall Attendance"
                 count={`${averageAttendance}%`}
                 percentage={{
-                  color: "success",
-                  amount: "+5%",
-                  label: "than last semester",
+                  color: 'success',
+                  amount: '+5%',
+                  label: 'than last semester',
                 }}
               >
                 <MDBox width="100%">
@@ -83,9 +90,9 @@ function Dashboard() {
                 title="Overall Performance"
                 count={`${overallMarks.toFixed(2)}%`}
                 percentage={{
-                  color: "success",
-                  amount: "+3%",
-                  label: "than last semester",
+                  color: 'success',
+                  amount: '+3%',
+                  label: 'than last semester',
                 }}
               >
                 <MDBox width="100%">
@@ -106,11 +113,16 @@ function Dashboard() {
                 title="Rating"
                 count={`${starRating}/5`}
                 percentage={{
-                  color: "success",
+                  color: 'success',
                   label: `${ratingMessage}`,
                 }}
               >
-                <MDBox display="flex" alignItems="center" justifyContent="space-evenly" sx={{ pb: 1.45 }}>
+                <MDBox
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-evenly"
+                  sx={{ pb: 1.45 }}
+                >
                   {[...Array(fullStars)].map((_, index) => (
                     <StarIcon key={`full-${index}`} color="warning" />
                   ))}
@@ -137,7 +149,7 @@ function Dashboard() {
               </MDBox>
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
-              <MDBox mb={3} borderRadius='3px'>
+              <MDBox mb={3} borderRadius="3px">
                 <ReportsLineChart
                   color="success"
                   title="Marks Graphical"
@@ -162,7 +174,7 @@ function Dashboard() {
                 icon="check_circle"
                 sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
                 percentage={{
-                  label: "Great work, keep it up!"
+                  label: 'Great work, keep it up!',
                 }}
               >
                 <MDBox
@@ -202,12 +214,16 @@ function Dashboard() {
                         </MDTypography>
                         <MDBox width="60%" mx={2}>
                           <progress
-                          value={subject.percentage}
-                          max={100}
-                          style={{ width: '100%' }}
-                        ></progress>
+                            value={subject.percentage}
+                            max={100}
+                            style={{ width: '100%' }}
+                          ></progress>
                         </MDBox>
-                        <MDTypography variant="button" fontWeight="medium" sx={{ minWidth: '35px' }}>
+                        <MDTypography
+                          variant="button"
+                          fontWeight="medium"
+                          sx={{ minWidth: '35px' }}
+                        >
                           {`${subject.percentage}%`}
                         </MDTypography>
                       </MDBox>
@@ -227,7 +243,7 @@ function Dashboard() {
                 icon="warning"
                 sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
                 percentage={{
-                  label: "Needs improvement"
+                  label: 'Needs improvement',
                 }}
               >
                 <MDBox
@@ -272,7 +288,11 @@ function Dashboard() {
                             style={{ width: '100%' }}
                           ></progress>
                         </MDBox>
-                        <MDTypography variant="button" fontWeight="medium" sx={{ minWidth: '35px' }}>
+                        <MDTypography
+                          variant="button"
+                          fontWeight="medium"
+                          sx={{ minWidth: '35px' }}
+                        >
                           {`${subject.percentage}%`}
                         </MDTypography>
                       </MDBox>
@@ -291,7 +311,7 @@ function Dashboard() {
                 icon="error"
                 title="Low-Attendance Alerts"
                 percentage={{
-                  color: "error",
+                  color: 'error',
                   label: `Total: ${lowAttendanceSubjects.length}`,
                 }}
               >
@@ -337,7 +357,11 @@ function Dashboard() {
                             style={{ width: '100%' }}
                           ></progress>
                         </MDBox>
-                        <MDTypography variant="button" fontWeight="medium" sx={{ minWidth: '35px' }}>
+                        <MDTypography
+                          variant="button"
+                          fontWeight="medium"
+                          sx={{ minWidth: '35px' }}
+                        >
                           {`${subject.percentage}%`}
                         </MDTypography>
                       </MDBox>
@@ -355,7 +379,7 @@ function Dashboard() {
         <MDBox mt={2}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={12} lg={12}>
-              <Projects/>
+              <Projects />
             </Grid>
           </Grid>
         </MDBox>

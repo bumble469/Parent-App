@@ -18,15 +18,13 @@ const NotificationMenu = ({ open, onClose, notifications }) => {
         },
       }}
     >
-      <DialogTitle sx={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
-        Notifications
-      </DialogTitle>
+      <DialogTitle sx={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Notifications</DialogTitle>
       <DialogContent>
         {notifications.length > 0 ? (
           notifications.map((notification, index) => (
             <React.Fragment key={index}>
-              <NotificationItem 
-                icon={<Icon sx={{ color: 'black', fontSize: '2rem' }}>{notification.icon}</Icon>} 
+              <NotificationItem
+                icon={<Icon sx={{ color: 'black', fontSize: '2rem' }}>{notification.icon}</Icon>}
                 title={notification.title}
               />
               {index < notifications.length - 1 && <Divider sx={{ my: 1 }} />}
@@ -47,7 +45,7 @@ NotificationMenu.propTypes = {
     PropTypes.shape({
       icon: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
 };
 

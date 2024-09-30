@@ -1,33 +1,56 @@
-import React, { useState, useMemo } from "react";
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import DataTable from "examples/Tables/DataTable";
-import achievements from "./data/achievementsData";
-import CardContent from "@mui/material/CardContent";
-import MDBox from "components/MDBox";
+import React, { useState, useMemo } from 'react';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import DataTable from 'examples/Tables/DataTable';
+import achievements from './data/achievementsData';
+import CardContent from '@mui/material/CardContent';
+import MDBox from 'components/MDBox';
 import Typography from '@mui/material/Typography';
-import MDTypography from "components/MDTypography";
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import attendanceData from "./data/AttendancData";
-import marksData from "./data/MarksData";
-import { Box } from "@mui/material";
+import MDTypography from 'components/MDTypography';
+import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
+import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
+import Footer from 'examples/Footer';
+import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
+import attendanceData from './data/AttendancData';
+import marksData from './data/MarksData';
+import { Box } from '@mui/material';
 import ApexCharts from 'react-apexcharts';
 
 // Chart.js imports
-import { Radar, Line, Bar } from "react-chartjs-2";
-import { Chart as ChartJS, RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js";
+import { Radar, Line, Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  RadarController,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+} from 'chart.js';
 
-ChartJS.register(RadarController, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
+ChartJS.register(
+  RadarController,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+);
 
 function Performance() {
-  const [semester, setSemester] = useState("semester1");
+  const [semester, setSemester] = useState('semester1');
 
   const handleSemesterChange = (event) => {
     setSemester(event.target.value);
@@ -37,7 +60,10 @@ function Performance() {
   const currentMarksData = marksData[semester] || [];
   // Calculate average attendance percentage
   const totalClasses = currentData.reduce((acc, data) => acc + data.attendance.length, 0);
-  const totalPresent = currentData.reduce((acc, data) => acc + data.attendance.filter(record => record.status === "Present").length, 0);
+  const totalPresent = currentData.reduce(
+    (acc, data) => acc + data.attendance.filter((record) => record.status === 'Present').length,
+    0,
+  );
   const averageAttendance = totalClasses ? (totalPresent / totalClasses) * 100 : 0;
 
   // Calculate overall average grade
@@ -59,31 +85,39 @@ function Performance() {
     return Array.from(new Set(allDates)).sort();
   }, [currentData]);
 
-  const columns = useMemo(() => [
-    { Header: "Subject", accessor: "subject" },
-    ...uniqueDates.map((date) => ({ Header: date, accessor: date })),
-  ], [uniqueDates]);
-  
-  const tableData = useMemo(() => 
-    currentData.map((data) => {
-      const row = { subject: data.subject };
-      uniqueDates.forEach((date) => {
-        const record = data.attendance.find((rec) => rec.date === date);
-        row[date] = record ? record.status : "No Lectures";
-      });
-      return row;
-    })
-  , [currentData, uniqueDates]);
+  const columns = useMemo(
+    () => [
+      { Header: 'Subject', accessor: 'subject' },
+      ...uniqueDates.map((date) => ({ Header: date, accessor: date })),
+    ],
+    [uniqueDates],
+  );
 
-  const marksColumns = useMemo(() => [
-    { Header: "Subject", accessor: "subject" },
-    { Header: "Interim", accessor: "interim" },
-    { Header: "SLE", accessor: "sle" },
-    { Header: "Internals", accessor: "internals" },
-    { Header: "Practicals", accessor: "practicals" },
-    { Header: "Theory", accessor: "theory" },
-    { Header: "Total", accessor: "total" },
-  ], []);
+  const tableData = useMemo(
+    () =>
+      currentData.map((data) => {
+        const row = { subject: data.subject };
+        uniqueDates.forEach((date) => {
+          const record = data.attendance.find((rec) => rec.date === date);
+          row[date] = record ? record.status : 'No Lectures';
+        });
+        return row;
+      }),
+    [currentData, uniqueDates],
+  );
+
+  const marksColumns = useMemo(
+    () => [
+      { Header: 'Subject', accessor: 'subject' },
+      { Header: 'Interim', accessor: 'interim' },
+      { Header: 'SLE', accessor: 'sle' },
+      { Header: 'Internals', accessor: 'internals' },
+      { Header: 'Practicals', accessor: 'practicals' },
+      { Header: 'Theory', accessor: 'theory' },
+      { Header: 'Total', accessor: 'total' },
+    ],
+    [],
+  );
 
   const marksTableData = useMemo(() => {
     return currentMarksData.map((data) => ({
@@ -97,120 +131,128 @@ function Performance() {
     }));
   }, [currentMarksData]);
 
-  const marksBarChartData = useMemo(() => ({
-    series: [{
-      name: 'Total Marks',
-      data: currentMarksData.map((data) => ({
-        x: data.subject,
-        y: data.total
-      })),
-    }],
-    chartOptions: {
-      chart: {
-        type: 'bar',
-        height: 350,
-        stacked: false,
-      },
-      plotOptions: {
-        bar: {
-          horizontal: true,
+  const marksBarChartData = useMemo(
+    () => ({
+      series: [
+        {
+          name: 'Total Marks',
+          data: currentMarksData.map((data) => ({
+            x: data.subject,
+            y: data.total,
+          })),
+        },
+      ],
+      chartOptions: {
+        chart: {
+          type: 'bar',
+          height: 350,
+          stacked: false,
+        },
+        plotOptions: {
+          bar: {
+            horizontal: true,
+          },
+        },
+        xaxis: {
+          title: {
+            text: 'Total Marks',
+          },
+        },
+        yaxis: {
+          title: {
+            text: 'Subjects',
+          },
+        },
+        colors: ['#FF5733'],
+        dataLabels: {
+          enabled: true,
         },
       },
-      xaxis: {
-        title: {
-          text: 'Total Marks'
-        },
-      },
-      yaxis: {
-        title: {
-          text: 'Subjects'
-        },
-      },
-      colors: ['#FF5733'],
-      dataLabels: {
-        enabled: true
-      }
-    },
-  }), [currentMarksData]);
+    }),
+    [currentMarksData],
+  );
 
   const averageAttendanceBySubject = useMemo(() => {
     return currentData.map((data) => {
       const totalClasses = data.attendance.length;
-      const totalPresent = data.attendance.filter(record => record.status === "Present").length;
+      const totalPresent = data.attendance.filter((record) => record.status === 'Present').length;
       const averageAttendance = totalClasses ? (totalPresent / totalClasses) * 100 : 0;
-      return { 
-        subject: data.subject, 
-        averageAttendance: Math.round(averageAttendance * 100) / 100 // Rounds to 2 decimal places
+      return {
+        subject: data.subject,
+        averageAttendance: Math.round(averageAttendance * 100) / 100, // Rounds to 2 decimal places
       };
     });
-  }, [currentData]);  
+  }, [currentData]);
 
-  const attendanceDumbbellChartData = useMemo(() => ({
-    series: [{
-      name: 'Average Attendance',
-      data: averageAttendanceBySubject.map((data) => ({
-        x: data.subject,
-        y: data.averageAttendance,
-        y2: data.averageAttendance - 10, // Example: subtracting 10 for visualization
-      })),
-    }],
-    chartOptions: {
-      chart: {
-        type: 'scatter',
-        zoom: { enabled: false },
-      },
-      xaxis: { type: 'category' },
-      yaxis: { title: { text: 'Attendance (%)' } },
-      plotOptions: {
-        scatter: {
-          dataLabels: { enabled: true },
+  const attendanceDumbbellChartData = useMemo(
+    () => ({
+      series: [
+        {
+          name: 'Average Attendance',
+          data: averageAttendanceBySubject.map((data) => ({
+            x: data.subject,
+            y: data.averageAttendance,
+            y2: data.averageAttendance - 10, // Example: subtracting 10 for visualization
+          })),
+        },
+      ],
+      chartOptions: {
+        chart: {
+          type: 'scatter',
+          zoom: { enabled: false },
+        },
+        xaxis: { type: 'category' },
+        yaxis: { title: { text: 'Attendance (%)' } },
+        plotOptions: {
+          scatter: {
+            dataLabels: { enabled: true },
+          },
         },
       },
-    },
-  }), [averageAttendanceBySubject]);
-  
+    }),
+    [averageAttendanceBySubject],
+  );
 
   // Prepare bar graph data for marks
-  
 
   // Pie Chart Data for Marks Distribution
   const radarChartData = useMemo(() => {
     const subjects = currentMarksData.map((data) => data.subject);
     const datasets = [
       {
-        label: "Interim",
+        label: 'Interim',
         data: currentMarksData.map((data) => data.interim),
-        borderColor: "#FF5733",
-        backgroundColor: "rgba(255, 87, 51, 0.2)",
-        pointBackgroundColor: "#FF5733",
+        borderColor: '#FF5733',
+        backgroundColor: 'rgba(255, 87, 51, 0.2)',
+        pointBackgroundColor: '#FF5733',
       },
       {
-        label: "SLE",
+        label: 'SLE',
         data: currentMarksData.map((data) => data.sle),
-        borderColor: "#33FF57",
-        backgroundColor: "rgba(51, 255, 87, 0.2)",
-        pointBackgroundColor: "#33FF57",
+        borderColor: '#33FF57',
+        backgroundColor: 'rgba(51, 255, 87, 0.2)',
+        pointBackgroundColor: '#33FF57',
       },
       {
-        label: "Internals",
+        label: 'Internals',
         data: currentMarksData.map((data) => data.internals),
-        borderColor: "#3357FF",
-        backgroundColor: "rgba(51, 87, 255, 0.2)",
-        pointBackgroundColor: "#3357FF",
+        borderColor: '#3357FF',
+        backgroundColor: 'rgba(51, 87, 255, 0.2)',
+        pointBackgroundColor: '#3357FF',
       },
       {
-        label: "Practicals",
+        label: 'Practicals',
         data: currentMarksData.map((data) => data.practicals),
-        borderColor: "#FF33A1",
-        backgroundColor: "rgba(255, 51, 161, 0.2)",
-        pointBackgroundColor: "#FF33A1",
+        borderColor: '#FF33A1',
+        backgroundColor: 'rgba(255, 51, 161, 0.2)',
+        pointBackgroundColor: '#FF33A1',
       },
       {
-        label: "Theory",
+        label: 'Theory',
         data: currentMarksData.map((data) => data.theory),
-        borderColor: "#FFCC33",
-        backgroundColor: "rgba(255, 204, 51, 0.2)",
-        pointBackgroundColor: "#FFCC33",
+        borderColor: '#FFCC33',
+        backgroundColor: 'rgba(255, 204, 51, 0.2)',
+        pointBackgroundColor: '#FFCC33',
       },
     ];
 
@@ -288,16 +330,16 @@ function Performance() {
           <Grid item xs={12}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <MDBox sx={{ height: "100%" }}>
+                <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
                     color="success"
                     icon="school"
                     title="Average Attendance"
                     count={`${averageAttendance.toFixed(2)}%`}
                     percentage={{
-                      color: averageAttendance < 75 ? "error" : "success",
-                      amount: averageAttendance < 75 ? "-10%" : "+5%",
-                      label: "than last semester",
+                      color: averageAttendance < 75 ? 'error' : 'success',
+                      amount: averageAttendance < 75 ? '-10%' : '+5%',
+                      label: 'than last semester',
                     }}
                   >
                     <MDBox width="100%">
@@ -311,16 +353,16 @@ function Performance() {
                 </MDBox>
               </Grid>
               <Grid item xs={12} md={4}>
-                <MDBox sx={{ height: "100%" }}>
+                <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
                     color="info"
                     icon="leaderboard"
                     title="Average Grade"
                     count={`${Math.min(Math.max(overallMarks, 0), 100).toFixed(2)}%`}
                     percentage={{
-                      color: "success",
-                      amount: "+3%",
-                      label: "than last semester",
+                      color: 'success',
+                      amount: '+3%',
+                      label: 'than last semester',
                     }}
                   >
                     <MDBox width="100%">
@@ -334,7 +376,7 @@ function Performance() {
                 </MDBox>
               </Grid>
               <Grid item xs={12} md={4}>
-                <MDBox sx={{ height: "100%" }}>
+                <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
                     color="warning"
                     icon="star"
@@ -345,13 +387,14 @@ function Performance() {
                   >
                     <MDBox
                       sx={{
-                        maxHeight: "50px", // Set a maximum height for the scrollable area
-                        overflowY: "auto",  // Enable vertical scrolling
-                        padding: "8px",     // Optional: Add padding to ensure content is not flush with the edges
+                        maxHeight: '50px', // Set a maximum height for the scrollable area
+                        overflowY: 'auto', // Enable vertical scrolling
+                        padding: '8px', // Optional: Add padding to ensure content is not flush with the edges
                       }}
                     >
                       <MDTypography variant="body2" color="textSecondary" fontSize="0.9rem">
-                        Debate Club, Chess Club, Volunteer Work, Art Workshop, Soccer, Coding Club, Music Band, Drama Society, Student Council, Photography Club
+                        Debate Club, Chess Club, Volunteer Work, Art Workshop, Soccer, Coding Club,
+                        Music Band, Drama Society, Student Council, Photography Club
                       </MDTypography>
                     </MDBox>
                   </ComplexStatisticsCard>
@@ -360,7 +403,9 @@ function Performance() {
               <Grid item xs={12}>
                 <Card sx={{ width: '100%', overflow: 'hidden' }}>
                   <CardContent>
-                    <Typography sx={{ mb: 2, color:"grey", mt:2 }}>Achievements & Projects</Typography>
+                    <Typography sx={{ mb: 2, color: 'grey', mt: 2 }}>
+                      Achievements & Projects
+                    </Typography>
                     <Box
                       sx={{
                         display: 'flex',
@@ -370,41 +415,50 @@ function Performance() {
                       }}
                     >
                       {achievements.map((achievement, index) => (
-                        <Box 
-                          key={index} 
-                          sx={{ 
-                            minWidth: '200px',  // Ensures cards have a minimum width
-                            textAlign: 'center', 
-                            p: 2, 
-                            border: '1px solid #ddd', 
+                        <Box
+                          key={index}
+                          sx={{
+                            minWidth: '200px', // Ensures cards have a minimum width
+                            textAlign: 'center',
+                            p: 2,
+                            border: '1px solid #ddd',
                             borderRadius: '4px',
                             backgroundColor: '#f9f9f9',
                             overflow: 'hidden',
                           }}
                         >
-                          <Typography variant="body2" sx={{ 
-                            fontWeight: 'bold',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            mb: 1 // Space between title and description
-                          }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 'bold',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              mb: 1, // Space between title and description
+                            }}
+                          >
                             {achievement.title}
                           </Typography>
-                          <Typography variant="body2" sx={{ 
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'normal' // Allows for wrapping in description
-                          }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'normal', // Allows for wrapping in description
+                            }}
+                          >
                             {achievement.description}
                           </Typography>
-                          <Typography variant="caption" sx={{ 
-                            color: 'gray',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            mt: 1 // Space between description and date
-                          }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'gray',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              mt: 1, // Space between description and date
+                            }}
+                          >
                             {achievement.date}
                           </Typography>
                         </Box>
@@ -548,7 +602,6 @@ function Performance() {
                 </MDBox>
               </Card>
             </Grid>
-
           </Grid>
         </Grid>
       </MDBox>
