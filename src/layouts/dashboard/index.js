@@ -8,7 +8,7 @@ import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import ReportsBarChart from 'examples/Charts/BarCharts/ReportsBarChart';
 import ReportsLineChart from 'examples/Charts/LineCharts/ReportsLineChart';
-import Projects from 'layouts/dashboard/components/Projects';
+import Projects from 'layouts/dashboard/events/index';
 import reportsBarChartData, {
   calculateOverallAttendance,
 } from 'layouts/dashboard/data/reportsBarChartData';
