@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const facultyRoutes = require('./facultyapi/api');  
 const chatRoutes = require('./chatapi/api');  
-const eventsRoutes = require('./dashboardapi/events_api');  // Import events routes
+const eventsRoutes = require('./dashboardapi/events_api');
+const studentProfileRoutes = require('./profileapi/api');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -20,7 +21,8 @@ app.use((req, res, next) => {
 // Define routes for faculty, chat, and events APIs
 app.use('/api', facultyRoutes); 
 app.use('/api/chat', chatRoutes); 
-app.use('/api/events', eventsRoutes); // Add events routes
+app.use('/api/events', eventsRoutes);
+app.use('/api/student', studentProfileRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

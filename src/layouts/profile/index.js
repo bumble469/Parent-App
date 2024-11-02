@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 
 // @mui icons
@@ -18,10 +18,33 @@ import ProfileInfoCard from 'examples/Cards/InfoCards/ProfileInfoCard';
 // Overview page components
 import Header from 'layouts/profile/components/Header';
 import PlatformSettings from 'layouts/profile/components/PlatformSettings';
-import studentData from './data/studentdata';
 
 function Overview() {
-  const { student } = studentData;
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudentProfile = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/student/profile');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setStudent(data);
+      } catch (error) {
+        console.error('Error fetching student profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentProfile();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Optionally, add a spinner or loading indicator
+  }
 
   return (
     <DashboardLayout>
@@ -34,61 +57,60 @@ function Overview() {
               <PlatformSettings />
             </Grid>
             <Grid item xs={12} md={8}>
-              <ProfileInfoCard
-                title="Profile Information"
-                description="Detailed information about the student and parents."
-                info={{
-                  'Student Information': {
-                    'Full Name': student.name,
-                    'Roll No': student.rollNo,
-                    Age: student.age,
-                    Email: student.email,
-                    'Date of Birth': student.dateOfBirth,
-                    'Enrollment Date': student.enrollmentDate,
-                    GPA: student.academicPerformance.gpa,
-                    Address: `${student.address.street}, ${student.address.city}, ${student.address.state}, ${student.address.zipCode}`,
-                    'Contact Home': student.contact.home,
-                    'Contact Mobile': student.contact.mobile,
-                  },
-                  'Mother Information': {
-                    Name: student.parents.mother.name,
-                    'Contact Mobile': student.parents.mother.contact.mobile,
-                    'Contact Work': student.parents.mother.contact.work,
-                    Email: student.parents.mother.email,
-                    Address: `${student.parents.mother.address.street}, ${student.parents.mother.address.city}, ${student.parents.mother.address.state}, ${student.parents.mother.address.zipCode}`,
-                    Occupation: student.parents.mother.occupation,
-                    'Work Hours': student.parents.mother.workHours,
-                  },
-                  'Father Information': {
-                    Name: student.parents.father.name,
-                    'Contact Mobile': student.parents.father.contact.mobile,
-                    'Contact Work': student.parents.father.contact.work,
-                    Email: student.parents.father.email,
-                    Address: `${student.parents.father.address.street}, ${student.parents.father.address.city}, ${student.parents.father.address.state}, ${student.parents.father.address.zipCode}`,
-                    Occupation: student.parents.father.occupation,
-                    'Work Hours': student.parents.father.workHours,
-                  },
-                }}
-                social={[
-                  {
-                    link: 'https://www.facebook.com/CreativeTim/',
-                    icon: <FacebookIcon />,
-                    color: 'facebook',
-                  },
-                  {
-                    link: 'https://twitter.com/creativetim',
-                    icon: <TwitterIcon />,
-                    color: 'twitter',
-                  },
-                  {
-                    link: 'https://www.instagram.com/creativetimofficial/',
-                    icon: <InstagramIcon />,
-                    color: 'instagram',
-                  },
-                ]}
-                action={{ route: '', tooltip: 'Edit Profile' }}
-                shadow={false}
-              />
+              {student && (
+                <ProfileInfoCard
+                  title="Profile Information"
+                  description="Detailed information about the student and parents."
+                  info={{
+                    'Student Information': {
+                      'Full Name': student.studentInfo.fullName,
+                      'Roll No': student.studentInfo.rollNo,
+                      Age: student.studentInfo.age,
+                      Email: student.studentInfo.email,
+                      'Date of Birth': student.studentInfo.dob,
+                      'Enrollment Date': student.studentInfo.enrollmentDate,
+                      GPA: student.studentInfo.gpa,
+                      Address: student.studentInfo.address,
+                      'Contact Mobile': student.studentInfo.contactMobile,
+                    },
+                    'Mother Information': {
+                      Name: student.motherInfo.name,
+                      'Contact Mobile': student.motherInfo.contactMobile,
+                      Email: student.motherInfo.email,
+                      Address: student.motherInfo.address,
+                      Occupation: student.motherInfo.occupation,
+                      'Work Hours': student.motherInfo.workHours,
+                    },
+                    'Father Information': {
+                      Name: student.fatherInfo.name,
+                      'Contact Mobile': student.fatherInfo.contactMobile,
+                      Email: student.fatherInfo.email,
+                      Address: student.fatherInfo.address,
+                      Occupation: student.fatherInfo.occupation,
+                      'Work Hours': student.fatherInfo.workHours,
+                    },
+                  }}
+                  social={[
+                    {
+                      link: 'https://www.facebook.com/CreativeTim/',
+                      icon: <FacebookIcon />,
+                      color: 'facebook',
+                    },
+                    {
+                      link: 'https://twitter.com/creativetim',
+                      icon: <TwitterIcon />,
+                      color: 'twitter',
+                    },
+                    {
+                      link: 'https://www.instagram.com/creativetimofficial/',
+                      icon: <InstagramIcon />,
+                      color: 'instagram',
+                    },
+                  ]}
+                  action={{ route: '', tooltip: 'Edit Profile' }}
+                  shadow={false}
+                />
+              )}
             </Grid>
           </Grid>
         </MDBox>
