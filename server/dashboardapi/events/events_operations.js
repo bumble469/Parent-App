@@ -1,4 +1,4 @@
-const { sql, poolPromise } = require('../utils/db');
+const { sql, poolPromise } = require('../../utils/db');
 
 async function getEvents() {
     try {

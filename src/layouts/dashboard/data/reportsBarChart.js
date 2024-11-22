@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ReportsLineChart from 'examples/Charts/LineCharts/ReportsLineChart/index'; // Import the ReportsBarChart component
+import ReportsBarChart from 'examples/Charts/BarCharts/ReportsBarChart'; // Import the ReportsBarChart component
 
-const ReportsLineChartWrapper = () => {
+const ReportsBarChartWrapper = () => {
   const [data, setData] = useState(null); // State to hold the fetched chart data
   const [loading, setLoading] = useState(true); // State for loading
   const [error, setError] = useState(null); // State for errors
@@ -15,14 +15,18 @@ const ReportsLineChartWrapper = () => {
 
         // Mapping the API response data to the required chart format
         const subjects = response.data.map(item => item.sub_name);
-        const marks = response.data.map(item => item.totalMarks);
+        const attended_lects = response.data.map(item => item.lectures_attended);
+        const total_lects = response.data.map(item => item.lectures_total);
+
         // Construct the data object to match the chart format
         const chartData = {
           labels: subjects,
-          datasets: { label: 'Marks', data: marks },
+          datasets: {
+            attended: attended_lects,
+            total: total_lects,
+          },
           
         };
-        console.log("my marks: "+ marks)
         // Set the data for the chart
         setData(chartData);
         setLoading(false);
@@ -46,18 +50,26 @@ const ReportsLineChartWrapper = () => {
 
   // If data is successfully fetched, render the ReportsBarChart
   return (
-    <ReportsLineChart
-      color="success"
-      title="Marks Graphical"
-      description={
-        <>
-          (<strong>OUT OF 150</strong>)
-        </>
-      }
-      date="updated 4 min ago"
-      chart={data}
+    <ReportsBarChart
+      color="info"
+      title="Subject Wise Attendance"
+      description="Lectures Attended / Lectures Occurred"
+      date="campaign sent 2 days ago"
+      chart={data} // Pass the mapped data to the chart
+      options={{
+        // Adding x-axis label rotation for better visibility
+        scales: {
+          x: {
+            ticks: {
+              autoSkip: false, // Prevent auto-skipping of labels
+              maxRotation: 45,  // Rotate labels by 45 degrees
+              minRotation: 45,  // Set minimum rotation for consistency
+            },
+          },
+        },
+      }}
     />
   );
 };
 
-export default ReportsLineChartWrapper;
+export default ReportsBarChartWrapper;

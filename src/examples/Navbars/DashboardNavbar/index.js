@@ -109,10 +109,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
       <MenuItem sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
         <Avatar sx={{ width: 56, height: 56, mb: 1 }} alt="User Name" src={profileImage} />
         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-          John Doe
+          {student.stud_firstname}&nbsp;{student.stud_lastname}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Roll No: 123456
+          Rollno: {student.stud_rollno}
         </Typography>
       </MenuItem>
 
@@ -159,6 +159,32 @@ function DashboardNavbar({ absolute, light, isMini }) {
     fontSize: '1.5rem', // Make icons larger
   });
 
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudentDetails = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/student/currentsemester');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setStudent(data);
+      } catch (error) {
+        console.error('Error fetching student profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentDetails();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Optionally, add a spinner or loading indicator
+  }
+
   return (
     <AppBar
       position={absolute ? 'absolute' : navbarType}
@@ -181,7 +207,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   fontFamily: '"Noto Sans", sans-serif',
                 }}
               >
-                Current Semester: {global.currentSemester}
+                Current Semester: {student.current_Sem}
               </MDTypography>
             </MDBox>
             <MDBox color={light ? 'white' : 'inherit'}>

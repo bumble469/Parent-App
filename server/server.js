@@ -3,8 +3,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const facultyRoutes = require('./facultyapi/api');  
 const chatRoutes = require('./chatapi/api');  
-const eventsRoutes = require('./dashboardapi/events_api');
+const eventsRoutes = require('./dashboardapi/events/events_api');
 const studentProfileRoutes = require('./profileapi/api');
+const studentDashboardStarRoutes = require('./dashboardapi/starapi/api');
+const studentDashboardGraphRoutes = require('./dashboardapi/graphapi/api')
+const studentPerformanceRoutes = require('./performanceapi/api');
+const studentCurrentSemesterRoutes = require('./navbarapi/api');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -18,11 +22,14 @@ app.use((req, res, next) => {
     next();
 });
 
-// Define routes for faculty, chat, and events APIs
 app.use('/api', facultyRoutes); 
 app.use('/api/chat', chatRoutes); 
 app.use('/api/events', eventsRoutes);
 app.use('/api/student', studentProfileRoutes);
+app.use('/api/dashboard', studentDashboardStarRoutes);
+app.use('/api/dashboard', studentDashboardGraphRoutes);
+app.use('/api/performance', studentPerformanceRoutes);
+app.use('/api/student', studentCurrentSemesterRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

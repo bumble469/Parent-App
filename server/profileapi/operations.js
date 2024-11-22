@@ -30,7 +30,7 @@ async function getStudentParentProfile(studentId) {
                     fatheroccupation, 
                     fatherworkhours 
                 FROM student_parent_info 
-                WHERE stud_id = 3
+                WHERE stud_id = 1
             `);
 
         console.log('Database Query Result:', result.recordset);

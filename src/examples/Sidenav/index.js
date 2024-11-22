@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import List from '@mui/material/List';
@@ -9,7 +9,6 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import SidenavCollapse from 'examples/Sidenav/SidenavCollapse';
 import SidenavRoot from 'examples/Sidenav/SidenavRoot';
-import studentData from 'layouts/profile/data/studentdata';
 import {
   useMaterialUIController,
   setMiniSidenav,
@@ -17,27 +16,51 @@ import {
   setWhiteSidenav,
 } from 'context';
 
-function Sidenav({ color, brand, brandName, parentName, routes, ...rest }) {
+function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace('/', '');
-  const { student } = studentData;
+  
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const closeSidenav = () => setMiniSidenav(dispatch, true);
-
+  // Fetch student profile
   useEffect(() => {
-    function handleMiniSidenav() {
+    const fetchStudentProfile = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/student/profile');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setStudent(data);
+      } catch (error) {
+        console.error('Error fetching student profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentProfile();
+  }, []);
+
+  // Ensure hooks are called consistently
+  useEffect(() => {
+    const handleMiniSidenav = () => {
       setMiniSidenav(dispatch, window.innerWidth < 1200);
       setTransparentSidenav(dispatch, window.innerWidth < 1200 ? false : transparentSidenav);
       setWhiteSidenav(dispatch, window.innerWidth < 1200 ? false : whiteSidenav);
-    }
+    };
 
     window.addEventListener('resize', handleMiniSidenav);
     handleMiniSidenav();
     return () => window.removeEventListener('resize', handleMiniSidenav);
   }, [dispatch, location]);
 
+  const closeSidenav = () => setMiniSidenav(dispatch, true);
+
+  // Render routes
   const renderRoutes = routes.map(({ type, name, icon, title, key, href, route }) => {
     let returnValue;
     if (type === 'collapse') {
@@ -53,7 +76,6 @@ function Sidenav({ color, brand, brandName, parentName, routes, ...rest }) {
             name={name}
             icon={icon}
             active={key === collapseName}
-            noCollapse={noCollapse}
           />
         </Link>
       ) : (
@@ -92,6 +114,10 @@ function Sidenav({ color, brand, brandName, parentName, routes, ...rest }) {
     return returnValue;
   });
 
+  if (loading) {
+    return <div>Loading...</div>;  // Show loading until student data is fetched
+  }
+
   return (
     <SidenavRoot
       {...rest}
@@ -104,11 +130,11 @@ function Sidenav({ color, brand, brandName, parentName, routes, ...rest }) {
         px={2}
         textAlign="left"
         sx={{
-          backgroundColor: '#ffffff', // White background
-          borderBottom: '1px solid #e0e0e0', // Light gray border
+          backgroundColor: '#ffffff',
+          borderBottom: '1px solid #e0e0e0',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start', // Align items to the left
+          alignItems: 'flex-start',
         }}
       >
         <MDBox
@@ -155,21 +181,39 @@ function Sidenav({ color, brand, brandName, parentName, routes, ...rest }) {
             padding: '3px',
           }}
         >
-          <MDTypography
-            variant="caption"
-            color="black"
-            fontSize="0.9rem"
-            sx={{
-              display: 'block',
-              maxWidth: '100%', // Ensures the text fits within the container
-              overflow: 'hidden', // Hides any text that overflows the container
-              textOverflow: 'ellipsis', // Adds ellipsis for overflow text
-              whiteSpace: 'nowrap', // Prevents text from wrapping to a new line
-              mb: 1, // Optional: adds margin at the bottom
-            }}
-          >
-            Welcome, {student.parents.mother.name} and {student.parents.father.name}
-          </MDTypography>
+          {student && student.motherInfo && student.fatherInfo ? (
+            <MDTypography
+              variant="caption"
+              color="black"
+              fontSize="0.9rem"
+              sx={{
+                display: 'block',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                mb: 1,
+              }}
+            >
+              Welcome, {student.motherInfo.name} and {student.fatherInfo.name}
+            </MDTypography>
+          ) : (
+            <MDTypography
+              variant="caption"
+              color="black"
+              fontSize="0.9rem"
+              sx={{
+                display: 'block',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                mb: 1,
+              }}
+            >
+              Welcome, Parents
+            </MDTypography>
+          )}
         </MDBox>
       </MDBox>
       <List sx={{ marginTop: '13px' }}>{renderRoutes}</List>
@@ -206,17 +250,16 @@ Sidenav.propTypes = {
   color: PropTypes.oneOf(['primary', 'secondary', 'info', 'success', 'warning', 'error']),
   brand: PropTypes.string.isRequired,
   brandName: PropTypes.string.isRequired,
-  parentName: PropTypes.string.isRequired,
   routes: PropTypes.arrayOf(
     PropTypes.shape({
       type: PropTypes.oneOf(['collapse', 'title', 'divider']).isRequired,
-      name: PropTypes.node.isRequired,
-      icon: PropTypes.node,
-      route: PropTypes.string,
-      href: PropTypes.string,
+      name: PropTypes.string.isRequired,
+      icon: PropTypes.node.isRequired,
+      title: PropTypes.string,
       key: PropTypes.string.isRequired,
-      noCollapse: PropTypes.bool,
-    }),
+      href: PropTypes.string,
+      route: PropTypes.string,
+    })
   ).isRequired,
 };
 

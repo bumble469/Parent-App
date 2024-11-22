@@ -57,7 +57,7 @@ function configs(labels, datasets) {
       scales: {
         y: {
           min: 1, // Set minimum value of y-axis to 1
-          max: 35, // Set maximum value of y-axis to 50
+          max: 100, // Set maximum value of y-axis to 50
           grid: {
             drawBorder: false,
             display: true,
