@@ -1,7 +1,7 @@
 // Utility function to calculate star rating and provide messages
 export function calculateStarRating(overallMarks, averageAttendance) {
   // Calculate overall rating with weights
-  const weightedRating = overallMarks * 0.8 + averageAttendance * 0.2;
+  const weightedRating = overallMarks * 0.6 + averageAttendance * 0.4;
 
   // Convert to star rating out of 5
   const starRating = (weightedRating / 100) * 5;
@@ -13,13 +13,13 @@ export function calculateStarRating(overallMarks, averageAttendance) {
 
   // Generate a message based on the star rating
   let ratingMessage = '';
-  if (starRating < 1) {
+  if (starRating <= 1) {
     ratingMessage = 'Very Poor: Please attend to your child immediately.';
-  } else if (starRating < 2) {
+  } else if (starRating <= 2) {
     ratingMessage = 'Bad: Needs a lot of improvement.';
-  } else if (starRating < 3) {
+  } else if (starRating <= 3) {
     ratingMessage = 'Average: Has room for improvement.';
-  } else if (starRating < 4) {
+  } else if (starRating <= 4) {
     ratingMessage = 'Good: Keep going.';
   } else {
     ratingMessage = 'Excellent: Great job!';

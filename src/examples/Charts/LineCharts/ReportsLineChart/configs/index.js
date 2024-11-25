@@ -1,17 +1,17 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.1.0
-=========================================================
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 
-* Product Page: https://www.creative-tim.com/product/nextjs-material-dashboard-pro
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+// Register necessary components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartDataLabels);
 
 function configs(labels, datasets) {
   return {
@@ -20,15 +20,15 @@ function configs(labels, datasets) {
       datasets: [
         {
           label: datasets.label,
-          tension: 0,
+          tension: 0.4, // Smooth curve
           pointRadius: 5,
-          pointBorderColor: 'transparent',
-          pointBackgroundColor: 'rgba(255, 255, 255, .8)',
-          borderColor: 'rgba(255, 255, 255, .8)',
+          pointBorderColor: 'rgba(255, 255, 255, .8)', // White border around points
+          pointBackgroundColor: 'rgba(60, 179, 113, 1)', // Contrast green for the point
+          borderColor: 'rgba(255, 255, 255, .8)', // Line color
           borderWidth: 4,
           backgroundColor: 'transparent',
-          fill: true,
-          data: datasets.data,
+          fill: false, // Line without fill
+          data: datasets.data, // Data points
           maxBarThickness: 6,
         },
       ],
@@ -38,7 +38,17 @@ function configs(labels, datasets) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false,
+          display: false, // Hides legend
+        },
+        datalabels: {
+          display: true, // Always show labels
+          color: '#fff', // White text for labels
+          align: 'top', // Align above the data point
+          font: {
+            size: 12,
+            weight: 'bold',
+          },
+          formatter: (value) => value.toFixed(2), // Round numbers to 2 decimal places
         },
       },
       interaction: {
@@ -57,33 +67,33 @@ function configs(labels, datasets) {
           },
           ticks: {
             display: true,
-            color: '#f8f9fa',
+            color: '#f8f9fa', // White text for y-axis ticks
             padding: 10,
             font: {
               size: 14,
               weight: 300,
-              family: 'Roboto',
+              family: '"Noto Sans", "Helvetica", "Arial", sans-serif',
               style: 'normal',
               lineHeight: 2,
             },
           },
+          max: 145,
         },
         x: {
           grid: {
             drawBorder: false,
-            display: false,
+            display: false, // Hides x-axis grid
             drawOnChartArea: false,
             drawTicks: false,
-            borderDash: [5, 5],
           },
           ticks: {
             display: true,
-            color: '#f8f9fa',
-            padding: 10,
+            color: '#f8f9fa', // White text for x-axis ticks
+            padding: 5,
             font: {
               size: 14,
               weight: 300,
-              family: 'Roboto',
+              family: '"Noto Sans", "Helvetica", "Arial", sans-serif',
               style: 'normal',
               lineHeight: 2,
             },

@@ -7,8 +7,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
-// Register necessary chart.js components
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+ChartJS.register(ChartDataLabels);
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function configs(labels, datasets) {
@@ -18,21 +18,21 @@ function configs(labels, datasets) {
       datasets: [
         {
           label: 'Lectures Attended',
-          backgroundColor: 'rgb(60,179,113)', // Light White
-          borderColor: '#dcdcdc', // Slightly Darker White
+          backgroundColor: 'rgb(70,140,90,0.72)',
+          borderColor: '#dcdcdc',
           borderWidth: 1,
           data: datasets.attended,
-          maxBarThickness: 10,
-          borderRadius: 10,
+          maxBarThickness: 11,
+          borderRadius: 7,
         },
         {
           label: 'Total Lectures',
-          backgroundColor: 'rgb(230, 230, 230)', // Solid White
-          borderColor: '#e0e0e0', // Slightly Darker White
+          backgroundColor: 'rgb(70, 90, 140,0.72)',
+          borderColor: '#e0e0e0',
           borderWidth: 1,
           data: datasets.total,
-          maxBarThickness: 10,
-          borderRadius: 10,
+          maxBarThickness: 11,
+          borderRadius: 7,
         },
       ],
     },
@@ -53,11 +53,25 @@ function configs(labels, datasets) {
             },
           },
         },
+        // Enable datalabels plugin
+        datalabels: {
+          display: true, // Ensure labels are always visible
+          color: '#fff', // White text
+          anchor: 'center', // Center align the labels
+          align: 'center', // Center text vertically
+          font: {
+            size: 15,
+            weight: 'bold',
+          },
+          formatter: function (value) {
+            return value; // Display the value
+          },
+        },
       },
       scales: {
         y: {
           min: 1, // Set minimum value of y-axis to 1
-          max: 100, // Set maximum value of y-axis to 50
+          max: 30, // Set maximum value of y-axis to 50
           grid: {
             drawBorder: false,
             display: true,
@@ -68,11 +82,11 @@ function configs(labels, datasets) {
           },
           ticks: {
             stepSize: 5, // Adjust step size for y-axis ticks
-            padding: 10,
+            padding: 5,
             font: {
               size: 14,
               weight: 300,
-              family: 'Roboto',
+              family: '"Noto Sans", "Helvetica", "Arial", sans-serif',
               style: 'normal',
               lineHeight: 2,
             },
@@ -91,11 +105,11 @@ function configs(labels, datasets) {
           ticks: {
             display: true,
             color: '#f8f9fa',
-            padding: 10,
+            padding: 5,
             font: {
               size: 14,
               weight: 300,
-              family: 'Roboto',
+              family: '"Noto Sans", "Helvetica", "Arial", sans-serif',
               style: 'normal',
               lineHeight: 2,
             },
@@ -103,7 +117,10 @@ function configs(labels, datasets) {
         },
       },
     },
+    plugins: [ChartDataLabels], // Register the datalabels plugin
   };
 }
+
+
 
 export default configs;

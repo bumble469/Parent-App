@@ -67,6 +67,36 @@ function Dashboard() {
   );
 
   // Use the utility function to get strong and weak subjects
+  let labelMessageForOverallMarks = {
+    message: '',
+    color: ''
+  };
+  let labelMessageForOverallAttendance = {
+    message: '',
+    color: ''
+  };
+  
+  if (overallMarksFromAPI < 50) {
+    labelMessageForOverallMarks.message = "Needs Improvement!";
+    labelMessageForOverallMarks.color = "error";
+  }else if(overallMarksFromAPI < 75){
+    labelMessageForOverallMarks.message = "Can do better..";
+    labelMessageForOverallMarks.color = "warning";
+  } else {
+    labelMessageForOverallMarks.message = "Good, Keep It Up!";
+    labelMessageForOverallMarks.color = "success";
+  }
+
+  if (overallAttendancePercentage < 50) {
+    labelMessageForOverallAttendance.message = "Needs Improvement!";
+    labelMessageForOverallAttendance.color = "error";
+  }else if(overallAttendancePercentage < 75){
+    labelMessageForOverallAttendance.message = "Can do better..";
+    labelMessageForOverallAttendance.color = "warning";
+  } else {
+    labelMessageForOverallAttendance.message = "Good, Keep It Up!";
+    labelMessageForOverallAttendance.color = "success";
+  }
 
   return (
     <DashboardLayout>
@@ -81,9 +111,8 @@ function Dashboard() {
                 title="Overall Attendance"
                 count={`${averageAttendanceFromAPI.toFixed(2)}%`}
                 percentage={{
-                  color: 'success',
-                  amount: '+5%',
-                  label: 'than last semester',
+                  color: labelMessageForOverallAttendance.color,
+                  amount: labelMessageForOverallAttendance.message
                 }}
               >
                 <MDBox width="100%">
@@ -103,9 +132,8 @@ function Dashboard() {
                 title="Overall Performance"
                 count={`${overallMarksFromAPI.toFixed(2)}%`}
                 percentage={{
-                  color: 'success',
-                  amount: '+3%',
-                  label: 'than last semester',
+                  color: labelMessageForOverallMarks.color,
+                  amount: labelMessageForOverallMarks.message
                 }}
               >
                 <MDBox width="100%">
