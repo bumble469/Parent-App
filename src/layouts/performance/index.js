@@ -19,35 +19,39 @@ import attendanceData from './data/AttendancData';
 import marksData from './data/MarksData';
 import { Box } from '@mui/material';
 import ApexCharts from 'react-apexcharts';
-
-// Chart.js imports
-import { Radar, Line, Bar } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
   RadarController,
   RadialLinearScale,
   PointElement,
   LineElement,
   Title,
-  Tooltip,
-  Legend,
   BarElement,
   CategoryScale,
   LinearScale,
 } from 'chart.js';
 
 ChartJS.register(
+  ArcElement,  // Make sure ArcElement is registered
+  Tooltip,
+  Legend,
   RadarController,
   RadialLinearScale,
   PointElement,
   LineElement,
   Title,
-  Tooltip,
-  Legend,
   BarElement,
   CategoryScale,
-  LinearScale,
+  LinearScale
 );
+
+import { Radar, Line, Bar } from 'react-chartjs-2';
+
+
 
 function Performance() {
   const [semester, setSemester] = useState('semester1');
@@ -136,10 +140,7 @@ function Performance() {
       series: [
         {
           name: 'Total Marks',
-          data: currentMarksData.map((data) => ({
-            x: data.subject,
-            y: data.total,
-          })),
+          data: currentMarksData.map((data) => data.total),
         },
       ],
       chartOptions: {
@@ -150,17 +151,18 @@ function Performance() {
         },
         plotOptions: {
           bar: {
-            horizontal: true,
+            horizontal: false, // Set to false for vertical bars
           },
         },
         xaxis: {
+          categories: currentMarksData.map((data) => data.subject), // Subject names as categories
           title: {
-            text: 'Total Marks',
+            text: 'Subjects',
           },
         },
         yaxis: {
           title: {
-            text: 'Subjects',
+            text: 'Total Marks',
           },
         },
         colors: ['#FF5733'],
@@ -184,37 +186,46 @@ function Performance() {
     });
   }, [currentData]);
 
-  const attendanceDumbbellChartData = useMemo(
+
+  //Bar chart 
+  const attendanceBarChartData = useMemo(
     () => ({
       series: [
         {
           name: 'Average Attendance',
-          data: averageAttendanceBySubject.map((data) => ({
-            x: data.subject,
-            y: data.averageAttendance,
-            y2: data.averageAttendance - 10, // Example: subtracting 10 for visualization
-          })),
+          data: averageAttendanceBySubject.map((data) => data.averageAttendance),
         },
       ],
       chartOptions: {
         chart: {
-          type: 'scatter',
-          zoom: { enabled: false },
+          type: 'bar',
+          height: 350,
         },
-        xaxis: { type: 'category' },
-        yaxis: { title: { text: 'Attendance (%)' } },
         plotOptions: {
-          scatter: {
-            dataLabels: { enabled: true },
+          bar: {
+            horizontal: false, // Set to false for vertical bars
           },
+        },
+        xaxis: {
+          categories: averageAttendanceBySubject.map((data) => data.subject),
+          title: {
+            text: 'Subjects',
+          },
+        },
+        yaxis: {
+          title: {
+            text: 'Average Attendance (%)',
+          },
+        },
+        colors: ['#33A1FF'],
+        dataLabels: {
+          enabled: true,
         },
       },
     }),
     [averageAttendanceBySubject],
   );
-
-  // Prepare bar graph data for marks
-
+  
   // Pie Chart Data for Marks Distribution
   const radarChartData = useMemo(() => {
     const subjects = currentMarksData.map((data) => data.subject);
@@ -512,19 +523,20 @@ function Performance() {
                     coloredShadow="info"
                   >
                     <MDTypography variant="h6" color="white">
-                      Attendance Dumbell Representation
+                      Attendance Bar Chart
                     </MDTypography>
                   </MDBox>
                   <MDBox pt={3}>
                     <ApexCharts
-                      options={attendanceDumbbellChartData.chartOptions}
-                      series={attendanceDumbbellChartData.series}
-                      type="scatter"
+                      options={attendanceBarChartData.chartOptions}
+                      series={attendanceBarChartData.series}
+                      type="bar"
                       height={350}
                     />
                   </MDBox>
                 </Card>
               </Grid>
+
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6} mt={4} mb={2}>
@@ -555,25 +567,102 @@ function Performance() {
                 </Card>
               </Grid>
               <Grid item xs={12} md={6} mt={4} mb={2}>
-                <Card>
-                  <MDBox
-                    mx={2}
-                    mt={-3}
-                    py={3}
-                    px={2}
-                    variant="gradient"
-                    bgColor="info"
-                    borderRadius="lg"
-                    coloredShadow="info"
-                  >
-                    <MDTypography variant="h6" color="white">
-                      Marks Radar Chart
-                    </MDTypography>
-                  </MDBox>
-                  <MDBox pt={3}>
-                    <Radar data={radarChartData} />
-                  </MDBox>
-                </Card>
+              <Card>
+                <MDBox
+                  mx={2}
+                  mt={-3}
+                  py={3}
+                  px={2}
+                  variant="gradient"
+                  bgColor="primary" // Professional color
+                  borderRadius="lg"
+                  coloredShadow="primary"
+                >
+                  <MDTypography variant="h6" color="white" fontWeight="medium">
+                    Marks Distribution
+                  </MDTypography>
+                </MDBox>
+
+                <MDBox pt={3} style={{ height: '425px' }}>
+                  <Pie
+                    data={{
+                      labels: radarChartData.labels, // Labels from radar chart (subject names)
+                      datasets: [
+                        {
+                          label: 'Interim',
+                          data: radarChartData.datasets.map((dataset) => dataset.data[0]), // Interim data for each subject
+                          backgroundColor: 'rgba(255, 87, 51, 0.2)', // Red color for Interim
+                          hoverBackgroundColor: 'rgba(255, 87, 51, 0.4)',
+                        },
+                        {
+                          label: 'SLE',
+                          data: radarChartData.datasets.map((dataset) => dataset.data[1]), // SLE data for each subject
+                          backgroundColor: 'rgba(51, 255, 87, 0.2)', // Green color for SLE
+                          hoverBackgroundColor: 'rgba(51, 255, 87, 0.4)',
+                        },
+                        {
+                          label: 'Internals',
+                          data: radarChartData.datasets.map((dataset) => dataset.data[2]), // Internals data for each subject
+                          backgroundColor: 'rgba(51, 87, 255, 0.2)', // Blue color for Internals
+                          hoverBackgroundColor: 'rgba(51, 87, 255, 0.4)',
+                        },
+                        {
+                          label: 'Practicals',
+                          data: radarChartData.datasets.map((dataset) => dataset.data[3]), // Practicals data for each subject
+                          backgroundColor: 'rgba(255, 51, 161, 0.2)', // Pink color for Practicals
+                          hoverBackgroundColor: 'rgba(255, 51, 161, 0.4)',
+                        },
+                        {
+                          label: 'Theory',
+                          data: radarChartData.datasets.map((dataset) => dataset.data[4]), // Theory data for each subject
+                          backgroundColor: 'rgba(255, 204, 51, 0.2)', // Yellow color for Theory
+                          hoverBackgroundColor: 'rgba(255, 204, 51, 0.4)',
+                        },
+                      ],
+                    }}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: {
+                          position: 'top',
+                          labels: {
+                            font: {
+                              size: 12,
+                              family: 'Roboto, sans-serif',
+                              color: '#fff', // Ensure the text color is white for visibility
+                            },
+                          },
+                        },
+                        tooltip: {
+                          enabled: true,
+                          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Dark background for tooltips
+                          titleFont: {
+                            size: 14,
+                            family: 'Roboto, sans-serif',
+                            color: '#fff', // White text for tooltip title
+                          },
+                          bodyFont: {
+                            size: 12,
+                            family: 'Roboto, sans-serif',
+                            color: '#fff', // White text for tooltip body
+                          },
+                        },
+                      },
+                      maintainAspectRatio: true,
+                      animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart',
+                      },
+                      elements: {
+                        arc: {
+                          borderWidth: 1, // Set border width for better visibility of segments
+                          borderColor: '#fff', // Add white border for segments to separate them
+                        },
+                      },
+                    }}
+                  />
+                </MDBox>
+              </Card>
               </Grid>
             </Grid>
             <Grid item xs={12} md={12} mt={4} mb={2}>

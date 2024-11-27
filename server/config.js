@@ -1,5 +1,5 @@
 const config = {
-    server: "DESKTOP-BI9PQCA\\SQLEXPRESS",  
+    server: "JATIN-PC\\SQLEXPRESS",  
     database: "psat",              
     driver: "msnodesqlv8",         
     options: {
