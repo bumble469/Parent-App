@@ -11,6 +11,7 @@ const studentPerformanceRoutes = require('./performanceapi/api');
 const studentCurrentSemesterRoutes = require('./navbarapi/api');
 const getStudentAchievementsForPerformance = require('./performanceapi/achievementsapi/api');
 const getStudentDetailedAttendanceForPerformance = require('./performanceapi/detailedAttendanceApi/api')
+const getStudentDetailedMarksForPerformance = require('./performanceapi/detailedMarksApi/api');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -34,6 +35,7 @@ app.use('/api/performance', studentPerformanceRoutes);
 app.use('/api/student', studentCurrentSemesterRoutes);
 app.use('/api/performance', getStudentAchievementsForPerformance);
 app.use('/api/performance', getStudentDetailedAttendanceForPerformance)
+app.use('/api/performance',getStudentDetailedMarksForPerformance);
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

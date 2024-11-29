@@ -1,11 +1,15 @@
 import React, { useEffect, useState, useMemo } from "react";
 import ApexCharts from "react-apexcharts";
-import { Card, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { Card } from "@mui/material";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 
 // Function to generate the line chart data and configuration
-const generateMarksLineChartData = (currentMarksData) => {
+const generateMarksLineChartData = (currentMarksData, threshold) => {
+  // Calculate the min and max values based on marks obtained
+  const maxMarks = Math.max(...currentMarksData.map((data) => data.total));
+  const minMarks = Math.min(...currentMarksData.map((data) => data.total));
+
   return useMemo(
     () => ({
       series: [
@@ -40,8 +44,9 @@ const generateMarksLineChartData = (currentMarksData) => {
             formatter: (value) => value.toFixed(0),
             style: { fontSize: "12px", fontWeight: 500 },
           },
-          tickAmount: 10,
-          max: 450,
+          tickAmount: 15,
+          max: 145, // Add buffer to the max value
+          min: minMarks - 30, // Add buffer to the min value
         },
         colors: ["#1E90FF"],
         dataLabels: {
@@ -63,30 +68,30 @@ const generateMarksLineChartData = (currentMarksData) => {
         annotations: {
           yaxis: [
             {
-              y: 400,
+              y: threshold,
               borderColor: "#FF0000",
               borderWidth: "1.5px",
               label: {
-                text: "High Mark Threshold --",
+                text: `High Mark Threshold: ${threshold}`,
                 style: {
                   color: "#fff",
                   background: "rgb(250,50,50)",
                   fontSize: "12px",
-                  padding: { top: 8, bottom: 8, left: 12, right: 12 },
+                  padding: { top: 3, bottom: 3, left: 3, right: 3 },
                 },
-                offsetX: -20,
-                offsetY: -140,
+                offsetX: -10, // Adjust this value to place the label nicely
+                offsetY: -30, // Adjust the vertical position to avoid overlap
               },
             },
           ],
         },
       },
     }),
-    [currentMarksData]
+    [currentMarksData, threshold]
   );
 };
 
-const LineGraph = ({ semester }) => {
+const LineGraph = ({ semester, threshold = 110 }) => {
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("All");
 
@@ -113,17 +118,14 @@ const LineGraph = ({ semester }) => {
   }, [semester]);
 
   // Group data by subject
-  const groupedMarksData = marksData.reduce((acc, { name, marks_obtained, marks_total }) => {
+  const groupedMarksData = marksData.reduce((acc, { name, marks_obtained }) => {
     if (!acc[name]) {
       acc[name] = { earned: 0, total: 0 };
     }
-    acc[name].total += marks_total;
+    acc[name].total += marks_obtained;
     return acc;
   }, {});
 
-  const subjects = ["All", ...Object.keys(groupedMarksData)];
-
-  // Prepare filtered data based on subject selection
   const filteredMarksData =
     selectedSubject === "All"
       ? Object.keys(groupedMarksData).map((subject) => ({
@@ -137,8 +139,8 @@ const LineGraph = ({ semester }) => {
           },
         ];
 
-  // Generate chart data
-  const chartData = generateMarksLineChartData(filteredMarksData);
+  // Generate chart data with dynamic Y-axis and threshold
+  const chartData = generateMarksLineChartData(filteredMarksData, threshold);
 
   return (
     <Card>
@@ -148,9 +150,9 @@ const LineGraph = ({ semester }) => {
         py={3}
         px={2}
         variant="gradient"
-        bgColor="info"
+        bgColor="error"
         borderRadius="lg"
-        coloredShadow="info"
+        coloredShadow="error"
       >
         <MDTypography variant="h6" color="white">
           Total Marks Line Graph
@@ -158,20 +160,20 @@ const LineGraph = ({ semester }) => {
       </MDBox>
       <MDBox pt={3} px={3}>
         {/* Filter for Subjects */}
-        <FormControl variant="outlined" sx={{ mb: 2, width: "200px" }}>
-          <InputLabel>Select Subject</InputLabel>
-          <Select
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
+          <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
-            label="Select Subject"
+            style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', border: '1px solid #ddd', marginRight: '20px' }}
           >
-            {subjects.map((subject) => (
-              <MenuItem key={subject} value={subject}>
+            <option value="All">All Subjects</option>
+            {Object.keys(groupedMarksData).map((subject) => (
+              <option key={subject} value={subject}>
                 {subject}
-              </MenuItem>
+              </option>
             ))}
-          </Select>
-        </FormControl>
+          </select>
+        </div>
 
         {/* Line Graph */}
         <ApexCharts

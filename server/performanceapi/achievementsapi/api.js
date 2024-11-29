@@ -1,3 +1,4 @@
+require('../../../src/Global')
 const express = require('express');
 const router = express.Router();
 const { getStudentAchievementsForPerformance } = require('./operations'); // Import the function from operations.js
@@ -5,7 +6,7 @@ const { getStudentAchievementsForPerformance } = require('./operations'); // Imp
 // Updated route to include semester in the query
 router.get('/student/achievements', async (req, res) => {
     try {
-        const studentId = 1; // Assuming you have a way to retrieve the student ID (e.g., from session, JWT, etc.)
+        const studentId = global.student_id; // Assuming you have a way to retrieve the student ID (e.g., from session, JWT, etc.)
         const { semester } = req.query; // Get the semester from the query string
 
         if (!studentId) {

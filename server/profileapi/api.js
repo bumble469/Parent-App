@@ -1,4 +1,4 @@
-// events/api.js
+require('../../src/Global')
 const operations = require('./operations');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -19,7 +19,7 @@ router.use((req, res, next) => {
 // Define the endpoint to get faculty details
 router.route('/profile').get(async (req, res) => {
     try {
-        const result = await operations.getStudentParentProfile();
+        const result = await operations.getStudentParentProfile(global.student_id);
         console.log('Fetched data:', result);
         res.json(result);
     } catch (error) {

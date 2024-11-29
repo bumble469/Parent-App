@@ -22,7 +22,6 @@ function configs(labels, datasets) {
           borderColor: '#dcdcdc',
           borderWidth: 1,
           data: datasets.attended,
-          maxBarThickness: 11,
           borderRadius: 7,
         },
         {
@@ -31,14 +30,13 @@ function configs(labels, datasets) {
           borderColor: '#e0e0e0',
           borderWidth: 1,
           data: datasets.total,
-          maxBarThickness: 11,
           borderRadius: 7,
         },
       ],
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: false, // Disable aspect ratio to control height
       plugins: {
         legend: {
           position: 'top',
@@ -70,8 +68,8 @@ function configs(labels, datasets) {
       },
       scales: {
         y: {
-          min: 1, // Set minimum value of y-axis to 1
-          max: 100, // Set maximum value of y-axis to 50
+          min: 0, // Set minimum value of y-axis to 0 (or adjust as needed)
+          max: 100, // Set maximum value of y-axis to 100 (or adjust as needed)
           grid: {
             drawBorder: false,
             display: true,
@@ -81,7 +79,7 @@ function configs(labels, datasets) {
             color: 'rgba(255, 255, 255, .2)',
           },
           ticks: {
-            stepSize: 5, // Adjust step size for y-axis ticks
+            stepSize: 5,
             padding: 5,
             font: {
               size: 14,
@@ -91,14 +89,14 @@ function configs(labels, datasets) {
               lineHeight: 2,
             },
             color: '#fff',
-          },
+          }          
         },
         x: {
           grid: {
-            drawBorder: false,
-            display: false, // Hide x-axis grid lines
-            drawOnChartArea: false,
-            drawTicks: false,
+            drawBorder: true,
+            display: true, // Hide x-axis grid lines
+            drawOnChartArea: true,
+            drawTicks: true,
             borderDash: [5, 5],
             color: 'rgba(255, 255, 255, .2)',
           },
@@ -116,11 +114,17 @@ function configs(labels, datasets) {
           },
         },
       },
+      onResize: function (chart) {
+        const chartWidth = chart.width;
+        const barThickness = chartWidth / 40;
+        chart.data.datasets.forEach(dataset => {
+          dataset.maxBarThickness = barThickness;
+        });
+        chart.update(); // Re-render the chart with updated bar thickness
+      },
     },
     plugins: [ChartDataLabels], // Register the datalabels plugin
   };
 }
-
-
 
 export default configs;

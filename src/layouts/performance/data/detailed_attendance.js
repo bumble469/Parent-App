@@ -3,8 +3,9 @@ import DataTable from 'examples/Tables/DataTable';
 
 const AttendanceTable = ({ semester }) => {
   const [attendanceData, setAttendanceData] = useState({});
-  const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const columnsPerPage = 8; // Number of columns to display per page
 
   // Fetch attendance data for the selected semester
   const fetchDetailedAttendance = async (semester) => {
@@ -12,18 +13,10 @@ const AttendanceTable = ({ semester }) => {
       const response = await fetch(`http://localhost:8080/api/performance/student/detailedattendance?semester=${semester}`);
       const data = await response.json();
 
-      console.log('Fetched data:', data); // Log the fetched data
-
       // Group data by subject and attendance date
       const groupedData = data.reduce((acc, { name, attendance_date, attended }) => {
-        // Convert the date string to a Date object
         const parsedDate = new Date(attendance_date);
-
-        // If the date is invalid, skip this entry
-        if (isNaN(parsedDate)) {
-          console.warn(`Invalid date found for ${name} on ${attendance_date}`);
-          return acc;
-        }
+        if (isNaN(parsedDate)) return acc;
 
         if (!acc[name]) {
           acc[name] = [];
@@ -32,7 +25,6 @@ const AttendanceTable = ({ semester }) => {
         return acc;
       }, {});
 
-      console.log("Grouped Data:", groupedData); // Log grouped data
       setAttendanceData(groupedData);
     } catch (error) {
       console.error("Error fetching detailed attendance:", error);
@@ -43,128 +35,85 @@ const AttendanceTable = ({ semester }) => {
     fetchDetailedAttendance(semester);
   }, [semester]);
 
-  // Get all dates and group them by day, month, and year (dd/mm/yyyy)
+  // Get all dates and generate unique dates in dd/mm/yyyy format
   const allDates = Object.values(attendanceData).flat().map(item => item.date);
-
-  console.log("All Dates:", allDates); // Log all date objects to check if they are valid
-
-  // Filter unique dates in dd/mm/yyyy format
   const uniqueDates = Array.from(new Set(allDates.map(date => {
-    // Format the date as dd/mm/yyyy
-    const day = String(date.getDate()).padStart(2, '0'); // Ensure day is two digits
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add 1 because months are zero-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    return `${day}/${month}/${year}`; // Format as dd/mm/yyyy
+    return `${day}/${month}/${year}`;
   })));
 
-  console.log("Unique Dates:", uniqueDates); // Log unique dates for debugging
+  // Prepare table data: rows will be subjects, and columns will be dates
+  const tableData = useMemo(() => {
+    if (selectedSubject) {
+      const subjectData = attendanceData[selectedSubject] || [];
+      const row = { subject: selectedSubject };
 
-  // Get unique months for the filter
-  const uniqueMonths = Array.from(new Set(allDates.map(date => {
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Format month as dd/mm/yyyy
-    const year = date.getFullYear();
-    return `${month}/${year}`; // Use month/year format
-  })));
+      uniqueDates.forEach((formattedDate) => {
+        const [day, month, year] = formattedDate.split('/');
+        const monthIndex = parseInt(month) - 1;
+        const dayIndex = parseInt(day);
 
-  // Prepare data for DataTable
-  const tableData = Object.keys(attendanceData).map((subject) => {
-    const row = { subject };
-
-    // Generate date headers for each formatted date (e.g., 01/01/2024, 02/01/2024)
-    uniqueDates.forEach((formattedDate) => {
-      const [day, month, year] = formattedDate.split('/');
-      const monthIndex = parseInt(month) - 1; // Convert month to zero-indexed
-      const dayIndex = parseInt(day);
-
-      // Find attendance record for the specific date
-      const attendanceRecord = attendanceData[subject].filter(item => {
-        const recordDate = item.date;
-        if (!(recordDate instanceof Date)) {
-          console.warn(`Invalid recordDate for subject ${subject}:`, recordDate);
-          return false;
-        }
-        return recordDate.getDate() === dayIndex && recordDate.getMonth() === monthIndex && recordDate.getFullYear() === parseInt(year);
-      });
-
-      // For dates that have no attendance data, or null attendance, mark as 'No Lecture'
-      if (attendanceRecord.length > 0) {
-        const sortedRecords = attendanceRecord.sort((a, b) => a.date - b.date);
-
-        // Check for null or undefined attendance and mark as 'No Lecture' for such records
-        const attendanceStatus = sortedRecords.map(record => {
-          if (record.attended === null || record.attended === undefined) {
-            return 'No Lecture';
-          }
-          return record.attended ? 'Present' : 'Absent';
+        const attendanceRecord = subjectData.filter(item => {
+          const recordDate = item.date;
+          return recordDate.getDate() === dayIndex && recordDate.getMonth() === monthIndex && recordDate.getFullYear() === parseInt(year);
         });
 
-        row[formattedDate] = attendanceStatus.join(',  '); // Combine multiple attendance statuses for the date
-      } else {
-        row[formattedDate] = 'No Lecture'; // If no attendance data for the date, mark as 'No Lecture'
-      }
-    });
+        if (attendanceRecord.length > 0) {
+          const sortedRecords = attendanceRecord.sort((a, b) => a.date - b.date);
+          const attendanceStatus = sortedRecords.map(record => {
+            if (record.attended === null || record.attended === undefined) {
+              return 'No Lecture';
+            }
+            return record.attended ? 'Present' : 'Absent';
+          });
+          row[formattedDate] = attendanceStatus.join(', ');
+        } else {
+          row[formattedDate] = 'No Lecture';
+        }
+      });
 
-    return row;
-  });
+      return [row]; // Only return data for the selected subject
+    }
 
-  console.log("Table Data:", tableData); // Log final table data
+    return []; // If no subject is selected, return empty data
+  }, [attendanceData, uniqueDates, selectedSubject]);
 
-  const columns = useMemo(
-    () => [
+  // Columns configuration for DataTable
+  const columns = useMemo(() => {
+    return [
       { Header: 'Subject', accessor: 'subject' },
-      ...uniqueDates.map((date) => ({ Header: date, accessor: date }))
-    ],
-    [uniqueDates]
-  );
+      ...uniqueDates.map(date => ({ Header: date, accessor: date }))
+    ];
+  }, [uniqueDates]);
 
-  // Filter tableData based on selected month and subject
-  const filteredData = tableData.filter(row => {
-    const isMonthFiltered = selectedMonth
-      ? Object.keys(row).some(date => {
-          // Skip 'subject' key
-          if (date === 'subject') return false;
-  
-          // Extract the month/year part from the formatted date (e.g., '01/01/2024' -> '01/2024')
-          const [day, month, year] = date.split('/');
-          const formattedDateMonth = `${month}/${year}`; // 'MM/YYYY' format
-          
-          // Check if the month/year matches the selected month
-          return formattedDateMonth === selectedMonth;
-        })
-      : true; // If no month is selected, don't filter by month
-  
-    const isSubjectFiltered = selectedSubject
-      ? row.subject === selectedSubject
-      : true;
-  
-    return isMonthFiltered && isSubjectFiltered;
-  });  
-    
+  // Paginate the columns
+  const paginatedColumns = columns.slice(currentPage * columnsPerPage, (currentPage + 1) * columnsPerPage);
+  const totalPages = Math.ceil(columns.length / columnsPerPage);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
+  };
+
   return (
     <div style={{ overflowX: 'auto' }}>
       {/* Filters */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
-        {/* Month Filter */}
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', marginRight: '10px', border: '1px solid #ddd' }}
-        >
-          <option value="">All Months</option>
-          {uniqueMonths.map((month) => (
-            <option key={month} value={month}>
-              {month}
-            </option>
-          ))}
-        </select>
-
-        {/* Subject Filter */}
         <select
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
           style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', border: '1px solid #ddd', marginRight: "20px" }}
         >
-          <option value="">All Subjects</option>
+          <option value="">Select Subject</option>
           {Object.keys(attendanceData).map((subject) => (
             <option key={subject} value={subject}>
               {subject}
@@ -172,15 +121,62 @@ const AttendanceTable = ({ semester }) => {
           ))}
         </select>
       </div>
-
       {/* DataTable */}
       <DataTable
-        table={{ columns: columns, rows: filteredData }}
-        isSorted={false}
-        entriesPerPage={true}
-        showTotalEntries={true}
-        noEndBorder
+        table={{
+          columns: paginatedColumns,
+          rows: tableData 
+        }}
+        isSorted={true}
+        entriesPerPage={false}
+        showTotalEntries={false}
       />
+      <div style={{
+        display: 'flex', 
+        justifyContent: 'center', 
+        marginTop: '15px', 
+        alignItems: 'center',
+        gap: '15px',
+        marginBottom: '15px'
+      }}>
+        <button 
+          onClick={goToPreviousPage} 
+          disabled={currentPage === 0} 
+          style={{
+            padding: '8px 16px', 
+            backgroundColor: currentPage === 0 ? '#d3d3d3' : '#007bff', 
+            color: '#fff', 
+            border: 'none', 
+            borderRadius: '4px', 
+            cursor: currentPage === 0 ? 'not-allowed' : 'pointer', 
+            fontSize: '14px', 
+            transition: 'background-color 0.3s ease',
+          }}
+        >
+          Previous
+        </button>
+        
+        <span style={{ fontSize: '14px', color: '#333', fontWeight: 'bold' }}>
+          Page {currentPage + 1} of {totalPages}
+        </span>
+        
+        <button 
+          onClick={goToNextPage} 
+          disabled={currentPage === totalPages - 1} 
+          style={{
+            padding: '8px 16px', 
+            backgroundColor: currentPage === totalPages - 1 ? '#d3d3d3' : '#007bff', 
+            color: '#fff', 
+            border: 'none', 
+            borderRadius: '4px', 
+            cursor: currentPage === totalPages - 1 ? 'not-allowed' : 'pointer', 
+            fontSize: '14px', 
+            transition: 'background-color 0.3s ease',
+          }}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

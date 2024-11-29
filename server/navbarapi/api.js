@@ -1,10 +1,11 @@
+require('../../src/Global');
 const express = require('express');
 const router = express.Router();
 const { getStudentCurrentSemester } = require('./operations');
 
 router.get('/currentsemester', async (req, res) => {
     try {
-        const studentId = 1;
+        const studentId = global.student_id;
         if (!studentId) {
             return res.status(400).json({ message: 'Student ID is missing in the session.' });
         }

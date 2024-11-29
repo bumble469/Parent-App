@@ -1,1 +1,1 @@
-global.currentSemester = 4;
+global.student_id = 1;

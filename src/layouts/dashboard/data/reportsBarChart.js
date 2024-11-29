@@ -5,7 +5,7 @@ import DataTable from 'examples/Tables/DataTable';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 const ReportsBarChartWrapper = () => {
-  const [data, setData] = useState(null); // State to hold the fetched chart data
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true); // State for loading
   const [error, setError] = useState(null); // State for errors
   const [attendanceData, setAttendanceData] = useState([]); 

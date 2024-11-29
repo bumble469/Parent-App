@@ -12,6 +12,11 @@ import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatist
 import MDTypography from 'components/MDTypography';
 import { fetchAchievements } from "./data/achievements";
 import AttendanceTable from './data/detailed_attendance';
+import ReportsBarChartWrapper from './data/attendanceBar1';
+import MarksTable from './data/detailed_marks';
+import LineGraph from './data/marksGraphs';
+import Footer from 'examples/Footer';
+
 function Performance() {
   const [semester, setSemester] = useState('');
   const [semesters, setSemesters] = useState([]);
@@ -182,7 +187,7 @@ function Performance() {
               <Grid item xs={12} md={4}>
                 <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
-                    color="success"
+                    color="info"
                     icon="school"
                     title="Average Attendance"
                     count={`${averageAttendance.toFixed(2)}%`}
@@ -205,7 +210,7 @@ function Performance() {
               <Grid item xs={12} md={4}>
                 <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
-                    color="info"
+                    color="error"
                     icon="leaderboard"
                     title="Average Grade"
                     count={`${averageMarks.toFixed(2)}%`}
@@ -319,7 +324,7 @@ function Performance() {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} mt={2}>
+          <Grid item xs={12} mt={1}>
            <Grid container spacing={2}>
               <Grid item xs={12} md={12} mt={3} mb={3}>
                 <Card>
@@ -329,23 +334,37 @@ function Performance() {
                     py={3}
                     px={2}
                     variant="gradient"
-                    bgColor="success"
+                    bgColor="info"
                     borderRadius="lg"
                     coloredShadow="info"
                   >
                     <MDTypography variant="h6" color="white">
-                      Attendance Table
+                      Subject-Wise Detailed Attendance
                     </MDTypography>
                   </MDBox>
                   <MDBox pt={3}>
                   <AttendanceTable semester={semester} />
                   </MDBox>
                 </Card>
-              </Grid>     
-           </Grid>
+              </Grid> 
+              <Grid item xs={12} md={12} mt={1} mb={3}>
+                  <ReportsBarChartWrapper semester={semester}/>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12} lg={12} mt={3} mb={2}>
+                <MarksTable semester={semester}/>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12} lg={12} mt={4} mb={2}>
+                <LineGraph semester={semester}/>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </MDBox>
+      <Footer/>
     </DashboardLayout>
   );
 }

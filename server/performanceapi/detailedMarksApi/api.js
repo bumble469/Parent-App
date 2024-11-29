@@ -1,10 +1,10 @@
-require('../../../src/Global')
+require('../../../src/Global');
 const express = require('express');
 const router = express.Router();
-const { getStudentDetailedAttendanceForPerformance } = require('./operations'); // Import the function from operations.js
+const { getStudentDetailedMarksForPerformance } = require('./operations'); // Import the function from operations.js
 
 // Updated route to include semester in the query
-router.get('/student/detailedattendance', async (req, res) => {
+router.get('/student/detailedmarks', async (req, res) => {
     try {
         const studentId = global.student_id; // Assuming you have a way to retrieve the student ID (e.g., from session, JWT, etc.)
         const { semester } = req.query; // Get the semester from the query string
@@ -18,7 +18,7 @@ router.get('/student/detailedattendance', async (req, res) => {
         }
 
         // Call the function to get student achievements for the given semester
-        const studentDetails = await getStudentDetailedAttendanceForPerformance(studentId, semester);
+        const studentDetails = await getStudentDetailedMarksForPerformance(studentId, semester);
 
         if (!studentDetails) {
             return res.status(404).json({ message: `No data found for the student in semester ${semester}` });

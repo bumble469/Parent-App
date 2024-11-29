@@ -46,7 +46,7 @@ function ReportsLineChart({ color, title, description, date, chart }) {
               py={2}
               pr={0.5}
               mt={-5}
-              height="12.5rem"
+              height="14.5rem"
             >
               <Line data={data} options={options} redraw />
             </MDBox>
