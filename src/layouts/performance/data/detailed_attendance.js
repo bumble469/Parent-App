@@ -3,7 +3,8 @@ import DataTable from 'examples/Tables/DataTable';
 
 const AttendanceTable = ({ semester }) => {
   const [attendanceData, setAttendanceData] = useState({});
-  const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('all'); // Default to "All Subjects"
+  const [selectedMonth, setSelectedMonth] = useState(''); // Month filter
   const [currentPage, setCurrentPage] = useState(0);
   const columnsPerPage = 8; // Number of columns to display per page
 
@@ -27,7 +28,7 @@ const AttendanceTable = ({ semester }) => {
 
       setAttendanceData(groupedData);
     } catch (error) {
-      console.error("Error fetching detailed attendance:", error);
+      console.error('Error fetching detailed attendance:', error);
     }
   };
 
@@ -36,141 +37,221 @@ const AttendanceTable = ({ semester }) => {
   }, [semester]);
 
   // Get all dates and generate unique dates in dd/mm/yyyy format
-  const allDates = Object.values(attendanceData).flat().map(item => item.date);
-  const uniqueDates = Array.from(new Set(allDates.map(date => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  })));
+  const allDates = Object.values(attendanceData)
+    .flat()
+    .map((item) => item.date);
+  const uniqueDates = Array.from(
+    new Set(
+      allDates.map((date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      })
+    )
+  );
+
+  // Extract unique months in MM/YYYY format for the month filter
+  const uniqueMonths = Array.from(
+    new Set(
+      allDates.map((date) => {
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month}/${year}`;
+      })
+    )
+  );
 
   // Prepare table data: rows will be subjects, and columns will be dates
   const tableData = useMemo(() => {
-    if (selectedSubject) {
-      const subjectData = attendanceData[selectedSubject] || [];
-      const row = { subject: selectedSubject };
+    const filteredDates = uniqueDates.filter((formattedDate) => {
+      if (!selectedMonth) return true; // If no month is selected, show all data
+      const [day, month, year] = formattedDate.split('/');
+      return `${month}/${year}` === selectedMonth;
+    });
 
-      uniqueDates.forEach((formattedDate) => {
+    const subjects = selectedSubject === 'all' ? Object.keys(attendanceData) : [selectedSubject];
+
+    return subjects.map((subject) => {
+      const subjectData = attendanceData[subject] || [];
+      const row = { subject };
+
+      filteredDates.forEach((formattedDate) => {
         const [day, month, year] = formattedDate.split('/');
         const monthIndex = parseInt(month) - 1;
         const dayIndex = parseInt(day);
 
-        const attendanceRecord = subjectData.filter(item => {
+        const attendanceRecord = subjectData.filter((item) => {
           const recordDate = item.date;
-          return recordDate.getDate() === dayIndex && recordDate.getMonth() === monthIndex && recordDate.getFullYear() === parseInt(year);
+          return (
+            recordDate.getDate() === dayIndex &&
+            recordDate.getMonth() === monthIndex &&
+            recordDate.getFullYear() === parseInt(year)
+          );
         });
 
         if (attendanceRecord.length > 0) {
           const sortedRecords = attendanceRecord.sort((a, b) => a.date - b.date);
-          const attendanceStatus = sortedRecords.map(record => {
+          const attendanceStatus = sortedRecords.map((record) => {
             if (record.attended === null || record.attended === undefined) {
-              return 'No Lecture';
+              return { status: 'No Lecture', color: 'black' };
             }
-            return record.attended ? 'Present' : 'Absent';
+            return record.attended
+              ? { status: 'Present', color: 'green' }
+              : { status: 'Absent', color: 'red' };
           });
-          row[formattedDate] = attendanceStatus.join(', ');
+          row[formattedDate] = attendanceStatus[0]; // Show the first attendance record for simplicity
         } else {
-          row[formattedDate] = 'No Lecture';
+          row[formattedDate] = { status: 'No Lecture', color: 'black' };
         }
       });
 
-      return [row]; // Only return data for the selected subject
-    }
-
-    return []; // If no subject is selected, return empty data
-  }, [attendanceData, uniqueDates, selectedSubject]);
+      return row;
+    });
+  }, [attendanceData, uniqueDates, selectedSubject, selectedMonth]);
 
   // Columns configuration for DataTable
   const columns = useMemo(() => {
     return [
       { Header: 'Subject', accessor: 'subject' },
-      ...uniqueDates.map(date => ({ Header: date, accessor: date }))
+      ...uniqueDates
+        .filter((date) => {
+          if (!selectedMonth) return true; // Show all columns if no month is selected
+          const [, month, year] = date.split('/');
+          return `${month}/${year}` === selectedMonth;
+        })
+        .map((date) => ({
+          Header: date,
+          accessor: date,
+          Cell: ({ value }) => (
+            <span style={{ color: value.color }}>{value.status}</span>
+          ),
+        })),
     ];
-  }, [uniqueDates]);
+  }, [uniqueDates, selectedMonth]);
 
   // Paginate the columns
-  const paginatedColumns = columns.slice(currentPage * columnsPerPage, (currentPage + 1) * columnsPerPage);
+  const paginatedColumns = columns.slice(
+    currentPage * columnsPerPage,
+    (currentPage + 1) * columnsPerPage
+  );
   const totalPages = Math.ceil(columns.length / columnsPerPage);
 
   const goToNextPage = () => {
     if (currentPage < totalPages - 1) {
-      setCurrentPage(prevPage => prevPage + 1);
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 0) {
-      setCurrentPage(prevPage => prevPage - 1);
+      setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
   return (
     <div style={{ overflowX: 'auto' }}>
       {/* Filters */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '20px',
+        }}
+      >
         <select
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
-          style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', border: '1px solid #ddd', marginRight: "20px" }}
+          style={{
+            padding: '8px',
+            borderRadius: '4px',
+            fontSize: '14px',
+            border: '1px solid #ddd',
+          }}
         >
-          <option value="">Select Subject</option>
+          <option value="all">All Subjects</option>
           {Object.keys(attendanceData).map((subject) => (
             <option key={subject} value={subject}>
               {subject}
             </option>
           ))}
         </select>
+
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          style={{
+            padding: '8px',
+            borderRadius: '4px',
+            fontSize: '14px',
+            border: '1px solid #ddd',
+          }}
+        >
+          <option value="">Select Month</option>
+          {uniqueMonths.map((month) => (
+            <option key={month} value={month}>
+              {month}
+            </option>
+          ))}
+        </select>
       </div>
+
       {/* DataTable */}
       <DataTable
         table={{
           columns: paginatedColumns,
-          rows: tableData 
+          rows: tableData,
         }}
         isSorted={true}
         entriesPerPage={false}
         showTotalEntries={false}
       />
-      <div style={{
-        display: 'flex', 
-        justifyContent: 'center', 
-        marginTop: '15px', 
-        alignItems: 'center',
-        gap: '15px',
-        marginBottom: '15px'
-      }}>
-        <button 
-          onClick={goToPreviousPage} 
-          disabled={currentPage === 0} 
+      {/* Pagination */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '15px',
+          alignItems: 'center',
+          gap: '15px',
+          marginBottom: '15px',
+        }}
+      >
+        <button
+          onClick={goToPreviousPage}
+          disabled={currentPage === 0}
           style={{
-            padding: '8px 16px', 
-            backgroundColor: currentPage === 0 ? '#d3d3d3' : '#007bff', 
-            color: '#fff', 
-            border: 'none', 
-            borderRadius: '4px', 
-            cursor: currentPage === 0 ? 'not-allowed' : 'pointer', 
-            fontSize: '14px', 
+            padding: '8px 16px',
+            backgroundColor: currentPage === 0 ? '#d3d3d3' : '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
             transition: 'background-color 0.3s ease',
           }}
         >
           Previous
         </button>
-        
+
         <span style={{ fontSize: '14px', color: '#333', fontWeight: 'bold' }}>
           Page {currentPage + 1} of {totalPages}
         </span>
-        
-        <button 
-          onClick={goToNextPage} 
-          disabled={currentPage === totalPages - 1} 
+
+        <button
+          onClick={goToNextPage}
+          disabled={currentPage === totalPages - 1}
           style={{
-            padding: '8px 16px', 
-            backgroundColor: currentPage === totalPages - 1 ? '#d3d3d3' : '#007bff', 
-            color: '#fff', 
-            border: 'none', 
-            borderRadius: '4px', 
-            cursor: currentPage === totalPages - 1 ? 'not-allowed' : 'pointer', 
-            fontSize: '14px', 
+            padding: '8px 16px',
+            backgroundColor:
+              currentPage === totalPages - 1 ? '#d3d3d3' : '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: currentPage === totalPages - 1 ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
             transition: 'background-color 0.3s ease',
           }}
         >
