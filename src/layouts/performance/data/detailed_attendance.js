@@ -3,18 +3,19 @@ import DataTable from 'examples/Tables/DataTable';
 
 const AttendanceTable = ({ semester }) => {
   const [attendanceData, setAttendanceData] = useState({});
-  const [selectedSubject, setSelectedSubject] = useState('all'); // Default to "All Subjects"
-  const [selectedMonth, setSelectedMonth] = useState(''); // Month filter
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('all'); // New dropdown state
   const [currentPage, setCurrentPage] = useState(0);
-  const columnsPerPage = 8; // Number of columns to display per page
+  const columnsPerPage = 8;
 
-  // Fetch attendance data for the selected semester
   const fetchDetailedAttendance = async (semester) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/performance/student/detailedattendance?semester=${semester}`);
+      const response = await fetch(
+        `http://localhost:8080/api/performance/student/detailedattendance?semester=${semester}`
+      );
       const data = await response.json();
 
-      // Group data by subject and attendance date
       const groupedData = data.reduce((acc, { name, attendance_date, attended }) => {
         const parsedDate = new Date(attendance_date);
         if (isNaN(parsedDate)) return acc;
@@ -36,7 +37,6 @@ const AttendanceTable = ({ semester }) => {
     fetchDetailedAttendance(semester);
   }, [semester]);
 
-  // Get all dates and generate unique dates in dd/mm/yyyy format
   const allDates = Object.values(attendanceData)
     .flat()
     .map((item) => item.date);
@@ -51,7 +51,6 @@ const AttendanceTable = ({ semester }) => {
     )
   );
 
-  // Extract unique months in MM/YYYY format for the month filter
   const uniqueMonths = Array.from(
     new Set(
       allDates.map((date) => {
@@ -62,10 +61,9 @@ const AttendanceTable = ({ semester }) => {
     )
   );
 
-  // Prepare table data: rows will be subjects, and columns will be dates
   const tableData = useMemo(() => {
     const filteredDates = uniqueDates.filter((formattedDate) => {
-      if (!selectedMonth) return true; // If no month is selected, show all data
+      if (!selectedMonth) return true;
       const [day, month, year] = formattedDate.split('/');
       return `${month}/${year}` === selectedMonth;
     });
@@ -91,8 +89,7 @@ const AttendanceTable = ({ semester }) => {
         });
 
         if (attendanceRecord.length > 0) {
-          const sortedRecords = attendanceRecord.sort((a, b) => a.date - b.date);
-          const attendanceStatus = sortedRecords.map((record) => {
+          const attendanceStatus = attendanceRecord.map((record) => {
             if (record.attended === null || record.attended === undefined) {
               return { status: 'No Lecture', color: 'black' };
             }
@@ -100,23 +97,25 @@ const AttendanceTable = ({ semester }) => {
               ? { status: 'Present', color: 'green' }
               : { status: 'Absent', color: 'red' };
           });
-          row[formattedDate] = attendanceStatus[0]; // Show the first attendance record for simplicity
-        } else {
+
+          if (selectedStatus === 'all' || attendanceStatus[0].status === selectedStatus) {
+            row[formattedDate] = attendanceStatus[0];
+          }
+        } else if (selectedStatus === 'all' || selectedStatus === 'No Lecture') {
           row[formattedDate] = { status: 'No Lecture', color: 'black' };
         }
       });
 
       return row;
     });
-  }, [attendanceData, uniqueDates, selectedSubject, selectedMonth]);
+  }, [attendanceData, uniqueDates, selectedSubject, selectedMonth, selectedStatus]);
 
-  // Columns configuration for DataTable
   const columns = useMemo(() => {
     return [
       { Header: 'Subject', accessor: 'subject' },
       ...uniqueDates
         .filter((date) => {
-          if (!selectedMonth) return true; // Show all columns if no month is selected
+          if (!selectedMonth) return true;
           const [, month, year] = date.split('/');
           return `${month}/${year}` === selectedMonth;
         })
@@ -124,13 +123,12 @@ const AttendanceTable = ({ semester }) => {
           Header: date,
           accessor: date,
           Cell: ({ value }) => (
-            <span style={{ color: value.color }}>{value.status}</span>
+            <span style={{ color: value?.color || 'black' }}>{value?.status || ''}</span>
           ),
         })),
     ];
   }, [uniqueDates, selectedMonth]);
 
-  // Paginate the columns
   const paginatedColumns = columns.slice(
     currentPage * columnsPerPage,
     (currentPage + 1) * columnsPerPage
@@ -151,7 +149,6 @@ const AttendanceTable = ({ semester }) => {
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      {/* Filters */}
       <div
         style={{
           display: 'flex',
@@ -196,9 +193,24 @@ const AttendanceTable = ({ semester }) => {
             </option>
           ))}
         </select>
+
+        <select
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+          style={{
+            padding: '8px',
+            borderRadius: '4px',
+            fontSize: '14px',
+            border: '1px solid #ddd',
+          }}
+        >
+          <option value="all">All Statuses</option>
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
+          <option value="No Lecture">No Lecture</option>
+        </select>
       </div>
 
-      {/* DataTable */}
       <DataTable
         table={{
           columns: paginatedColumns,
@@ -208,7 +220,7 @@ const AttendanceTable = ({ semester }) => {
         entriesPerPage={false}
         showTotalEntries={false}
       />
-      {/* Pagination */}
+
       <div
         style={{
           display: 'flex',
