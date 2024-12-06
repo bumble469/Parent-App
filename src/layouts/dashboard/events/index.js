@@ -20,7 +20,7 @@ export default function Data() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/events/events'); // Adjust the URL based on your API
+        const response = await axios.get('http://localhost:8001/api/events/events'); // Adjust the URL based on your API
         // Check if the response is an array and set state
         if (Array.isArray(response.data)) {
           setEvents(response.data);
@@ -42,13 +42,14 @@ export default function Data() {
   }, []); // Runs once when the component mounts
 
   // Prepare rows for the DataTable
-  // Prepare rows for the DataTable
-    const rows = (events || []).map((event) => ({
-        event: event.event_name, // Display event name
-        date: new Date(event.event_date).toLocaleDateString(), // Format date
-        time: event.event_time.split('T')[1].split('.')[0], // Format time
-        venue: event.venue, // Display venue
-    }));
+  const rows = (events || []).map((event) => ({
+    subject_name: event.subject_name, // Display subject name
+    teacher_fullname: event.teacher_fullname, // Display teacher's name
+    lecture_date: new Date(event.lecture_date).toLocaleDateString(), // Format lecture date
+    lecture_time: new Date(event.lecture_time).toLocaleTimeString(), // Format lecture time
+    lecture_location: event.lecture_location, // Display lecture location
+    is_holiday: event.is_holiday ? 'Yes' : 'No', // Display if it's a holiday
+  }));
 
   // Show loading or error messages if applicable
   if (loading) {
@@ -58,7 +59,7 @@ export default function Data() {
       </MDBox>
     );
   }
-  
+
   if (error) {
     return (
       <MDTypography color="error">{error}</MDTypography>
@@ -67,10 +68,12 @@ export default function Data() {
 
   // Define columns for the DataTable
   const columns = [
-    { Header: 'Event', accessor: 'event', width: '45%', align: 'left' },
-    { Header: 'Date', accessor: 'date', width: '20%', align: 'left' },
-    { Header: 'Time', accessor: 'time', align: 'center' },
-    { Header: 'Venue', accessor: 'venue', align: 'center' },
+    { Header: 'Subject', accessor: 'subject_name', width: '20%', align: 'left' },
+    { Header: 'Teacher', accessor: 'teacher_fullname', width: '25%', align: 'left' },
+    { Header: 'Date', accessor: 'lecture_date', width: '15%', align: 'left' },
+    { Header: 'Time', accessor: 'lecture_time', width: '15%', align: 'center' },
+    { Header: 'Location', accessor: 'lecture_location', width: '15%', align: 'center' },
+    { Header: 'Holiday', accessor: 'is_holiday', width: '10%', align: 'center' },
   ];
 
   // Return the Card component with the DataTable

@@ -6,14 +6,9 @@ async function getStudentMarksAndAttendanceForCurrentSemester(studentId) {
         let result = await pool.request()
             .input('studentId', sql.Int, studentId) 
             .query(`
-                SELECT sub_id, marks_obtained, marks_type, marks_total, lectures_attended, lectures_total
-                FROM StudentPerformance
-                WHERE stud_id = @studentId
-                  AND sem_id = (
-                    SELECT MAX(sem_id) 
-                    FROM StudentPerformance 
-                    WHERE stud_id = @studentId
-                  )
+                SELECT subject_id, marks_obtained, exam_type_id, max_marks, total_lectures_attended, total_lectures_conducted
+                FROM vw_student_dashboard
+                WHERE student_id = @studentId;
             `);
 
         console.log('Database Query Result:', result.recordset);

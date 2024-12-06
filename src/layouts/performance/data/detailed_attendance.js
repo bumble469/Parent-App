@@ -12,18 +12,18 @@ const AttendanceTable = ({ semester }) => {
   const fetchDetailedAttendance = async (semester) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/performance/student/detailedattendance?semester=${semester}`
+        `http://localhost:8001/api/performance/student/detailedattendance?semester=${semester}`
       );
       const data = await response.json();
 
-      const groupedData = data.reduce((acc, { name, attendance_date, attended }) => {
-        const parsedDate = new Date(attendance_date);
+      const groupedData = data.reduce((acc, { subject_name, scan_time, is_present }) => {
+        const parsedDate = new Date(scan_time);
         if (isNaN(parsedDate)) return acc;
 
-        if (!acc[name]) {
-          acc[name] = [];
+        if (!acc[subject_name]) {
+          acc[subject_name] = [];
         }
-        acc[name].push({ date: parsedDate, attended });
+        acc[subject_name].push({ date: parsedDate, is_present });
         return acc;
       }, {});
 
@@ -36,6 +36,13 @@ const AttendanceTable = ({ semester }) => {
   useEffect(() => {
     fetchDetailedAttendance(semester);
   }, [semester]);
+
+  const resetFilters = () => {
+    setSelectedSubject('all');
+    setSelectedMonth('');
+    setSelectedStatus('all');
+    setCurrentPage(0);
+  };
 
   const allDates = Object.values(attendanceData)
     .flat()
@@ -90,10 +97,10 @@ const AttendanceTable = ({ semester }) => {
 
         if (attendanceRecord.length > 0) {
           const attendanceStatus = attendanceRecord.map((record) => {
-            if (record.attended === null || record.attended === undefined) {
+            if (record.is_present === null || record.is_present === undefined) {
               return { status: 'No Lecture', color: 'black' };
             }
-            return record.attended
+            return record.is_present
               ? { status: 'Present', color: 'green' }
               : { status: 'Absent', color: 'red' };
           });
@@ -152,63 +159,81 @@ const AttendanceTable = ({ semester }) => {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           alignItems: 'center',
           gap: '10px',
           marginBottom: '20px',
         }}
       >
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
+        <button
+          onClick={resetFilters}
           style={{
-            padding: '8px',
-            borderRadius: '4px',
-            fontSize: '14px',
-            border: '1px solid #ddd',
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '5px 10px',
+            borderRadius: '3px',
+            border: '1px solid #f5c6cb',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            marginLeft: '1rem'
           }}
         >
-          <option value="all">All Subjects</option>
-          {Object.keys(attendanceData).map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </select>
+          Clear Filters
+        </button>
 
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          style={{
-            padding: '8px',
-            borderRadius: '4px',
-            fontSize: '14px',
-            border: '1px solid #ddd',
-          }}
-        >
-          <option value="">Select Month</option>
-          {uniqueMonths.map((month) => (
-            <option key={month} value={month}>
-              {month}
-            </option>
-          ))}
-        </select>
+        <div style={{ display: 'flex', gap: '10px', marginRight: '1rem' }}>
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            style={{
+              padding: '8px',
+              borderRadius: '4px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+            }}
+          >
+            <option value="all">All Subjects</option>
+            {Object.keys(attendanceData).map((subject) => (
+              <option key={subject} value={subject}>
+                {subject}
+              </option>
+            ))}
+          </select>
 
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          style={{
-            padding: '8px',
-            borderRadius: '4px',
-            fontSize: '14px',
-            border: '1px solid #ddd',
-          }}
-        >
-          <option value="all">All Statuses</option>
-          <option value="Present">Present</option>
-          <option value="Absent">Absent</option>
-          <option value="No Lecture">No Lecture</option>
-        </select>
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            style={{
+              padding: '8px',
+              borderRadius: '4px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+            }}
+          >
+            <option value="">All Months</option>
+            {uniqueMonths.map((month) => (
+              <option key={month} value={month}>
+                {month}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            style={{
+              padding: '8px',
+              borderRadius: '4px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+            }}
+          >
+            <option value="all">All Statuses</option>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+            <option value="No Lecture">No Lecture</option>
+          </select>
+        </div>
       </div>
 
       <DataTable
@@ -247,28 +272,30 @@ const AttendanceTable = ({ semester }) => {
         >
           Previous
         </button>
-
-        <span style={{ fontSize: '14px', color: '#333', fontWeight: 'bold' }}>
-          Page {currentPage + 1} of {totalPages}
-        </span>
-
         <button
           onClick={goToNextPage}
-          disabled={currentPage === totalPages - 1}
+          disabled={currentPage >= totalPages - 1}
           style={{
             padding: '8px 16px',
-            backgroundColor:
-              currentPage === totalPages - 1 ? '#d3d3d3' : '#007bff',
+            backgroundColor: currentPage >= totalPages - 1 ? '#d3d3d3' : '#007bff',
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: currentPage === totalPages - 1 ? 'not-allowed' : 'pointer',
+            cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
             fontSize: '14px',
             transition: 'background-color 0.3s ease',
           }}
         >
           Next
         </button>
+        <span
+          style={{
+            fontSize: '1rem',
+            color: '#333',
+          }}
+        >
+          Page {currentPage + 1} of {totalPages}
+        </span>
       </div>
     </div>
   );

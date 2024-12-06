@@ -21,8 +21,10 @@ export function calculateStarRating(overallMarks, averageAttendance) {
     ratingMessage = 'Average: Has room for improvement.';
   } else if (starRating <= 4) {
     ratingMessage = 'Good: Keep going.';
-  } else {
+  } else if (starRating > 4 && starRating <= 5){
     ratingMessage = 'Excellent: Great job!';
+  } else{
+    ratingMessage = "No rating for now.."
   }
 
   return { starRating: starRating.toFixed(1), fullStars, halfStar, emptyStars, ratingMessage };

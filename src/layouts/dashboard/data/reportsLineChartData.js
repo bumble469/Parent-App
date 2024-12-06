@@ -14,7 +14,7 @@ const ReportsLineChartWrapper = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/dashboard/student/graph');
+        const response = await axios.get('http://localhost:8001/api/dashboard/student/graph');
         if (Array.isArray(response.data)) {
           setMarksData(response.data);
         } else {

@@ -1,5 +1,3 @@
-// faculty/api.js
-
 const operations = require('./operations');
 const express = require('express');
 const bodyParser = require('body-parser');

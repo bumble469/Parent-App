@@ -61,7 +61,7 @@ function configs(labels, datasets) {
             drawBorder: false,
             display: true,
             drawOnChartArea: true,
-            drawTicks: false,
+            drawTicks: true,
             borderDash: [5, 5],
             color: 'rgba(255, 255, 255, .2)',
           },
@@ -81,9 +81,9 @@ function configs(labels, datasets) {
         },
         x: {
           grid: {
-            drawBorder: false,
-            display: false, // Hides x-axis grid
-            drawOnChartArea: false,
+            drawBorder: true,
+            display: true, // Hides x-axis grid
+            drawOnChartArea: true,
             drawTicks: false,
           },
           ticks: {

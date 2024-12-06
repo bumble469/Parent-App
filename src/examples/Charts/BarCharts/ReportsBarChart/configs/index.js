@@ -12,6 +12,10 @@ ChartJS.register(ChartDataLabels);
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function configs(labels, datasets) {
+  const maxValue = Math.max(
+    ...datasets.attended, 
+    ...datasets.total
+  );
   return {
     data: {
       labels,
@@ -68,8 +72,8 @@ function configs(labels, datasets) {
       },
       scales: {
         y: {
-          min: 0, // Set minimum value of y-axis to 0 (or adjust as needed)
-          max: 100, // Set maximum value of y-axis to 100 (or adjust as needed)
+          min: 0,
+          max: maxValue + 1, 
           grid: {
             drawBorder: false,
             display: true,

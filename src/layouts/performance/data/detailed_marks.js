@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DataTable from 'examples/Tables/DataTable';
 import MDTypography from 'components/MDTypography';
-import { Card, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Card } from '@mui/material';
 import MDBox from 'components/MDBox';
 
 const MarksTable = ({ semester }) => {
@@ -11,7 +11,7 @@ const MarksTable = ({ semester }) => {
   // Fetch marks data for the selected semester
   const fetchMarksData = async (semester) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/performance/student/detailedmarks?semester=${semester}`);
+      const response = await fetch(`http://localhost:8001/api/performance/student/detailedmarks?semester=${semester}`);
       const data = await response.json();
 
       // Ensure data is an array before setting it
@@ -29,13 +29,13 @@ const MarksTable = ({ semester }) => {
     fetchMarksData(semester);
   }, [semester]);
 
-  // Group data by subject and marks type
+  // Group data by subject and exam type
   const groupedMarksData = Array.isArray(marksData)
-    ? marksData.reduce((acc, { name, marks_type, marks_obtained, marks_total, grade }) => {
-        if (!acc[name]) {
-          acc[name] = [];
+    ? marksData.reduce((acc, { subject_name, exam_type, marks_obtained, max_marks }) => {
+        if (!acc[subject_name]) {
+          acc[subject_name] = [];
         }
-        acc[name].push({ marks_type, marks_obtained, marks_total, grade });
+        acc[subject_name].push({ exam_type, marks_obtained, max_marks });
         return acc;
       }, {})
     : {};
@@ -43,14 +43,18 @@ const MarksTable = ({ semester }) => {
   // Function to calculate grade based on total marks
   const calculateGrade = (totalMarks, maxMarks) => {
     const percentage = (totalMarks / maxMarks) * 100;
-    if (percentage >= 90) return 'A+';
-    if (percentage >= 80) return 'A';
-    if (percentage >= 70) return 'B';
-    if (percentage >= 60) return 'C';
+    if (percentage >= 80) return 'O';
+    if (percentage < 80 && percentage >= 75) return 'A+';
+    if (percentage < 75 && percentage >= 60) return 'A';
+    if (percentage < 60 && percentage >= 55) return 'B+';
+    if (percentage < 55 && percentage >= 50) return 'B';
+    if (percentage < 50 && percentage >= 45) return 'C';
+    if (percentage < 45 && percentage >= 35) return 'D';
+    if (percentage < 35 ) return "F: ATKT"
     return 'F';
   };
 
-  // Prepare table data: rows will be subjects, and columns will be marks types
+  // Prepare table data: rows will be subjects, and columns will be exam types
   const marksTableData = Array.isArray(marksData)
     ? Object.keys(groupedMarksData).map(subject => {
         const subjectData = groupedMarksData[subject];
@@ -58,10 +62,10 @@ const MarksTable = ({ semester }) => {
         let maxMarks = 0;
         const row = { subject };
 
-        subjectData.forEach(({ marks_type, marks_obtained, marks_total }) => {
+        subjectData.forEach(({ exam_type, marks_obtained, max_marks }) => {
           totalMarks += marks_obtained;
-          maxMarks += marks_total;
-          row[marks_type] = `${marks_obtained}`; // Marks obtained for each type
+          maxMarks += max_marks;
+          row[exam_type] = `${marks_obtained}`; // Marks obtained for each exam type
         });
 
         row["total"] = `${totalMarks} / ${maxMarks}`; // Total marks
@@ -79,26 +83,18 @@ const MarksTable = ({ semester }) => {
   // Get unique subjects for the dropdown
   const subjects = ['All', ...new Set(marksTableData.map(row => row.subject))];
 
-  // Remove duplicate marks types across all subjects
-  const uniqueMarksTypes = Array.isArray(marksData)
-    ? [
-        ...new Set(marksData.map(item => item.marks_type))
-      ]
+  // Get unique exam types across all subjects
+  const uniqueExamTypes = Array.isArray(marksData)
+    ? [...new Set(marksData.map(item => item.exam_type))]
     : [];
 
   // Add total and grade columns to the columns configuration
   const marksColumns = [
     { Header: 'Subject', accessor: 'subject' },
-    ...uniqueMarksTypes.map(marksType => {
-      const totalMarks = groupedMarksData[Object.keys(groupedMarksData)[0]] // Get total marks from any subject
-        .filter(item => item.marks_type === marksType)
-        .reduce((total, { marks_total }) => total + marks_total, 0);
-
-      return {
-        Header: `${marksType} (${totalMarks})`, // Include total marks beside marks type
-        accessor: marksType,
-      };
-    }),
+    ...uniqueExamTypes.map(examType => ({
+      Header: `${examType}`, // Column for each exam type
+      accessor: examType,
+    })),
     {
       Header: `Total`,
       accessor: 'total', // This column will display the total marks for each subject
@@ -131,31 +127,30 @@ const MarksTable = ({ semester }) => {
         py={3}
         px={2}
         variant="gradient"
-        bgColor="error"
+        bgColor="success"
         borderRadius="lg"
-        coloredShadow="info"
+        coloredShadow="success"
       >
         <MDTypography variant="h6" color="white">
           Marks Category-Wise
         </MDTypography>
       </MDBox>
       <MDBox pt={2} px={2}>
-        {/* Grand Total and Overall Grade Section */}
-          {/* Subject Filter */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', border: '1px solid #ddd', marginRight: '20px' }}
-            >
-              <option value="All">All Subjects</option>
-              {Object.keys(groupedMarksData).map((subject) => (
-                <option key={subject} value={subject}>
-                  {subject}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Subject Filter */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', border: '1px solid #ddd', marginRight: '20px' }}
+          >
+            <option value="All">All Subjects</option>
+            {subjects.map((subject) => (
+              <option key={subject} value={subject}>
+                {subject}
+              </option>
+            ))}
+          </select>
+        </div>
         {/* Data Table */}
         <DataTable
           table={{ columns: marksColumns, rows: filteredMarksTableData }}
@@ -164,8 +159,8 @@ const MarksTable = ({ semester }) => {
           showTotalEntries={false}
           noEndBorder
         />
-        <hr></hr>
-        <div style={{fontWeight: 'bold',fontSize: '0.9rem', display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', marginTop:'10px' }}>
+        <hr />
+        <div style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', marginTop: '10px' }}>
           <p>Grand Total: {totalMarksAllSubjects} / {maxMarksAllSubjects}</p>
           <p>Overall Percentage: {overallPercentage.toFixed(2)}%</p>
           <p>Overall Grade: {overallGrade}</p>

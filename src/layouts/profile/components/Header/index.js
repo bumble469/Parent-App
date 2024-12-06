@@ -5,29 +5,30 @@ import Grid from '@mui/material/Grid';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import MDAvatar from 'components/MDAvatar';
-import breakpoints from 'assets/theme/base/breakpoints';
-import burceMars from 'assets/images/bruce-mars.jpg';
 import backgroundImage from 'assets/images/campus.jpg';
-import studentData from 'layouts/profile/data/studentdata';
 import { Divider } from '@mui/material';
+import bruceMars from '../../../../assets/images/bruce-mars.jpg';
 
 function Header({ children }) {
-  const [tabsOrientation, setTabsOrientation] = useState('horizontal');
-  const [tabValue, setTabValue] = useState(0);
-  const { student } = studentData;
+  const [student, setStudent] = useState(null);
 
   useEffect(() => {
-    function handleTabsOrientation() {
-      return window.innerWidth < breakpoints.values.sm
-        ? setTabsOrientation('vertical')
-        : setTabsOrientation('horizontal');
-    }
+    // Fetch student data (you can replace this with your API call)
+    // Example:
+    fetch('http://localhost:8001/api/student/profile') // Change to your actual API endpoint
+      .then((response) => response.json())
+      .then((data) => {
+        setStudent(data); // Assuming the response structure contains student data
+      })
+      .catch((error) => {
+        console.error('Error fetching student data:', error);
+      });
+  }, []);
 
-    window.addEventListener('resize', handleTabsOrientation);
-    handleTabsOrientation();
-
-    return () => window.removeEventListener('resize', handleTabsOrientation);
-  }, [tabsOrientation]);
+  // Check if student data is available
+  if (!student) {
+    return <div>Loading...</div>; // Loading state while waiting for data
+  }
 
   return (
     <MDBox position="relative" mb={5}>
@@ -60,13 +61,17 @@ function Header({ children }) {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid item>
-            <MDAvatar src={burceMars} alt="profile-image" size="xl" shadow="sm" />{' '}
-            {/* Adjusted size */}
+          <MDAvatar
+            src={student.studentInfo.studentImage || bruceMars} // Use the Base64 image or fallback to default
+            alt="profile-image"
+            size="xl"
+            shadow="sm"
+          />
           </Grid>
           <Grid item>
             <MDBox height="100%" mt={1} lineHeight={1}>
               <MDTypography variant="h5" fontWeight="medium">
-                {student.name}
+                {student.studentInfo.fullName} {/* Displaying student's full name */}
               </MDTypography>
             </MDBox>
           </Grid>

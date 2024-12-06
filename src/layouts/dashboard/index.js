@@ -20,11 +20,10 @@ function Dashboard() {
   const [error, setError] = useState(null); // State for error
   const [studentData, setStudentData] = useState(null); // State for the fetched student data
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/dashboard/student/star');
+        const response = await axios.get('http://localhost:8001/api/dashboard/student/star');
         console.log('API Response:', response.data); // Log to check the data
         setStudentData(response.data); // Set the fetched data
         setLoading(false);
@@ -43,9 +42,9 @@ function Dashboard() {
 
   // Calculate total marks and total attendance from the data
   const marksData = studentData?.map((item) => item.marks_obtained);
-  const totalMarksData = studentData?.map((item) => item.marks_total);
-  const attendanceData = studentData?.map((item) => item.lectures_attended);
-  const totalAttendanceData = studentData?.map((item) => item.lectures_total);
+  const totalMarksData = studentData?.map((item) => item.max_marks);
+  const attendanceData = studentData?.map((item) => item.total_lectures_attended);
+  const totalAttendanceData = studentData?.map((item) => item.total_lectures_conducted);
 
   // Calculate total marks and total attendance
   const totalMarks = marksData?.reduce((acc, curr) => acc + curr, 0) || 0;
@@ -75,27 +74,34 @@ function Dashboard() {
     message: '',
     color: ''
   };
-  
+
   if (overallMarksFromAPI < 50) {
     labelMessageForOverallMarks.message = "Needs Improvement!";
     labelMessageForOverallMarks.color = "error";
-  }else if(overallMarksFromAPI < 75){
+  } else if (overallMarksFromAPI < 75) {
     labelMessageForOverallMarks.message = "Can do better..";
     labelMessageForOverallMarks.color = "warning";
-  } else {
+  } else if (overallMarksFromAPI >= 75 && overallMarksFromAPI <= 100){
     labelMessageForOverallMarks.message = "Good, Keep It Up!";
     labelMessageForOverallMarks.color = "success";
+  } else{
+    labelMessageForOverallMarks.message = "no marks records detected.."
+    labelMessageForOverallMarks.color = "info"
   }
 
   if (overallAttendancePercentage < 50) {
     labelMessageForOverallAttendance.message = "Needs Improvement!";
     labelMessageForOverallAttendance.color = "error";
-  }else if(overallAttendancePercentage < 75){
+  } else if (overallAttendancePercentage < 75) {
     labelMessageForOverallAttendance.message = "Can do better..";
     labelMessageForOverallAttendance.color = "warning";
-  } else {
+  } else if (overallAttendancePercentage >= 75 && overallAttendancePercentage <= 100){
     labelMessageForOverallAttendance.message = "Good, Keep It Up!";
     labelMessageForOverallAttendance.color = "success";
+  }
+  else {
+    labelMessageForOverallAttendance.message = "no attendance records detected.."
+    labelMessageForOverallAttendance.color = "info"
   }
 
   return (
@@ -146,6 +152,8 @@ function Dashboard() {
               </ComplexStatisticsCard>
             </MDBox>
           </Grid>
+
+          {/* Always render the Rating component, but show empty stars if marks data is not available */}
           <Grid item xs={12} md={12} lg={4}>
             <MDBox>
               <ComplexStatisticsCard
@@ -164,11 +172,11 @@ function Dashboard() {
                   justifyContent="space-evenly"
                   sx={{ pb: 1.45 }}
                 >
-                  {[...Array(fullStars)].map((_, index) => (
+                  {[...Array(fullStars || 0)].map((_, index) => (
                     <StarIcon key={`full-${index}`} color="warning" />
                   ))}
                   {halfStar === 1 && <StarHalfIcon key="half" color="warning" />}
-                  {[...Array(emptyStars)].map((_, index) => (
+                  {[...Array(emptyStars || 5)].map((_, index) => (
                     <StarBorderIcon key={`empty-${index}`} color="action" />
                   ))}
                 </MDBox>
@@ -176,6 +184,8 @@ function Dashboard() {
             </MDBox>
           </Grid>
         </Grid>
+
+        {/* The remaining content */}
         <MDBox mt={5}>
           <Grid container spacing={1}>
             <Grid item xs={12} md={6} lg={6}>
@@ -185,12 +195,12 @@ function Dashboard() {
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
               <MDBox mb={3} borderRadius="3px">
-                <ReportsLineChartWrapper/>
+                <ReportsLineChartWrapper />
               </MDBox>
             </Grid>
           </Grid>
         </MDBox>
-        <SubjectDashboard/>
+        <SubjectDashboard />
         <MDBox mt={2}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={12} lg={12}>

@@ -8,8 +8,8 @@ async function getStudentDetailsForPerformance(studentId) {
             .input('studentId', sql.Int, studentId)  
             .query(`
                 SELECT *
-                FROM StudentPerformance
-                WHERE stud_id = @studentId
+                FROM vw_student_performance
+                WHERE student_id = @studentId
             `);
 
         console.log('Database Query Result:', result.recordset);

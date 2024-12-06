@@ -8,12 +8,11 @@ async function getStudentCurrentSemester(studentId) {
             .input('studentId', sql.Int, studentId)
             .query(`
                 SELECT 
-                    sem_id,
-                    firstname,
-                    lastname,
-                    rollno
-                FROM students 
-                WHERE stud_id = 1
+                    semester_id,
+                    student_full_name,
+                    roll_number
+                FROM student_data 
+                WHERE student_id = @studentId;
             `);
 
         console.log('Database Query Result:', result.recordset);
@@ -26,10 +25,9 @@ async function getStudentCurrentSemester(studentId) {
         const profileData = result.recordset[0];
 
         const formattedProfile = {
-            current_Sem: profileData.sem_id,
-            stud_firstname: profileData.firstname,
-            stud_lastname: profileData.lastname,
-            stud_rollno: profileData.rollno, 
+            current_Sem: profileData.semester_id,
+            stud_fullname: profileData.student_full_name,
+            stud_rollno: profileData.roll_number, 
         };
 
         return formattedProfile;

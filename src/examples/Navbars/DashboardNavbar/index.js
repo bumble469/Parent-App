@@ -31,7 +31,7 @@ import { useMaterialUIController, setTransparentNavbar, setMiniSidenav } from 'c
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
+  const { miniSidenav, transparentNavbar, fixedNavbar } = controller;
   const [openMenu, setOpenMenu] = useState(null);
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false); // State for Logout Dialog
@@ -109,7 +109,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       <MenuItem sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
         <Avatar sx={{ width: 56, height: 56, mb: 1 }} alt="User Name" src={profileImage} />
         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-          {student.stud_firstname}&nbsp;{student.stud_lastname}
+          {student.stud_fullname}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           Rollno: {student.stud_rollno}
@@ -148,10 +148,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
-      let colorValue = light || darkMode ? white.main : dark.main;
+      let colorValue = light
 
       if (transparentNavbar && !light) {
-        colorValue = darkMode ? rgba(text.main, 0.6) : text.main;
+        colorValue = text.main;
       }
 
       return colorValue;
@@ -165,7 +165,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   useEffect(() => {
     const fetchStudentDetails = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/student/currentsemester');
+        const response = await fetch('http://localhost:8001/api/student/currentsemester');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -189,7 +189,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     <AppBar
       position={absolute ? 'absolute' : navbarType}
       color="inherit"
-      sx={(theme) => navbar(theme, { transparentNavbar, absolute, light, darkMode })}
+      sx={(theme) => navbar(theme, { transparentNavbar, absolute, light })}
     >
       <Toolbar sx={(theme) => navbarContainer(theme)}>
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
@@ -218,7 +218,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 sx={{
                   ...navbarIconButton,
                   '&:hover': {
-                    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Adjust hover color
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Adjust hover color
                   },
                 }}
                 aria-controls="notification-menu"
@@ -247,7 +247,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 sx={{
                   ...navbarIconButton,
                   '&:hover': {
-                    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Adjust hover color
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Adjust hover color
                   },
                 }}
                 aria-controls="profile-menu"

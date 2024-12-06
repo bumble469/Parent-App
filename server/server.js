@@ -14,7 +14,7 @@ const getStudentDetailedAttendanceForPerformance = require('./performanceapi/det
 const getStudentDetailedMarksForPerformance = require('./performanceapi/detailedMarksApi/api');
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8001;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

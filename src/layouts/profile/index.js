@@ -26,7 +26,7 @@ function Overview() {
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/student/profile');
+        const response = await fetch('http://localhost:8001/api/student/profile');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -46,6 +46,10 @@ function Overview() {
     return <div>Loading...</div>; // Optionally, add a spinner or loading indicator
   }
 
+  // Debugging: Log the student object to check the structure
+  console.log(student);
+
+  // Ensure student and parentInfo are correctly populated before rendering
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -69,26 +73,23 @@ function Overview() {
                       Email: student.studentInfo.email,
                       'Date of Birth': student.studentInfo.dob,
                       'Enrollment Date': student.studentInfo.enrollmentDate,
-                      GPA: student.studentInfo.gpa,
                       Address: student.studentInfo.address,
                       'Contact Mobile': student.studentInfo.contactMobile,
                     },
-                    'Mother Information': {
-                      Name: student.motherInfo.name,
-                      'Contact Mobile': student.motherInfo.contactMobile,
-                      Email: student.motherInfo.email,
-                      Address: student.motherInfo.address,
-                      Occupation: student.motherInfo.occupation,
-                      'Work Hours': student.motherInfo.workHours,
-                    },
-                    'Father Information': {
-                      Name: student.fatherInfo.name,
-                      'Contact Mobile': student.fatherInfo.contactMobile,
-                      Email: student.fatherInfo.email,
-                      Address: student.fatherInfo.address,
-                      Occupation: student.fatherInfo.occupation,
-                      'Work Hours': student.fatherInfo.workHours,
-                    },
+                    'Parent Information': student.parentInfo && student.parentInfo.length > 0 ? {
+                      'Father Name': student.parentInfo[0]?.name || 'N/A',
+                      'Father Email': student.parentInfo[0]?.email || 'N/A',
+                      'Father Mobile': student.parentInfo[0]?.contactMobile || 'N/A',
+                      'Mother Name': student.parentInfo[1]?.name || 'N/A',
+                      'Mother Email': student.parentInfo[1]?.email || 'N/A',
+                      'Mother Mobile': student.parentInfo[1]?.contactMobile || 'N/A',
+                    } : { 'Parent Details': 'N/A' }, // Safely handle empty or undefined parentInfo
+                    'Course & Fees Information': {
+                      'Total Fees': student.studentInfo.totalFees || 'N/A',
+                      'Fees Paid': student.studentInfo.feesPaid || 'N/A',
+                      'Fees Pending': student.studentInfo.feesPending || 'N/A',
+                      'Transaction Status': student.studentInfo.transactionInfo?.transactionStatus || 'N/A',
+                    }
                   }}
                   social={[
                     {

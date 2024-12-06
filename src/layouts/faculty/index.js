@@ -6,182 +6,156 @@ import Tab from '@mui/material/Tab';
 import Icon from '@mui/material/Icon';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import MDBox from 'components/MDBox'; // Adjust the path if needed
-import DashboardLayout from 'examples/LayoutContainers/DashboardLayout'; // Adjust the path if needed
-import DashboardNavbar from 'examples/Navbars/DashboardNavbar'; // Adjust the path if needed
-import Footer from 'examples/Footer'; // Adjust the path if needed
-import axios from 'axios'; // Import axios for making API requests
+import MDBox from 'components/MDBox'; // Adjust path if needed
+import DashboardLayout from 'examples/LayoutContainers/DashboardLayout'; // Adjust path if needed
+import DashboardNavbar from 'examples/Navbars/DashboardNavbar'; // Adjust path if needed
+import Footer from 'examples/Footer'; // Adjust path if needed
+import axios from 'axios';
 
 function Faculty() {
-  const [tabValue, setTabValue] = useState(0);
-  const [staffData, setStaffData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [tabValue, setTabValue] = useState(0);  // State to manage selected tab
+  const [staffData, setStaffData] = useState([]);  // Store fetched staff data
+  const [loading, setLoading] = useState(true);  // Loading state
+  const [error, setError] = useState(null);  // Error state
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const response = await axios.get('http://localhost:8080/api/faculty'); 
-        console.log('API Response:', response.data); 
+        // URL based on selected tab
+        const apiUrl =
+          tabValue === 0
+            ? 'http://localhost:8001/api/faculty'  // For Overall filter
+            : 'http://localhost:8001/api/chat/chat-list';  // For Current Semester filter
 
-        if (Array.isArray(response.data)) {
-          setStaffData(response.data);
-        } else {
-          throw new Error('Unexpected API response structure');
-        }
-
+        // Fetch data from the selected API
+        const response = await axios.get(apiUrl);
+        setStaffData(response.data);
         setLoading(false);
-      } catch (error) {
-        console.error('API Error:', error); // Log the error for debugging
-        setError(error);
+      } catch (err) {
+        setError(err.message);
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [tabValue]);  // Effect runs when tabValue changes
 
   const handleSetTabValue = (event, newValue) => {
-    setTabValue(newValue);
+    setTabValue(newValue);  // Update the tab value
   };
 
-  // Group staff data by teacher_id
+  // Group staff by teacher_fullname
   const groupedStaff = staffData.reduce((acc, item) => {
-    if (!acc[item.teacher_id]) {
-      acc[item.teacher_id] = {
-        ...item,
+    const key = item.teacher_fullname;
+    if (!acc[key]) {
+      acc[key] = {
+        teacher_fullname: item.teacher_fullname,
+        teacher_qualification: item.teacher_qualification,
+        teacher_type: item.teacher_type,
+        teacher_image: item.teacher_image,
         subjects: [],
         semesters: []
       };
     }
-    if (item.subject_name && !acc[item.teacher_id].subjects.includes(item.subject_name)) {
-      acc[item.teacher_id].subjects.push(item.subject_name);
+    if (!acc[key].subjects.includes(item.subject_name)) {
+      acc[key].subjects.push(item.subject_name);
     }
-    if (item.semester_name && !acc[item.teacher_id].semesters.includes(item.semester_name)) {
-      acc[item.teacher_id].semesters.push(item.semester_name);
+    if (!acc[key].semesters.includes(item.semester_number)) {
+      acc[key].semesters.push(item.semester_number);
     }
     return acc;
   }, {});
 
   const staffArray = Object.values(groupedStaff);
 
-  // Filter staffArray based on the selected tab and current semester
-  const currentSemester = 'Semester 4'; // Set the current semester
-
-  const filteredStaff = tabValue === 1
-    ? staffArray.filter(staff => staff.semesters.includes(currentSemester))
-    : staffArray;
-
   if (loading) {
-    return <Typography variant="h6" color="text.primary">Loading...</Typography>;
+    return <Typography variant="h6">Loading...</Typography>;
   }
 
   if (error) {
-    return <Typography variant="h6" color="error">Error: {error.message}</Typography>;
+    return <Typography variant="h6" color="error">Error: {error}</Typography>;
   }
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={3} pb={3} mt={2} mb={2}>
+      <MDBox pt={3} pb={3}>
         {/* Tabs */}
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={12} md={6} lg={4} sx={{ ml: 'auto' }}>
+        <Grid container spacing={3} justifyContent="left">
+          <Grid item xs={12} md={6} lg={4}>
             <AppBar position="static">
               <Tabs
-                orientation="horizontal"
                 value={tabValue}
                 onChange={handleSetTabValue}
-                aria-label="faculty view tabs"
+                aria-label="faculty tabs"
               >
                 <Tab
                   label="Overall"
-                  icon={
-                    <Icon fontSize="small" sx={{ mt: -0.25 }}>
-                      group
-                    </Icon>
-                  }
+                  icon={<Icon>group</Icon>}
                 />
                 <Tab
                   label="Current Sem"
-                  icon={
-                    <Icon fontSize="small" sx={{ mt: -0.25 }}>
-                      calendar_today
-                    </Icon>
-                  }
+                  icon={<Icon>calendar_today</Icon>}
                 />
               </Tabs>
             </AppBar>
           </Grid>
         </Grid>
 
-        {/* Staff Boxes */}
+        {/* Faculty Cards */}
         <MDBox mt={3}>
-          <Grid container spacing={3} justifyContent="center">
-            {filteredStaff.length > 0 ? (
-              filteredStaff.map((staff) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={staff.teacher_id}>
+          <Grid container spacing={3}>
+            {staffArray.length > 0 ? (
+              staffArray.map((staff, index) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                   <Box
                     sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      height: '100%',
-                      width: '100%',
-                      maxWidth: 345,
-                      border: '1px solid #ddd',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "100%", // Allow the card to stretch fully
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      overflow: "hidden",
                       boxShadow: 3,
-                      margin: 'auto', // Center card horizontally
                     }}
                   >
                     <Box
                       component="img"
-                      src={staff.teacher_image || 'path/to/default/image.jpg'} // Handle missing images
-                      alt={`${staff.firstname} ${staff.lastname}`}
+                      src={staff.teacher_image || 'path/to/default/image.jpg'}
+                      alt={staff.teacher_fullname}
                       sx={{
-                        width: '100%',
-                        height: '140px',
-                        objectFit: 'cover',
+                        height: "180px", // Fixed height for the image
+                        objectFit: "cover",
+                        width: "100%",
                       }}
                     />
-                    <Box
-                      sx={{
-                        p: 2,
-                        flexGrow: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <Typography gutterBottom variant="h6" component="div">
-                        {`${staff.firstname} ${staff.lastname}`}
+                    <Box sx={{ p: 2, flexGrow: 1 }}>
+                      <Typography gutterBottom variant="h6">
+                        {staff.teacher_fullname}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        <b>Type:</b> {staff.type}
+                      <Typography variant="body2">
+                        <b>Type:</b> {staff.teacher_type}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        <b>Qualification:</b> {staff.qualification}
+                      <Typography variant="body2">
+                        <b>Qualification:</b> {staff.teacher_qualification}
                       </Typography>
-                      {staff.subjects.length > 0 && (
-                        <Typography variant="body2" color="text.secondary">
-                          <b>Subjects:</b> {staff.subjects.join(', ')}
-                        </Typography>
-                      )}
-                      {staff.semesters.length > 0 && (
-                        <Typography variant="body2" color="text.secondary">
-                          <b>Semesters:</b> {staff.semesters.join(', ')}
-                        </Typography>
-                      )}
+                      <Typography variant="body2">
+                        <b>Subjects:</b> {staff.subjects.join(', ')}
+                      </Typography>
+                      <Typography variant="body2">
+                        <b>Semesters:</b> {staff.semesters.join(', ')}
+                      </Typography>
                     </Box>
                   </Box>
                 </Grid>
               ))
             ) : (
-              <Grid item xs={12}>
-                <Typography variant="h6" color="text.primary">
-                  No staff members available for the selected view.
-                </Typography>
-              </Grid>
+              <Typography variant="h6" color="text.primary">
+                No faculty members available.
+              </Typography>
             )}
           </Grid>
         </MDBox>

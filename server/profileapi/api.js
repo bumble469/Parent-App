@@ -12,7 +12,7 @@ router.use(cors());
 
 // Middleware for logging
 router.use((req, res, next) => {
-    console.log('Middleware activated for faculty API');
+    console.log('Middleware activated for profile API');
     next();
 });
 
@@ -23,7 +23,7 @@ router.route('/profile').get(async (req, res) => {
         console.log('Fetched data:', result);
         res.json(result);
     } catch (error) {
-        console.error('Error fetching faculty:', error);
+        console.error('Error fetching profile info:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });

@@ -29,7 +29,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/student/profile');
+        const response = await fetch('http://localhost:8001/api/student/profile');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -181,7 +181,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             padding: '3px',
           }}
         >
-          {student && student.motherInfo && student.fatherInfo ? (
+          {student && student.parentInfo ? (
             <MDTypography
               variant="caption"
               color="black"
@@ -191,12 +191,12 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                 maxWidth: '100%',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                whiteSpace: 'normal',  // Allows text to wrap if it's long
                 mb: 1,
               }}
             >
-              Welcome, {student.motherInfo.name} and {student.fatherInfo.name}
-            </MDTypography>
+              Welcome, {student.parentInfo[0].name} and {student.parentInfo[1].name}
+            </MDTypography>          
           ) : (
             <MDTypography
               variant="caption"

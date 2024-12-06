@@ -1,20 +1,40 @@
-const { sql, poolPromise } = require('../utils/db'); 
+const { sql, poolPromise } = require('../utils/db');
 
-async function getChatList(semesterNumber) {
+async function getChatList(studentId) {
     try {
         let pool = await poolPromise;
-        const semesterName = `Semester ${semesterNumber}`;
 
         const query = `
-            SELECT t.teacher_id, t.firstname, t.lastname, t.subject_name, t.teacher_image
-            FROM TeacherDetails t
-            WHERE t.semester_name = @semester
+            SELECT 
+                t.teacher_id,
+                t.teacher_fullname,
+                STRING_AGG(t.subject_name, ', ') AS subject_name, -- Concatenate all subjects
+                t.teacher_image,
+                t.teacher_qualification,
+                t.teacher_type,
+                STRING_AGG(t.semester_number, ', ') AS semester_number  -- Corrected the syntax here
+            FROM 
+                TeacherDetails t
+            INNER JOIN 
+                student_data s
+            ON 
+                t.semester_id = s.semester_id
+                AND t.course_id = s.course_id
+            WHERE 
+                s.student_id = @studentId
+            GROUP BY 
+                t.teacher_id, 
+                t.teacher_fullname, 
+                t.teacher_image,
+                t.teacher_qualification,
+                t.teacher_type
         `;
-        
+
+        // Fetch data based on the provided studentId
         let result = await pool.request()
-            .input('semester', sql.NVarChar, semesterName) 
+            .input('studentId', sql.NVarChar, studentId)
             .query(query);
-        
+
         console.log('Database Query Result:', result.recordset);
 
         // Convert teacher_image to Base64 format
@@ -25,13 +45,13 @@ async function getChatList(semesterNumber) {
                 : null,
         }));
 
-        return chatList; 
+        return chatList;
     } catch (error) {
-        console.error('Error fetching chat list:', error); 
-        throw error; 
+        console.error('Error fetching chat list:', error);
+        throw error;
     }
 }
 
 module.exports = {
-    getChatList
+    getChatList,
 };

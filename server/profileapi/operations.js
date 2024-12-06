@@ -1,4 +1,5 @@
 const { sql, poolPromise } = require('../utils/db');
+const { Buffer } = require('buffer');
 
 async function getStudentParentProfile(studentId) {
     try {
@@ -8,78 +9,82 @@ async function getStudentParentProfile(studentId) {
             .input('studentId', sql.Int, studentId)
             .query(`
                 SELECT 
-                    full_name, 
-                    rollno, 
-                    age, 
-                    student_email, 
-                    dob, 
-                    enrollment_date, 
-                    gpa, 
-                    student_address,
-                    student_contact, 
-                    mothername, 
-                    mothercontact, 
-                    motheremail, 
-                    motheraddress, 
-                    motheroccupation, 
-                    motherworkhours,
-                    fathername, 
-                    fathercontact, 
-                    fatheremail, 
-                    fatheraddress, 
-                    fatheroccupation, 
-                    fatherworkhours 
-                FROM student_parent_info 
-                WHERE stud_id = 1
+                    student_id,
+                    studentFullName,
+                    rollNo,
+                    student_age AS age,
+                    studentEmail,
+                    student_dob AS dob,
+                    enrollmentDate,
+                    studentAddress,
+                    studentContact,
+                    student_image AS studentImage,
+                    parentFullName,
+                    parentEmail,
+                    parentContact,
+                    total_fees,
+                    fees_paid,
+                    fees_pending,
+                    transaction_id,
+                    transaction_date,
+                    transaction_type,
+                    payment_complete,
+                    transaction_status
+                FROM Student_Profile
+                WHERE student_id = @studentId
+                ORDER BY transaction_date
             `);
-
-        console.log('Database Query Result:', result.recordset);
 
         if (result.recordset.length === 0) {
             console.log('No student-parent profile found');
             return null;
         }
 
-        const profileData = result.recordset[0];
+        // Convert the student image from binary to Base64
+        const studentImage = result.recordset[0].studentImage
+            ? `data:image/jpeg;base64,${Buffer.from(result.recordset[0].studentImage).toString('base64')}`
+            : null;
 
-        const formattedProfile = {
-            studentInfo: {
-                fullName: profileData.full_name,
-                rollNo: profileData.rollno,
-                age: profileData.age,
-                email: profileData.student_email,
-                dob: profileData.dob,
-                enrollmentDate: profileData.enrollment_date,
-                gpa: profileData.gpa,
-                address: profileData.student_address,
-                contactMobile: profileData.student_contact,
+        const studentInfo = {
+            fullName: result.recordset[0].studentFullName,
+            rollNo: result.recordset[0].rollNo,
+            age: result.recordset[0].age,
+            email: result.recordset[0].studentEmail,
+            dob: result.recordset[0].dob,
+            enrollmentDate: result.recordset[0].enrollmentDate,
+            address: result.recordset[0].studentAddress,
+            contactMobile: result.recordset[0].studentContact,
+            studentImage: studentImage, // Base64 encoded image
+            totalFees: result.recordset[0].total_fees,
+            feesPaid: result.recordset[0].fees_paid,
+            feesPending: result.recordset[0].fees_pending,
+            transactionInfo: {
+                transactionId: result.recordset[0].transaction_id,
+                transactionDate: result.recordset[0].transaction_date,
+                transactionType: result.recordset[0].transaction_type,
+                paymentComplete: result.recordset[0].payment_complete,
+                transactionStatus: result.recordset[0].transaction_status,
             },
-            motherInfo: {
-                name: profileData.mothername,
-                contactMobile: profileData.mothercontact,
-                email: profileData.motheremail,
-                address: profileData.motheraddress,
-                occupation: profileData.motheroccupation,
-                workHours: profileData.motherworkhours,
-            },
-            fatherInfo: {
-                name: profileData.fathername,
-                contactMobile: profileData.fathercontact,
-                email: profileData.fatheremail,
-                address: profileData.fatheraddress,
-                occupation: profileData.fatheroccupation,
-                workHours: profileData.fatherworkhours,
-            }
         };
 
-        return formattedProfile;
+        const parentInfo = result.recordset.map(row => ({
+            name: row.parentFullName,
+            email: row.parentEmail,
+            contactMobile: row.parentContact,
+        }));
+
+        const response = {
+            studentInfo,
+            parentInfo,
+        };
+
+        return response;
     } catch (error) {
-        console.error('Error fetching student-parent profile: ', error.message); // Log the error message for clarity
-        console.error('Error details: ', error); // Log the full error object for more insights
+        console.error('Error fetching student-parent profile: ', error.message);
         throw error;
     }
 }
 
 module.exports = {
-    getStudentParentProfile
+    getStudentParentProfile,
 };

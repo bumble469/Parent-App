@@ -22,22 +22,22 @@ const ReportsBarChartWrapper = ({ semester }) => {
           throw new Error("Invalid semester value");
         }
 
-        const response = await axios.get(`http://localhost:8080/api/performance/student/detailedattendance?semester=${validSemester}`);
+        const response = await axios.get(`http://localhost:8001/api/performance/student/detailedattendance?semester=${validSemester}`);
         console.log('API Response:', response.data);
 
         if (Array.isArray(response.data)) {
           // Step 1: Process the data to calculate attended and total lectures, excluding null values
           const subjectsData = response.data.reduce((acc, item) => {
-            if (item.attended !== null) { // Exclude null values
-              if (!acc[item.name]) {
-                acc[item.name] = {
+            if (item.is_present !== null) { // Exclude null values
+              if (!acc[item.subject_name]) {
+                acc[item.subject_name] = {
                   attended: 0,
                   total: 0,
                 };
               }
-              acc[item.name].total += 1; // Every entry counts as a total lecture
-              if (item.attended) {
-                acc[item.name].attended += 1; // Count attended lectures (true)
+              acc[item.subject_name].total += 1; // Every entry counts as a total lecture
+              if (item.is_present) {
+                acc[item.subject_name].attended += 1; // Count attended lectures (true)
               }
             }
             return acc;

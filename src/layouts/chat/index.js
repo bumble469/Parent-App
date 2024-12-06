@@ -38,7 +38,7 @@ function Chat() {
     // Fetch teacher data from API
     const fetchTeachers = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/chat/chat-list/4'); // Replace with your API URL
+        const response = await fetch('http://localhost:8001/api/chat/chat-list'); // Replace with your API URL
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -96,7 +96,6 @@ function Chat() {
           width: { xs: '95%', sm: '100%' }, // Adjust width for mobile
         }}
       >
-        {/* Drawer for Mobile View */}
         <Drawer
           variant="temporary"
           open={drawerOpen}
@@ -149,7 +148,7 @@ function Chat() {
                   >
                     <ListItemIcon>
                       <Avatar
-                        alt={teacher.firstname}
+                        alt={teacher.teacher_fullname}
                         src={teacher.teacher_image ? teacher.teacher_image : 'default-image-url.jpg'} // Use the teacher's image
                         sx={{ width: 50, height: 50 }}
                       />
@@ -162,7 +161,7 @@ function Chat() {
                             fontSize: { xs: '1rem', sm: '0.9rem' }, // Reduce font size in desktop view
                           }}
                         >
-                          {`${teacher.firstname} ${teacher.lastname}`}
+                          {`${teacher.teacher_fullname}`}
                         </Typography>
                       }
                       secondary={
@@ -193,6 +192,16 @@ function Chat() {
             padding: 2,
             height: '100%',
             overflowY: 'auto',
+            '::-webkit-scrollbar': {
+              width: '8px', // Width of the scrollbar
+            },
+            '::-webkit-scrollbar-thumb': {
+              backgroundColor: '#888', // Color of the scrollbar thumb
+              borderRadius: '4px',
+            },
+            '::-webkit-scrollbar-thumb:hover': {
+              backgroundColor: '#555', // Color on hover
+            },
           }}
         >
           <Typography variant="h6" sx={{ marginBottom: 2 }}>
@@ -220,7 +229,7 @@ function Chat() {
                 >
                   <ListItemIcon>
                     <Avatar
-                      alt={`${teacher.firstname} ${teacher.lastname}`}
+                      alt={`${teacher.teacher_fullname}`}
                       src={teacher.teacher_image ? teacher.teacher_image : 'default-image-url.jpg'} // Use the teacher's image
                       sx={{ width: 50, height: 50 }}
                     />
@@ -233,7 +242,7 @@ function Chat() {
                           fontSize: { xs: '1rem', sm: '0.9rem' }, // Reduce font size in desktop view
                         }}
                       >
-                        {`${teacher.firstname} ${teacher.lastname}`}
+                        {`${teacher.teacher_fullname}`}
                       </Typography>
                     }
                     secondary={

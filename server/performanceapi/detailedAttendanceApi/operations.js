@@ -10,16 +10,19 @@ async function getStudentDetailedAttendanceForPerformance(studentId, semester) {
             .input('semester', sql.Int, semester)  // Add semester as input
             .query(`
                SELECT
-                    s.name,
-                    da.attendance_date,
-                    da.attended
-                FROM DetailedAttendance da
-                JOIN subjects s ON da.sub_id = s.sub_id
-                WHERE da.stud_id = @studentId
-                AND da.sem_id = @semester
+                    ms.subject_name,
+                    da.scan_time,
+                    da.is_present
+                FROM student_attendance da
+                
+                JOIN master_time_table mt ON da.time_table_id = mt.time_table_id
+                
+                JOIN master_subjects ms ON mt.subject_id = ms.subject_id
+                WHERE da.student_id = @studentId
+                AND ms.semester_id = @semester  -- Filter by semester from master_subjects
                 ORDER BY 
-                    YEAR(da.attendance_date) ASC,
-                    MONTH(da.attendance_date) ASC;
+                    YEAR(da.scan_time) ASC,
+                    MONTH(da.scan_time) ASC;
             `);
 
         console.log('Database Query Result:', result.recordset);

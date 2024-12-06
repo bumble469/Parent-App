@@ -15,7 +15,7 @@ const SubjectDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/dashboard/student/graph');
+        const response = await axios.get('http://localhost:8001/api/dashboard/student/graph');
 
         // Extract data
         const subjects = response.data.map(item => item.sub_name);

@@ -36,10 +36,10 @@ function Performance() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/performance/student');
+        const response = await fetch('http://localhost:8001/api/performance/student');
         const data = await response.json();
         // Extract unique semesters
-        const uniqueSemesters = Array.from(new Set(data.map(item => item.sem_id)))
+        const uniqueSemesters = Array.from(new Set(data.map(item => item.semester_id)))
           .map(id => ({
             id,
             name: `Semester ${id}`,
@@ -60,10 +60,10 @@ function Performance() {
   useEffect(() => {
     if (attendanceData.length > 0) {
       // Filter data based on selected semester
-      const filteredAttendance = attendanceData.filter(item => item.sem_id === semester);
+      const filteredAttendance = attendanceData.filter(item => item.semester_id === semester);
       // Calculate average attendance
-      const totalAttendance = filteredAttendance.reduce((sum, item) => sum + item.lectures_attended, 0);
-      const totalLectures = filteredAttendance.reduce((sum, item) => sum + item.lectures_total, 0);
+      const totalAttendance = filteredAttendance.reduce((sum, item) => sum + item.attended_lectures, 0);
+      const totalLectures = filteredAttendance.reduce((sum, item) => sum + item.lectures_conducted, 0);
       if (totalLectures > 0) {
         const avgAttendance = (totalAttendance / totalLectures) * 100;
         setAverageAttendance(avgAttendance);
@@ -71,15 +71,15 @@ function Performance() {
         setAverageAttendance(0); // Set to 0 if no lectures data
       }
       // Calculate average marks
-      const filteredMarks = marksData.filter(item => item.sem_id === semester);
+      const filteredMarks = marksData.filter(item => item.semester_id === semester);
 
       // Group by subject to sum marks for each subject
       const marksBySubject = filteredMarks.reduce((acc, item) => {
-        const subjectId = item.sub_id;
+        const subjectId = item.subject_id;
         if (!acc[subjectId]) {
           acc[subjectId] = { totalMarks: 0, obtainedMarks: 0 };
         }
-        acc[subjectId].totalMarks += item.marks_total;
+        acc[subjectId].totalMarks += item.max_marks;
         acc[subjectId].obtainedMarks += item.marks_obtained;
         return acc;
       }, {});
@@ -113,19 +113,17 @@ function Performance() {
     loadAchievements();
   }, [semester]);
 
-  
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={3}>
-          <Grid item xs={12} container spacing={3} justifyContent="flex-end">
+          <Grid item xs={12} container spacing={3} justifyContent="flex-start">
             <Grid item>
               <FormControl
                 variant="outlined"
                 sx={{
-                  minWidth: 220,
+                  minWidth: 250,
                   m: 1,
                   bgcolor: 'background.paper',
                   borderRadius: 1,
@@ -141,7 +139,7 @@ function Performance() {
                     padding: '0 8px',
                   }}
                 >
-                  Semester
+                  SEMESTER
                 </InputLabel>
                 <Select
                   labelId="semester-select-label"
@@ -210,7 +208,7 @@ function Performance() {
               <Grid item xs={12} md={4}>
                 <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
-                    color="error"
+                    color="success"
                     icon="leaderboard"
                     title="Average Grade"
                     count={`${averageMarks.toFixed(2)}%`}
@@ -245,6 +243,16 @@ function Performance() {
                         maxHeight: '50px', // Set a maximum height for the scrollable area
                         overflowY: 'auto', // Enable vertical scrolling
                         padding: '8px', // Optional: Add padding to ensure content is not flush with the edges
+                        '::-webkit-scrollbar': {
+                            width: '8px', // Width of the scrollbar
+                        },
+                        '::-webkit-scrollbar-thumb': {
+                          backgroundColor: '#888', // Color of the scrollbar thumb
+                          borderRadius: '4px',
+                        },
+                        '::-webkit-scrollbar-thumb:hover': {
+                          backgroundColor: '#555', // Color on hover
+                        },
                       }}
                     >
                       <MDTypography variant="body2" color="textSecondary" fontSize="0.9rem">

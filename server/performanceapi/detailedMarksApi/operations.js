@@ -10,18 +10,17 @@ async function getStudentDetailedMarksForPerformance(studentId, semester) {
             .input('semester', sql.Int, semester)  // Add semester as input
             .query(`
                SELECT 
-                    sp.stud_id,
-                    sp.sub_id,
-                    sp.sem_id,
-                    sp.name,
-                    sp.marks_type,
+                    sp.student_id,
+                    sp.subject_id,
+                    sp.semester_id,
+                    sp.subject_name,
+                    sp.exam_type,
                     sp.marks_obtained,
-                    sp.marks_total,
-                    sp.grade
-               FROM StudentPerformance sp
-               WHERE sp.stud_id = @studentId
-               AND sp.sem_id = @semester
-               ORDER BY sp.sub_id;
+                    sp.max_marks
+               FROM vw_student_performance sp
+               WHERE sp.student_id = @studentId
+               AND sp.semester_id = @semester
+               ORDER BY sp.subject_id;
             `);
 
         console.log('Database Query Result:', result.recordset);

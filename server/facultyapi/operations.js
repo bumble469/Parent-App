@@ -2,18 +2,23 @@ const { sql, poolPromise } = require('../utils/db');
 
 async function getFaculty() {
     try {
-        let pool = await poolPromise; 
-        
+        let pool = await poolPromise;
+
+        // Query the TeacherDetails view directly
         let result = await pool.request().query(`
-            SELECT t.teacher_id, t.firstname, t.lastname, t.type, t.qualification, t.teacher_image, t.subject_name, t.semester_name
-            FROM TeacherDetails t
-            LEFT JOIN teacher_subjects ts ON t.teacher_id = ts.teacher_id
-            LEFT JOIN subjects s ON ts.subject_id = s.sub_id
-            LEFT JOIN semesters sem ON ts.sem_id = sem.sem_id;
+            SELECT 
+                teacher_fullname,
+                teacher_qualification,
+                teacher_type,
+                teacher_image,
+                course_name,
+                semester_number,
+                subject_name
+            FROM TeacherDetails;
         `);
-        
+
         console.log('Database Query Result:', result.recordset);
-        
+
         const facultyData = result.recordset.map(row => ({
             ...row,
             teacher_image: row.teacher_image
@@ -24,7 +29,7 @@ async function getFaculty() {
         return facultyData;
     } catch (error) {
         console.error('Error: ', error);
-        throw error; 
+        throw error;
     }
 }
 

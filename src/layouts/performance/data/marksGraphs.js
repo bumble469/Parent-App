@@ -91,7 +91,7 @@ const generateMarksLineChartData = (currentMarksData, threshold) => {
   );
 };
 
-const LineGraph = ({ semester, threshold = 110 }) => {
+const LineGraph = ({ semester, threshold = 95 }) => {
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("All");
 
@@ -99,7 +99,7 @@ const LineGraph = ({ semester, threshold = 110 }) => {
   const fetchMarksData = async (semester) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/performance/student/detailedmarks?semester=${semester}`
+        `http://localhost:8001/api/performance/student/detailedmarks?semester=${semester}`
       );
       const data = await response.json();
 
@@ -118,11 +118,11 @@ const LineGraph = ({ semester, threshold = 110 }) => {
   }, [semester]);
 
   // Group data by subject
-  const groupedMarksData = marksData.reduce((acc, { name, marks_obtained }) => {
-    if (!acc[name]) {
-      acc[name] = { earned: 0, total: 0 };
+  const groupedMarksData = marksData.reduce((acc, { subject_name, marks_obtained }) => {
+    if (!acc[subject_name]) {
+      acc[subject_name] = { earned: 0, total: 0 };
     }
-    acc[name].total += marks_obtained;
+    acc[subject_name].total += marks_obtained;
     return acc;
   }, {});
 
@@ -150,9 +150,9 @@ const LineGraph = ({ semester, threshold = 110 }) => {
         py={3}
         px={2}
         variant="gradient"
-        bgColor="error"
+        bgColor="success"
         borderRadius="lg"
-        coloredShadow="error"
+        coloredShadow="success"
       >
         <MDTypography variant="h6" color="white">
           Total Marks Line Graph

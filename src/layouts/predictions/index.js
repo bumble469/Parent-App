@@ -58,62 +58,57 @@ function Predictions() {
     .sort((a, b) => a.percentage - b.percentage);
 
   // Data for Performance and Predicted Performance Chart
-  const performanceData = {
-    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'March', 'Jun', 'July', 'Aug', 'Sep', 'Oct'],
+  const attendancePredictionData = {
+    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
     datasets: [
       {
-        label: 'Performance Sem-4',
-        data: [65, 59, 80, 81, 56],
-        fill: false,
-        backgroundColor: '#42A5F5',
+        label: 'Actual Attendance',
+        data: [75, 80, 85, 88, 92, 85, 87, 90, 95, 90],
         borderColor: '#42A5F5',
-        borderDash: [5, 5], // Dashed line for historical data
+        backgroundColor: '#42A5F5',
+        borderWidth: 2,
+        borderDash: [],
       },
       {
-        label: 'Predicted Performance (Sem 5)',
-        data: [65, 59, 80, 81, 56, 55, 40, 70, 85, 90], // Extended to include predictions
-        fill: false,
-        backgroundColor: '#FF7043',
+        label: 'Predicted Attendance',
+        data: [80, 85, 88, 90, 92, 94, 96, 97, 98, 99],
         borderColor: '#FF7043',
+        backgroundColor: '#FF7043',
+        borderWidth: 2,
+        borderDash: [5, 5],
       },
     ],
   };
 
-  // Data for Attendance and Predicted Attendance Chart
-  const attendanceData = {
-    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'March', 'Jun', 'July', 'Aug', 'Sep', 'Oct'],
+  // Data for Predicted Performance Chart
+  const performancePredictionData = {
+    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
     datasets: [
       {
-        label: 'Attendance Sem-4',
-        data: [50, 60, 70, 90, 60],
-        fill: false,
-        backgroundColor: '#66BB6A',
+        label: 'Actual Performance',
+        data: [70, 75, 78, 80, 82, 85, 87, 88, 90, 92],
         borderColor: '#66BB6A',
-        borderDash: [5, 5], // Dashed line for historical data
+        backgroundColor: '#66BB6A',
+        borderWidth: 2,
+        borderDash: [],
       },
       {
-        label: 'Predicted Attendance (Sem 5)',
-        data: [50, 60, 70, 90, 60, 80, 70, 75, 85, 80], // Extended to include predictions
-        fill: false,
-        backgroundColor: '#FFAB40',
-        borderColor: '#FFAB40',
+        label: 'Predicted Performance',
+        data: [75, 80, 85, 88, 90, 92, 93, 95, 96, 98],
+        borderColor: '#FFA726',
+        backgroundColor: '#FFA726',
+        borderWidth: 2,
+        borderDash: [5, 5],
       },
     ],
   };
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // Important to allow chart to grow with container
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
-      },
-      tooltip: {
-        callbacks: {
-          label: function (tooltipItem) {
-            return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
-          },
-        },
       },
     },
   };
@@ -365,25 +360,23 @@ function Predictions() {
           </Grid>
 
           {/* Performance Chart */}
-          <Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ borderRadius: '12px', boxShadow: 3, p: 2, height: '400px' }}>
               <MDTypography variant="h6" fontWeight="medium" textAlign="center" gutterBottom>
-                Performance and Predicted Performance (Sem 5)
+                Predicted Attendance
               </MDTypography>
               <MDBox sx={{ height: '100%', p: 2 }}>
-                <Line data={performanceData} options={options} />
+                <Line data={attendancePredictionData} options={options} />
               </MDBox>
             </Card>
           </Grid>
-
-          {/* Attendance Chart */}
-          <Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ borderRadius: '12px', boxShadow: 3, p: 2, height: '400px' }}>
               <MDTypography variant="h6" fontWeight="medium" textAlign="center" gutterBottom>
-                Attendance and Predicted Attendance (Sem 5)
+                Predicted Performance
               </MDTypography>
               <MDBox sx={{ height: '100%', p: 2 }}>
-                <Line data={attendanceData} options={options} />
+                <Line data={performancePredictionData} options={options} />
               </MDBox>
             </Card>
           </Grid>

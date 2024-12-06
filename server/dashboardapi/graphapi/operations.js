@@ -7,25 +7,18 @@ async function getStudentMarksAndAttendanceForCurrentSemester(studentId) {
             .input('studentId', sql.Int, studentId)
             .query(`
                 SELECT 
-                    sp.sub_id,
-                    sp.name AS sub_name,
-                    SUM(sp.marks_obtained) AS total_marks_obtained,
-                    SUM(sp.marks_total) AS total_marks_possible,
-                    sp.lectures_attended,  -- Keep the original lectures attended
-                    sp.lectures_total      -- Keep the original lectures total
+                    subject_id,
+                    subject_name,
+                    SUM(marks_obtained) AS totalMarks,    -- Sum of marks_obtained
+                    SUM(max_marks) AS totalPossibleMarks,  -- Sum of max_marks
+                    SUM(total_lectures_attended) AS total_lectures_attended,  -- Total lectures attended
+                    SUM(total_lectures_conducted) AS total_lectures_conducted -- Total lectures conducted
                 FROM 
-                    StudentPerformance sp
+                    vw_student_dashboard
                 WHERE 
-                    sp.stud_id = @studentId
-                    AND sp.sem_id = (
-                        SELECT MAX(sem_id)
-                        FROM StudentPerformance 
-                        WHERE stud_id = @studentId
-                    )
+                    student_id = @studentId
                 GROUP BY 
-                    sp.sub_id, sp.name, sp.lectures_attended, sp.lectures_total -- Include lectures in the GROUP BY
-                ORDER BY 
-                    sp.sub_id;
+                    subject_id, subject_name
 
             `);
 
@@ -38,12 +31,12 @@ async function getStudentMarksAndAttendanceForCurrentSemester(studentId) {
 
         // Return transformed subject-wise data with subject names
         const transformedData = result.recordset.map(row => ({
-            sub_id: row.sub_id,
-            sub_name: row.sub_name,
-            totalMarks: row.total_marks_obtained,
-            totalPossibleMarks: row.total_marks_possible,
-            lectures_attended: row.lectures_attended,
-            lectures_total: row.lectures_total
+            sub_id: row.subject_id,
+            sub_name: row.subject_name,
+            totalMarks: row.totalMarks,
+            totalPossibleMarks: row.totalPossibleMarks,
+            lectures_attended: row.total_lectures_attended,
+            lectures_total: row.total_lectures_conducted
         }));
 
         return transformedData;
