@@ -8,27 +8,25 @@ import Footer from 'examples/Footer';
 import Projects from 'layouts/dashboard/events/index';
 import ReportsBarChartWrapper from './data/reportsBarChart';
 import ReportsLineChartWrapper from './data/reportsLineChartData';
-import { calculateStarRating } from './data/overallrating'; // Import the utility function
-import StarIcon from '@mui/icons-material/Star'; // Import star icon
-import StarBorderIcon from '@mui/icons-material/StarBorder'; // Import empty star icon
+import { calculateStarRating } from './data/overallrating'; 
+import StarIcon from '@mui/icons-material/Star'; 
+import StarBorderIcon from '@mui/icons-material/StarBorder'; 
 import StarHalfIcon from '@mui/icons-material/StarHalf';
 import SubjectDashboard from './data/strongweaksubjects';
 import axios from 'axios';
 
 function Dashboard() {
-  const [loading, setLoading] = useState(true); // State for loading
-  const [error, setError] = useState(null); // State for error
-  const [studentData, setStudentData] = useState(null); // State for the fetched student data
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [studentData, setStudentData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8001/api/dashboard/student/star');
-        console.log('API Response:', response.data); // Log to check the data
-        setStudentData(response.data); // Set the fetched data
+        setStudentData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('API Error:', error);
         setError(error);
         setLoading(false);
       }
@@ -37,35 +35,47 @@ function Dashboard() {
     fetchData();
   }, []);
 
+  // If still loading, show loading indicator
   if (loading) return <div>Loading...</div>;
+  
+  // If an error occurred, show error message
   if (error) return <div>Error: {error.message}</div>;
 
-  // Calculate total marks and total attendance from the data
-  const marksData = studentData?.map((item) => item.marks_obtained);
-  const totalMarksData = studentData?.map((item) => item.max_marks);
-  const attendanceData = studentData?.map((item) => item.total_lectures_attended);
-  const totalAttendanceData = studentData?.map((item) => item.total_lectures_conducted);
+  // If no data is received, show a message
+  if (!studentData || studentData.length === 0) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox py={2} mt={3} mb={2}>
+          <div>No data available to display.</div>
+        </MDBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
 
-  // Calculate total marks and total attendance
+  // Default values in case of missing data
+  const marksData = studentData?.map((item) => item.marks_obtained) || [];
+  const totalMarksData = studentData?.map((item) => item.max_marks) || [];
+  const attendanceData = studentData?.map((item) => item.total_lectures_attended) || [];
+  const totalAttendanceData = studentData?.map((item) => item.total_lectures_conducted) || [];
+
   const totalMarks = marksData?.reduce((acc, curr) => acc + curr, 0) || 0;
   const totalPossibleMarks = totalMarksData?.reduce((acc, curr) => acc + curr, 0) || 0;
   const totalAttendance = attendanceData?.reduce((acc, curr) => acc + curr, 0) || 0;
   const totalPossibleAttendance = totalAttendanceData?.reduce((acc, curr) => acc + curr, 0) || 0;
 
-  // Calculate the overall percentage for marks and attendance
-  const overallMarksPercentage = (totalMarks / totalPossibleMarks) * 100;
-  const overallAttendancePercentage = (totalAttendance / totalPossibleAttendance) * 100;
+  const overallMarksPercentage = totalMarks && totalPossibleMarks ? (totalMarks / totalPossibleMarks) * 100 : 0;
+  const overallAttendancePercentage = totalAttendance && totalPossibleAttendance ? (totalAttendance / totalPossibleAttendance) * 100 : 0;
 
   const overallMarksFromAPI = overallMarksPercentage;
   const averageAttendanceFromAPI = overallAttendancePercentage;
 
-  // Get star rating data using the utility function
   const { starRating, fullStars, halfStar, emptyStars, ratingMessage } = calculateStarRating(
     overallMarksFromAPI,
-    averageAttendanceFromAPI,
+    averageAttendanceFromAPI
   );
 
-  // Use the utility function to get strong and weak subjects
   let labelMessageForOverallMarks = {
     message: '',
     color: ''
@@ -85,8 +95,8 @@ function Dashboard() {
     labelMessageForOverallMarks.message = "Good, Keep It Up!";
     labelMessageForOverallMarks.color = "success";
   } else{
-    labelMessageForOverallMarks.message = "no marks records detected.."
-    labelMessageForOverallMarks.color = "info"
+    labelMessageForOverallMarks.message = "No marks records detected..";
+    labelMessageForOverallMarks.color = "info";
   }
 
   if (overallAttendancePercentage < 50) {
@@ -100,30 +110,31 @@ function Dashboard() {
     labelMessageForOverallAttendance.color = "success";
   }
   else {
-    labelMessageForOverallAttendance.message = "no attendance records detected.."
-    labelMessageForOverallAttendance.color = "info"
+    labelMessageForOverallAttendance.message = "No attendance records detected..";
+    labelMessageForOverallAttendance.color = "info";
   }
 
-  return (
+  return(
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={2} mt={3} mb={2}>
         <Grid container spacing={1}>
+          {/* Overall Attendance */}
           <Grid item xs={12} md={6} lg={4}>
             <MDBox>
               <ComplexStatisticsCard
                 color="success"
                 icon="weekend"
                 title="Overall Attendance"
-                count={`${averageAttendanceFromAPI.toFixed(2)}%`}
+                count={averageAttendanceFromAPI ? `${averageAttendanceFromAPI.toFixed(2)}%` : "N/A"}
                 percentage={{
                   color: labelMessageForOverallAttendance.color,
-                  amount: labelMessageForOverallAttendance.message
+                  amount: labelMessageForOverallAttendance.message || "No data available"
                 }}
               >
                 <MDBox width="100%">
                   <progress
-                    value={Math.min(Math.max(averageAttendanceFromAPI, 0), 100)}
+                    value={averageAttendanceFromAPI ? Math.min(Math.max(averageAttendanceFromAPI, 0), 100) : 0}
                     max={100}
                     style={{ width: '100%' }}
                   ></progress>
@@ -131,20 +142,22 @@ function Dashboard() {
               </ComplexStatisticsCard>
             </MDBox>
           </Grid>
+  
+          {/* Overall Performance */}
           <Grid className="Overall-Marks" item xs={12} md={6} lg={4}>
             <MDBox>
               <ComplexStatisticsCard
                 icon="leaderboard"
                 title="Overall Performance"
-                count={`${overallMarksFromAPI.toFixed(2)}%`}
+                count={overallMarksFromAPI ? `${overallMarksFromAPI.toFixed(2)}%` : "N/A"}
                 percentage={{
                   color: labelMessageForOverallMarks.color,
-                  amount: labelMessageForOverallMarks.message
+                  amount: labelMessageForOverallMarks.message || "No data available"
                 }}
               >
                 <MDBox width="100%">
                   <progress
-                    value={overallMarksFromAPI}
+                    value={overallMarksFromAPI || 0}
                     max={100}
                     style={{ width: '100%' }}
                   ></progress>
@@ -152,18 +165,18 @@ function Dashboard() {
               </ComplexStatisticsCard>
             </MDBox>
           </Grid>
-
-          {/* Always render the Rating component, but show empty stars if marks data is not available */}
+  
+          {/* Rating */}
           <Grid item xs={12} md={12} lg={4}>
             <MDBox>
               <ComplexStatisticsCard
                 color="warning"
                 icon="star"
                 title="Rating"
-                count={`${starRating}/5`}
+                count={starRating ? `${starRating}/5` : "N/A"}
                 percentage={{
                   color: 'success',
-                  label: `${ratingMessage}`,
+                  label: ratingMessage || "No data available"
                 }}
               >
                 <MDBox
@@ -184,8 +197,7 @@ function Dashboard() {
             </MDBox>
           </Grid>
         </Grid>
-
-        {/* The remaining content */}
+  
         <MDBox mt={5}>
           <Grid container spacing={1}>
             <Grid item xs={12} md={6} lg={6}>
@@ -200,6 +212,8 @@ function Dashboard() {
             </Grid>
           </Grid>
         </MDBox>
+  
+        {/* Subject Dashboard */}
         <SubjectDashboard />
         <MDBox mt={2}>
           <Grid container spacing={3}>
@@ -211,7 +225,7 @@ function Dashboard() {
       </MDBox>
       <Footer />
     </DashboardLayout>
-  );
+  );  
 }
 
 export default Dashboard;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import NotificationItem from 'examples/Items/NotificationItem';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -8,17 +9,20 @@ import Badge from '@mui/material/Badge';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Icon from '@mui/material/Icon';
-import Avatar from '@mui/material/Avatar'; // Add this import
-import Typography from '@mui/material/Typography'; // Add this import
-import Divider from '@mui/material/Divider'; // Add this import
+import Avatar from '@mui/material/Avatar';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import CloseIcon from '@mui/icons-material/Close';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import Breadcrumbs from 'examples/Breadcrumbs';
-import NotificationMenu from './components/notification'; // Ensure this import is correct
 import profileImage from '../../../assets/images/bruce-mars.jpg';
 import '../../../Global';
 import LogoutDialog from './components/logoutdialog';
-import { notifications } from './data/notificationdata';
 import {
   navbar,
   navbarContainer,
@@ -30,13 +34,14 @@ import { useMaterialUIController, setTransparentNavbar, setMiniSidenav } from 'c
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
+  const [notifications, setNotifications] = useState([]);
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar } = controller;
-  const [openMenu, setOpenMenu] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
-  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false); // State for Logout Dialog
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const route = useLocation().pathname.split('/').slice(1);
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (fixedNavbar) {
@@ -55,109 +60,31 @@ function DashboardNavbar({ absolute, light, isMini }) {
     return () => window.removeEventListener('scroll', handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
-  const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
-  const handleCloseMenu = () => setOpenMenu(null);
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+
   const handleOpenProfileMenu = (event) => setProfileMenuAnchor(event.currentTarget);
   const handleCloseProfileMenu = () => setProfileMenuAnchor(null);
 
   const handleRedirectToProfile = () => {
-    navigate('/profile'); // Navigate to the /profile route
+    navigate('/profile');
     handleCloseProfileMenu();
   };
 
   const handleLogout = () => {
-    setLogoutDialogOpen(true); // Open the confirm dialog
+    setLogoutDialogOpen(true);
   };
 
-  const handleOpenNavbar = () => setMiniSidenav(dispatch, !miniSidenav);
-
   const handleConfirmLogout = () => {
-    alert('Logged out'); // Show alert message
-    setLogoutDialogOpen(false); // Close the dialog after confirming
+    alert('Logged out');
+    setLogoutDialogOpen(false);
   };
 
   const handleCancelLogout = () => {
-    setLogoutDialogOpen(false); // Close the dialog if user cancels
+    setLogoutDialogOpen(false);
   };
 
-  const renderNotificationMenu = () => (
-    <NotificationMenu
-      open={Boolean(openMenu)}
-      onClose={handleCloseMenu}
-      notifications={notifications} // Use the imported notification data
-    />
-  );
-
-  const renderProfileMenu = () => (
-    <Menu
-      anchorEl={profileMenuAnchor}
-      anchorReference={null}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
-      }}
-      open={Boolean(profileMenuAnchor)}
-      onClose={handleCloseProfileMenu}
-      sx={{
-        mt: 2,
-        minWidth: 220,
-        borderRadius: '8px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-      }}
-    >
-      {/* User Details */}
-      <MenuItem sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
-        <Avatar sx={{ width: 56, height: 56, mb: 1 }} alt="User Name" src={profileImage} />
-        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-          {student.stud_fullname}
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Rollno: {student.stud_rollno}
-        </Typography>
-      </MenuItem>
-
-      <Divider sx={{ my: 1 }} />
-
-      {/* Profile Button */}
-      <MenuItem
-        onClick={handleRedirectToProfile}
-        sx={{ fontSize: '1rem', py: 1.25, display: 'flex', alignItems: 'center' }}
-      >
-        <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem', color: 'text.secondary' }}>
-          account_circle
-        </Icon>
-        Student Profile
-      </MenuItem>
-
-      {/* Logout Button */}
-      <MenuItem
-        onClick={handleLogout}
-        sx={{
-          fontSize: '1rem',
-          py: 1.25,
-          display: 'flex',
-          alignItems: 'center',
-          color: 'error.main',
-        }}
-      >
-        <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem' }}>logout</Icon>
-        Logout
-      </MenuItem>
-    </Menu>
-  );
-
-  const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
-    color: () => {
-      let colorValue = light
-
-      if (transparentNavbar && !light) {
-        colorValue = text.main;
-      }
-
-      return colorValue;
-    },
-    fontSize: '1.5rem', // Make icons larger
-  });
+  const handleOpenNavbar = () => setMiniSidenav(dispatch, !miniSidenav);
 
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -181,9 +108,63 @@ function DashboardNavbar({ absolute, light, isMini }) {
     fetchStudentDetails();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:8001/api/dashboard/student/graph');
+        const data = await response.json();
+
+        const lowAttendanceAndMarks = data.map((subject) => {
+          const attendancePercentage =
+            (subject.lectures_attended / subject.lectures_total) * 100;
+          const marksPercentage =
+            (subject.totalMarks / subject.totalPossibleMarks) * 100;
+
+          const notifications = [];
+
+          // Check for low attendance
+          if (attendancePercentage < 75) {
+            notifications.push({
+              icon: 'warning',
+              title: `${subject.sub_name} has low attendance: ${attendancePercentage.toFixed(
+                2
+              )}%`,
+            });
+          }
+
+          // Check for low marks
+          if (marksPercentage < 75) {
+            notifications.push({
+              icon: 'warning',
+              title: `${subject.sub_name} has low marks: ${marksPercentage.toFixed(
+                2
+              )}%`,
+            });
+          }
+
+          return notifications;
+        });
+
+        // Flatten the array of notifications
+        setNotifications(lowAttendanceAndMarks.flat());
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   if (loading) {
-    return <div>Loading...</div>; // Optionally, add a spinner or loading indicator
+    return <div>Loading...</div>;
   }
+
+  const iconsStyle = {
+    fontSize: '2rem',
+    color: 'inherit',
+  };
 
   return (
     <AppBar
@@ -211,6 +192,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               </MDTypography>
             </MDBox>
             <MDBox color={light ? 'white' : 'inherit'}>
+              {/* Notification Icon */}
               <IconButton
                 size="large"
                 disableRipple
@@ -218,40 +200,26 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 sx={{
                   ...navbarIconButton,
                   '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Adjust hover color
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
                   },
                 }}
-                aria-controls="notification-menu"
-                aria-haspopup="true"
-                onClick={handleOpenMenu}
+                onClick={handleOpenDialog}
               >
                 <Badge
                   variant="dot"
                   color="error"
-                  sx={{
-                    '& .MuiBadge-dot': {
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                    },
-                  }}
+                  invisible={notifications.length === 0}
                 >
-                  <Icon sx={{ ...iconsStyle }}>notifications</Icon>
+                  <Icon>notifications</Icon>
                 </Badge>
               </IconButton>
-              {renderNotificationMenu()}
+
+              {/* Profile Menu */}
               <IconButton
                 size="large"
                 disableRipple
                 color="inherit"
-                sx={{
-                  ...navbarIconButton,
-                  '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Adjust hover color
-                  },
-                }}
-                aria-controls="profile-menu"
-                aria-haspopup="true"
+                sx={navbarIconButton}
                 onClick={handleOpenProfileMenu}
               >
                 <img
@@ -260,7 +228,44 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   style={{ width: '2.2rem', height: '2.2rem', borderRadius: '50%' }}
                 />
               </IconButton>
-              {renderProfileMenu()}
+              <Menu
+                anchorEl={profileMenuAnchor}
+                anchorReference={null}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                open={Boolean(profileMenuAnchor)}
+                onClose={handleCloseProfileMenu}
+                sx={{
+                  mt: 2,
+                  minWidth: 220,
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                <MenuItem sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
+                  <Avatar sx={{ width: 56, height: 56, mb: 1 }} alt="User Name" src={profileImage} />
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {student.stud_fullname}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Rollno: {student.stud_rollno}
+                  </Typography>
+                </MenuItem>
+                <Divider sx={{ my: 1 }} />
+                <MenuItem onClick={handleRedirectToProfile}>
+                  <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem', color: 'text.secondary' }}>
+                    account_circle
+                  </Icon>
+                  Student Profile
+                </MenuItem>
+                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                  <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem' }}>logout</Icon>
+                  Logout
+                </MenuItem>
+              </Menu>
+
               <IconButton
                 size="medium"
                 disableRipple
@@ -276,26 +281,101 @@ function DashboardNavbar({ absolute, light, isMini }) {
           </MDBox>
         )}
       </Toolbar>
+
+      {/* Notification Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          },
+        }}
+      >
+        <Box sx={{ position: 'relative' }}>
+          <DialogTitle
+            sx={{
+              fontSize: '1.25rem',
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}
+          >
+            Notifications
+          </DialogTitle>
+          <IconButton
+            onClick={handleCloseDialog}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: 'gray',
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <DialogContent
+          sx={{
+            maxHeight: '400px',
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#888',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              backgroundColor: '#555',
+            },
+          }}
+        >
+          {loading ? (
+            <Box sx={{ textAlign: 'center', py: 2 }}>Loading notifications...</Box>
+          ) : notifications.length > 0 ? (
+            notifications.map((notification, index) => (
+              <React.Fragment key={index}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <NotificationItem
+                    icon={
+                      <Icon sx={{ color: 'rgb(249, 158, 0)', fontSize: '2rem' }}>
+                        {notification.icon}
+                      </Icon>
+                    }
+                    title={notification.title}
+                  />
+                  <IconButton
+                    onClick={() => removeNotification(index)}
+                    sx={{ color: 'red' }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+                {index < notifications.length - 1 && <Divider sx={{ my: 1 }} />}
+              </React.Fragment>
+            ))
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 2 }}>No notifications</Box>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <LogoutDialog
         open={logoutDialogOpen}
-        handleClose={handleCancelLogout}
-        handleConfirm={handleConfirmLogout}
+        onConfirm={handleConfirmLogout}
+        onCancel={handleCancelLogout}
       />
     </AppBar>
   );
 }
 
-DashboardNavbar.defaultProps = {
-  absolute: false,
-  light: false,
-  isMini: false,
-};
-
 DashboardNavbar.propTypes = {
   absolute: PropTypes.bool,
   light: PropTypes.bool,
   isMini: PropTypes.bool,
-  currentSemester: PropTypes.string.isRequired,
 };
 
 export default DashboardNavbar;

@@ -8,7 +8,6 @@ async function getFaculty() {
         let result = await pool.request().query(`
             SELECT 
                 teacher_fullname,
-                teacher_qualification,
                 teacher_type,
                 teacher_image,
                 course_name,

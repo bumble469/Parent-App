@@ -4,6 +4,7 @@ import ReportsBarChart from 'examples/Charts/BarCharts/ReportsBarChart'; // Impo
 import DataTable from 'examples/Tables/DataTable';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
+
 const ReportsBarChartWrapper = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true); // State for loading
@@ -13,7 +14,7 @@ const ReportsBarChartWrapper = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8001/api/dashboard/student/graph');
+        const response = await axios.get('http://localhost:8001/api/dashboard/student/attendance');
         console.log('API Response:', response.data); // Log to check the data
         if (Array.isArray(response.data)) {
           setAttendanceData(response.data);
@@ -32,7 +33,6 @@ const ReportsBarChartWrapper = () => {
             attended: attended_lects,
             total: total_lects,
           },
-          
         };
         // Set the data for the chart
         setData(chartData);
@@ -67,6 +67,13 @@ const ReportsBarChartWrapper = () => {
     return <div>Error: {error.message}</div>; // Show error message if there's an issue
   }
 
+  // Handle no data case
+  if (!attendanceData.length) {
+    return (
+      <div>No data available</div> // Display message if there's no data
+    );
+  }
+
   // If data is successfully fetched, render the ReportsBarChart
   return (
     <ReportsBarChart
@@ -91,7 +98,7 @@ const ReportsBarChartWrapper = () => {
             },
           }}
         >
-          <MDTypography sx={{fontSize:"13px"}}>Lectures Attended | Lectures Occurred</MDTypography>
+          <MDTypography sx={{ fontSize: '13px' }}>Lectures Attended | Lectures Occurred</MDTypography>
           <DataTable
             table={{ columns, rows }}
             showTotalEntries={false}

@@ -1,1 +1,1 @@
-global.student_id = 1;
+global.student_id = 1001;

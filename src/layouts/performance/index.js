@@ -16,18 +16,13 @@ import ReportsBarChartWrapper from './data/attendanceBar1';
 import MarksTable from './data/detailed_marks';
 import LineGraph from './data/marksGraphs';
 import Footer from 'examples/Footer';
-
+import OverallAttendance from './data/overallAttendance';
 function Performance() {
   const [semester, setSemester] = useState('');
   const [semesters, setSemesters] = useState([]);
-  const [attendanceData, setAttendanceData] = useState([]);
   const [marksData, setMarksData] = useState([]);
-  const [averageAttendance, setAverageAttendance] = useState(0);
   const [averageMarks, setAverageMarks] = useState(0);
   const [achievements, setAchievements] = useState([]);
-  const [detailedattendanceData, setDetailedAttendanceData] = useState([]);
-  const [months, setMonths] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
 
   const handleSemesterChange = (event) => {
     setSemester(event.target.value);
@@ -48,7 +43,6 @@ function Performance() {
         if (uniqueSemesters.length > 0) {
           setSemester(uniqueSemesters[0].id); // Default semester
         }
-        setAttendanceData(data); // Save all the data for processing
         setMarksData(data); // Save the marks data as well for later processing
 
       } catch (error) {
@@ -57,51 +51,40 @@ function Performance() {
     };
     fetchData();
   }, []);
+
   useEffect(() => {
-    if (attendanceData.length > 0) {
-      // Filter data based on selected semester
-      const filteredAttendance = attendanceData.filter(item => item.semester_id === semester);
-      // Calculate average attendance
-      const totalAttendance = filteredAttendance.reduce((sum, item) => sum + item.attended_lectures, 0);
-      const totalLectures = filteredAttendance.reduce((sum, item) => sum + item.lectures_conducted, 0);
-      if (totalLectures > 0) {
-        const avgAttendance = (totalAttendance / totalLectures) * 100;
-        setAverageAttendance(avgAttendance);
-      } else {
-        setAverageAttendance(0); // Set to 0 if no lectures data
+    // Calculate average marks
+    const filteredMarks = marksData.filter(item => item.semester_id === semester);
+
+    // Group by subject to sum marks for each subject
+    const marksBySubject = filteredMarks.reduce((acc, item) => {
+      const subjectId = item.subject_id;
+      if (!acc[subjectId]) {
+        acc[subjectId] = { totalMarks: 0, obtainedMarks: 0 };
       }
-      // Calculate average marks
-      const filteredMarks = marksData.filter(item => item.semester_id === semester);
+      acc[subjectId].totalMarks += item.max_marks;
+      acc[subjectId].obtainedMarks += item.marks_obtained;
+      return acc;
+    }, {});
 
-      // Group by subject to sum marks for each subject
-      const marksBySubject = filteredMarks.reduce((acc, item) => {
-        const subjectId = item.subject_id;
-        if (!acc[subjectId]) {
-          acc[subjectId] = { totalMarks: 0, obtainedMarks: 0 };
-        }
-        acc[subjectId].totalMarks += item.max_marks;
-        acc[subjectId].obtainedMarks += item.marks_obtained;
-        return acc;
-      }, {});
+    // Calculate the total obtained marks and total possible marks for all subjects
+    let totalObtainedMarks = 0;
+    let totalPossibleMarks = 0;
 
-      // Calculate the total obtained marks and total possible marks for all subjects
-      let totalObtainedMarks = 0;
-      let totalPossibleMarks = 0;
+    Object.values(marksBySubject).forEach(subject => {
+      totalObtainedMarks += subject.obtainedMarks;
+      totalPossibleMarks += subject.totalMarks;
+    });
 
-      Object.values(marksBySubject).forEach(subject => {
-        totalObtainedMarks += subject.obtainedMarks;
-        totalPossibleMarks += subject.totalMarks;
-      });
-
-      // Calculate the average marks
-      if (totalPossibleMarks > 0) {
-        const avgMarks = (totalObtainedMarks / totalPossibleMarks) * 100;
-        setAverageMarks(avgMarks);
-      } else {
-        setAverageMarks(0); // Set to 0 if no marks data
-      }
+    // Calculate the average marks
+    if (totalPossibleMarks > 0) {
+      const avgMarks = (totalObtainedMarks / totalPossibleMarks) * 100;
+      setAverageMarks(avgMarks);
+    } else {
+      setAverageMarks(0); // Set to 0 if no marks data
     }
-  }, [semester, attendanceData, marksData]);
+
+  }, [semester, marksData]);
 
   useEffect(() => {
     const loadAchievements = async () => {
@@ -112,7 +95,6 @@ function Performance() {
     };
     loadAchievements();
   }, [semester]);
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -183,27 +165,7 @@ function Performance() {
           <Grid item xs={12}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <MDBox sx={{ height: '100%' }}>
-                  <ComplexStatisticsCard
-                    color="info"
-                    icon="school"
-                    title="Average Attendance"
-                    count={`${averageAttendance.toFixed(2)}%`}
-                    percentage={{
-                      color: averageAttendance < 75 ? 'error' : 'success',
-                      amount: averageAttendance < 75 ? '-10%' : '+5%',
-                      label: 'than last semester',
-                    }}
-                  >
-                    <MDBox width="100%">
-                      <progress
-                        value={Math.min(Math.max(averageAttendance, 0), 100)}
-                        max={100}
-                        style={{ width: '100%' }}
-                      ></progress>
-                    </MDBox>
-                  </ComplexStatisticsCard>
-                </MDBox>
+                <OverallAttendance semester={semester}/>
               </Grid>
               <Grid item xs={12} md={4}>
                 <MDBox sx={{ height: '100%' }}>

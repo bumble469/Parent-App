@@ -195,7 +195,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                 mb: 1,
               }}
             >
-              Welcome, {student.parentInfo[0].name} and {student.parentInfo[1].name}
+              Welcome, {student.parentInfo[0]?.name} / {student.parentInfo[1]?.name}
             </MDTypography>          
           ) : (
             <MDTypography

@@ -6,7 +6,7 @@ import MDBox from 'components/MDBox';
 
 const MarksTable = ({ semester }) => {
   const [marksData, setMarksData] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState('All');
+  const [selectedSubject, setSelectedSubject] = useState('All Subjects');
 
   // Fetch marks data for the selected semester
   const fetchMarksData = async (semester) => {
@@ -76,16 +76,16 @@ const MarksTable = ({ semester }) => {
     : [];
 
   // Filtered data based on selected subject
-  const filteredMarksTableData = selectedSubject === 'All'
+  const filteredMarksTableData = selectedSubject === 'All Subjects'
     ? marksTableData
     : marksTableData.filter(row => row.subject === selectedSubject);
 
   // Get unique subjects for the dropdown
-  const subjects = ['All', ...new Set(marksTableData.map(row => row.subject))];
+  const subjects = ['All Subjects', ...new Set(marksTableData.map(row => row.subject))];
 
   // Get unique exam types across all subjects
   const uniqueExamTypes = Array.isArray(marksData)
-    ? [...new Set(marksData.map(item => item.exam_type))]
+    ? [...new Set(marksData.map(item => item.exam_type))] 
     : [];
 
   // Add total and grade columns to the columns configuration
@@ -143,7 +143,6 @@ const MarksTable = ({ semester }) => {
             onChange={(e) => setSelectedSubject(e.target.value)}
             style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', border: '1px solid #ddd', marginRight: '20px' }}
           >
-            <option value="All">All Subjects</option>
             {subjects.map((subject) => (
               <option key={subject} value={subject}>
                 {subject}

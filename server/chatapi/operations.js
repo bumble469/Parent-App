@@ -10,7 +10,6 @@ async function getChatList(studentId) {
                 t.teacher_fullname,
                 STRING_AGG(t.subject_name, ', ') AS subject_name, -- Concatenate all subjects
                 t.teacher_image,
-                t.teacher_qualification,
                 t.teacher_type,
                 STRING_AGG(t.semester_number, ', ') AS semester_number  -- Corrected the syntax here
             FROM 
@@ -26,7 +25,6 @@ async function getChatList(studentId) {
                 t.teacher_id, 
                 t.teacher_fullname, 
                 t.teacher_image,
-                t.teacher_qualification,
                 t.teacher_type
         `;
 

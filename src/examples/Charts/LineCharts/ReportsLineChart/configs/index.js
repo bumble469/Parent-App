@@ -77,7 +77,8 @@ function configs(labels, datasets) {
               lineHeight: 2,
             },
           },
-          max: 145,
+          max: 135,
+          min:80
         },
         x: {
           grid: {

@@ -16,23 +16,19 @@ const SubjectDashboard = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8001/api/dashboard/student/graph');
-
-        // Extract data
+        
+        // Extract data from API response
         const subjects = response.data.map(item => item.sub_name);
         const attendedLectures = response.data.map(item => item.lectures_attended);
         const totalLectures = response.data.map(item => item.lectures_total);
         const totalMarks = response.data.map(item => item.totalMarks);
         const totalPossibleMarks = response.data.map(item => item.totalPossibleMarks);
 
-        // Calculate percentages for marks and attendance
-        const marksPercentage = totalMarks.map((marks, index) => 
-          (marks / totalPossibleMarks[index]) * 100
-        );
-        const attendancePercentage = attendedLectures.map((attended, index) => 
-          (attended / totalLectures[index]) * 100
-        );
+        // Calculate percentages
+        const marksPercentage = totalMarks.map((marks, index) => (marks / totalPossibleMarks[index]) * 100);
+        const attendancePercentage = attendedLectures.map((attended, index) => (attended / totalLectures[index]) * 100);
 
-        // Logic for categorizing strong and weak subjects based on marks
+        // Categorize subjects
         const strongSubjects = subjects
           .map((name, index) => ({ name, percentage: marksPercentage[index] }))
           .filter(subject => subject.percentage > 80);
@@ -41,12 +37,11 @@ const SubjectDashboard = () => {
           .map((name, index) => ({ name, percentage: marksPercentage[index] }))
           .filter(subject => subject.percentage < 75);
 
-        // Logic for low attendance alerts
         const lowAttendanceAlerts = subjects
           .map((name, index) => ({ name, percentage: attendancePercentage[index] }))
           .filter(subject => subject.percentage < 75);
 
-        // Set the state
+        // Set state
         setStrongSubjects(strongSubjects);
         setWeakSubjects(weakSubjects);
         setLowAttendanceAlerts(lowAttendanceAlerts);
@@ -67,6 +62,7 @@ const SubjectDashboard = () => {
   return (
     <MDBox mt={1}>
       <Grid container spacing={3}>
+        {/* Strong Subjects */}
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="success"
@@ -104,14 +100,14 @@ const SubjectDashboard = () => {
                     display="flex"
                     flexDirection="column"
                     alignItems="flex-start"
-                    mb={2} // Adds some margin between subjects
+                    mb={2}
                     width="100%"
                   >
                     <MDTypography variant="button" fontWeight="medium">
                       {subject.name} &nbsp;&nbsp;
                       {Number(subject.percentage).toFixed(2)}%
                     </MDTypography>
-                    <MDBox width="100%"> {/* Added margin-top for space between name and progress */}
+                    <MDBox width="100%">
                       <progress
                         value={subject.percentage}
                         max={100}
@@ -128,6 +124,8 @@ const SubjectDashboard = () => {
             </MDBox>
           </ComplexStatisticsCard>
         </Grid>
+
+        {/* Weak Subjects */}
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="error"
@@ -158,37 +156,39 @@ const SubjectDashboard = () => {
                 },
               }}
             >
-            {weakSubjects.length > 0 ? (
-              weakSubjects.map((subject, index) => (
-                <MDBox
-                  key={index}
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="flex-start"
-                  mb={2} // Adds some margin between subjects
-                  width="100%"
-                >
-                  <MDTypography variant="button" fontWeight="medium">
-                    {subject.name} &nbsp;&nbsp;
-                    {Number(subject.percentage).toFixed(2)}%
-                  </MDTypography>
-                  <MDBox width="100%"> {/* Added margin-top for space between name and progress */}
-                    <progress
-                      value={subject.percentage}
-                      max={100}
-                      style={{ width: '100%' }}
-                    ></progress>
+              {weakSubjects.length > 0 ? (
+                weakSubjects.map((subject, index) => (
+                  <MDBox
+                    key={index}
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="flex-start"
+                    mb={2}
+                    width="100%"
+                  >
+                    <MDTypography variant="button" fontWeight="medium">
+                      {subject.name} &nbsp;&nbsp;
+                      {Number(subject.percentage).toFixed(2)}%
+                    </MDTypography>
+                    <MDBox width="100%">
+                      <progress
+                        value={subject.percentage}
+                        max={100}
+                        style={{ width: '100%' }}
+                      ></progress>
+                    </MDBox>
                   </MDBox>
-                </MDBox>
-              ))
-            ) : (
-              <MDTypography variant="h6" color="textSecondary">
-                No weak subjects
-              </MDTypography>
-            )}
+                ))
+              ) : (
+                <MDTypography variant="h6" color="textSecondary">
+                  No weak subjects
+                </MDTypography>
+              )}
             </MDBox>
           </ComplexStatisticsCard>
         </Grid>
+
+        {/* Low Attendance Alerts */}
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="warning"
@@ -220,18 +220,18 @@ const SubjectDashboard = () => {
               {lowAttendanceAlerts.length > 0 ? (
                 lowAttendanceAlerts.map((subject, index) => (
                   <MDBox
-                  key={index}
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="flex-start"
-                  mb={2} // Adds some margin between subjects
-                  width="100%"
-                >
-                  <MDTypography variant="button" fontWeight="medium" sx={{color:'red'}}>
-                    {subject.name} &nbsp;&nbsp;
-                    {Number(subject.percentage).toFixed(2)}%
-                  </MDTypography>
-                </MDBox>
+                    key={index}
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="flex-start"
+                    mb={2}
+                    width="100%"
+                  >
+                    <MDTypography variant="button" fontWeight="medium" sx={{ color: 'red' }}>
+                      {subject.name} &nbsp;&nbsp;
+                      {Number(subject.percentage).toFixed(2)}%
+                    </MDTypography>
+                  </MDBox>
                 ))
               ) : (
                 <MDTypography variant="body2">No low attendance subjects.</MDTypography>

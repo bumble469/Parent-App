@@ -47,13 +47,12 @@ function Faculty() {
     setTabValue(newValue);  // Update the tab value
   };
 
-  // Group staff by teacher_fullname
   const groupedStaff = staffData.reduce((acc, item) => {
     const key = item.teacher_fullname;
     if (!acc[key]) {
       acc[key] = {
         teacher_fullname: item.teacher_fullname,
-        teacher_qualification: item.teacher_qualification,
+
         teacher_type: item.teacher_type,
         teacher_image: item.teacher_image,
         subjects: [],
@@ -138,9 +137,6 @@ function Faculty() {
                       </Typography>
                       <Typography variant="body2">
                         <b>Type:</b> {staff.teacher_type}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Qualification:</b> {staff.teacher_qualification}
                       </Typography>
                       <Typography variant="body2">
                         <b>Subjects:</b> {staff.subjects.join(', ')}
