@@ -37,15 +37,13 @@ function collapseItem(theme, ownerState) {
 function collapseIconBox(theme, ownerState) {
   const { palette, transitions, borders, functions } = theme;
   const { active } = ownerState;
-
-  const { white, dark } = palette;
   const { borderRadius } = borders;
   const { pxToRem } = functions;
 
   return {
     minWidth: pxToRem(32),
     minHeight: pxToRem(32),
-    color: 'white', // Icon color is white when active, otherwise dark
+    color: active ? 'white !important' : "grey !important",
     borderRadius: borderRadius.md,
     display: 'grid',
     placeItems: 'center',

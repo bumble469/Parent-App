@@ -8,24 +8,29 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Sidenav from 'examples/Sidenav';
 // Material Dashboard 2 React themes
 import theme from 'assets/theme';
-// RTL plugins
 import rtlPlugin from 'stylis-plugin-rtl';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-// Material Dashboard 2 React routes
-import routes from 'routes';
-import Profile from './layouts/profile';
-// Material Dashboard 2 React contexts
-import { useMaterialUIController, setMiniSidenav } from 'context';
 // Images
 import logo from 'assets/images/web_logo.png';
+import Profile from './layouts/profile'; // Profile Component
+import Dashboard from './layouts/dashboard'; // Dashboard Component
+import Performance from './layouts/performance'; // Performance Component
+import Predictions from './layouts/predictions'; // Predictions Component
+import Faculty from './layouts/faculty'; // Faculty Component
+import Chat from './layouts/chat'; // Chat Component
+import Reporting from './layouts/reporting'; // Reporting Component
+// Material Dashboard 2 React contexts
+import { useMaterialUIController, setMiniSidenav } from 'context';
+import { Typography, Icon } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, direction, layout, sidenavColor, darkMode } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-
+  const { t } = useTranslation();
   // Cache for the rtl
   useMemo(() => {
     const cacheRtl = createCache({
@@ -63,14 +68,124 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
+  const routes = [
+    {
+      type: 'title',
+      title: `${t('Home')}`,
+      key: 'home',
+    },
+    {
+      type: 'collapse',
+      name: (
+        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+          {t('Dashboard')}
+        </Typography>
+      ),
+      key: 'dashboard',
+      icon: <Icon fontSize="small">dashboard</Icon>,
+      route: '/dashboard',
+      component: <Dashboard />,
+    },
+    {
+      type: 'divider',
+      key: 'home-divider',
+    },
+    {
+      type: 'title',
+      title: `${t('Analytics')}`,
+      key: 'analytics',
+    },
+    {
+      type: 'collapse',
+      name: (
+        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+          {t('Performance')}
+        </Typography>
+      ),
+      key: 'performance',
+      icon: <Icon fontSize="small">bar_chart</Icon>,
+      route: '/performance',
+      component: <Performance />,
+    },
+    {
+      type: 'collapse',
+      name: (
+        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+          {t('Predictions')}
+        </Typography>
+      ),
+      key: 'predictions',
+      icon: <Icon fontSize="small">show_chart</Icon>,
+      route: '/predictions',
+      component: <Predictions />,
+    },
+    {
+      type: 'divider',
+      key: 'analytics-divider',
+    },
+    {
+      type: 'title',
+      title: `${t('Staff and Communication')}`,
+      key: 'communication',
+    },
+    {
+      type: 'collapse',
+      name: (
+        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+          {t('Faculty')}
+        </Typography>
+      ),
+      key: 'faculty',
+      icon: <Icon fontSize="small">people</Icon>,
+      route: '/faculty',
+      component: <Faculty />,
+    },
+    {
+      type: 'collapse',
+      name: (
+        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+          {t('Chat')}
+        </Typography>
+      ),
+      key: 'chat',
+      icon: <Icon fontSize="small">chat</Icon>,
+      route: '/chat',
+      component: <Chat />,
+    },
+    {
+      type: 'divider',
+      key: 'communication-divider',
+    },
+    {
+      type: 'title',
+      title: `${t('Reports')}`,
+      key: 'summary-reports',
+    },
+    {
+      type: 'collapse',
+      name: (
+        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+          {t('Feedback')}
+        </Typography>
+      ),
+      key: 'feedback',
+      icon: <Icon fontSize="small">feedback</Icon>,
+      route: '/feedback',
+      component: <Reporting />,
+    },
+  ];
+
+  // Recursive function to map routes
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
       if (route.collapse) {
-        return getRoutes(route.collapse);
+        return getRoutes(route.collapse); // Recursively handle nested routes
       }
 
       if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+        return (
+          <Route exact path={route.route} element={route.component} key={route.key} />
+        );
       }
 
       return null;
@@ -81,14 +196,14 @@ export default function App() {
       <ThemeProvider theme={darkMode}>
         <CssBaseline />
         {layout === 'dashboard' && (
-            <Sidenav
-              color={sidenavColor}
-              brand={logo}
-              brandName="Material Dashboard 2"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-            />
+          <Sidenav
+            color={sidenavColor}
+            brand={logo}
+            brandName="Material Dashboard 2"
+            routes={routes} // Pass routes to the sidebar
+            onMouseEnter={handleOnMouseEnter}
+            onMouseLeave={handleOnMouseLeave}
+          />
         )}
         <Routes>
           {getRoutes(routes)}
@@ -100,16 +215,14 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       {layout === 'dashboard' && (
-        <>
-          <Sidenav
-            color={sidenavColor}
-            brand={logo}
-            brandName="P-SAT"
-            routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
-          />
-        </>
+        <Sidenav
+          color={sidenavColor}
+          brand={logo}
+          brandName="P-SAT"
+          routes={routes} // Pass routes to the sidebar
+          onMouseEnter={handleOnMouseEnter}
+          onMouseLeave={handleOnMouseLeave}
+        />
       )}
       <Routes>
         {getRoutes(routes)}

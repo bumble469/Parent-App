@@ -10,22 +10,22 @@ import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import MDBox from 'components/MDBox';
 import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 import MDTypography from 'components/MDTypography';
-import { fetchAchievements } from "./data/achievements";
+import LectureViewTable from "./data/lectures"; // Import LectureViewTable
 import AttendanceTable from './data/detailed_attendance';
 import ReportsBarChartWrapper from './data/attendanceBar1';
 import MarksTable from './data/detailed_marks';
 import LineGraph from './data/marksGraphs';
 import Footer from 'examples/Footer';
 import OverallAttendance from './data/overallAttendance';
+
 function Performance() {
-  const [semester, setSemester] = useState('');
-  const [semesters, setSemesters] = useState([]);
-  const [marksData, setMarksData] = useState([]);
-  const [averageMarks, setAverageMarks] = useState(0);
-  const [achievements, setAchievements] = useState([]);
+  const [semester, setSemester] = useState(''); // Initialize semester state
+  const [semesters, setSemesters] = useState([]); // Store list of semesters
+  const [marksData, setMarksData] = useState([]); // Store marks data
+  const [averageMarks, setAverageMarks] = useState(0); // Store average marks
 
   const handleSemesterChange = (event) => {
-    setSemester(event.target.value);
+    setSemester(event.target.value); // Update semester when changed
   };
 
   useEffect(() => {
@@ -41,10 +41,9 @@ function Performance() {
           }));
         setSemesters(uniqueSemesters);
         if (uniqueSemesters.length > 0) {
-          setSemester(uniqueSemesters[0].id); // Default semester
+          setSemester(uniqueSemesters[0].id); // Default to the first semester
         }
-        setMarksData(data); // Save the marks data as well for later processing
-
+        setMarksData(data); // Save the marks data for later processing
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -53,10 +52,9 @@ function Performance() {
   }, []);
 
   useEffect(() => {
-    // Calculate average marks
+    // Calculate average marks for the selected semester
     const filteredMarks = marksData.filter(item => item.semester_id === semester);
 
-    // Group by subject to sum marks for each subject
     const marksBySubject = filteredMarks.reduce((acc, item) => {
       const subjectId = item.subject_id;
       if (!acc[subjectId]) {
@@ -67,7 +65,6 @@ function Performance() {
       return acc;
     }, {});
 
-    // Calculate the total obtained marks and total possible marks for all subjects
     let totalObtainedMarks = 0;
     let totalPossibleMarks = 0;
 
@@ -76,25 +73,10 @@ function Performance() {
       totalPossibleMarks += subject.totalMarks;
     });
 
-    // Calculate the average marks
-    if (totalPossibleMarks > 0) {
-      const avgMarks = (totalObtainedMarks / totalPossibleMarks) * 100;
-      setAverageMarks(avgMarks);
-    } else {
-      setAverageMarks(0); // Set to 0 if no marks data
-    }
-
+    const avgMarks = totalPossibleMarks > 0 ? (totalObtainedMarks / totalPossibleMarks) * 100 : 0;
+    setAverageMarks(avgMarks);
   }, [semester, marksData]);
 
-  useEffect(() => {
-    const loadAchievements = async () => {
-      if (semester) {
-        const data = await fetchAchievements(semester);
-        setAchievements(data);
-      }
-    };
-    loadAchievements();
-  }, [semester]);
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -162,10 +144,11 @@ function Performance() {
               </FormControl>
             </Grid>
           </Grid>
+
           <Grid item xs={12}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <OverallAttendance semester={semester}/>
+                <OverallAttendance semester={semester} />
               </Grid>
               <Grid item xs={12} md={4}>
                 <MDBox sx={{ height: '100%' }}>
@@ -202,18 +185,18 @@ function Performance() {
                   >
                     <MDBox
                       sx={{
-                        maxHeight: '50px', // Set a maximum height for the scrollable area
-                        overflowY: 'auto', // Enable vertical scrolling
-                        padding: '8px', // Optional: Add padding to ensure content is not flush with the edges
+                        maxHeight: '50px',
+                        overflowY: 'auto',
+                        padding: '8px',
                         '::-webkit-scrollbar': {
-                            width: '8px', // Width of the scrollbar
+                            width: '8px',
                         },
                         '::-webkit-scrollbar-thumb': {
-                          backgroundColor: '#888', // Color of the scrollbar thumb
+                          backgroundColor: '#888',
                           borderRadius: '4px',
                         },
                         '::-webkit-scrollbar-thumb:hover': {
-                          backgroundColor: '#555', // Color on hover
+                          backgroundColor: '#555',
                         },
                       }}
                     >
@@ -225,77 +208,34 @@ function Performance() {
                   </ComplexStatisticsCard>
                 </MDBox>
               </Grid>
-              <Grid item xs={12}>
-                <Card sx={{ width: '100%', overflow: 'hidden' }}>
-                  <CardContent>
-                    <Typography sx={{ mb: 2, color: 'grey', mt: 2 }}>
-                      Achievements & Projects
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        overflowX: 'auto', // Enables horizontal scrolling
-                        padding: '10px',
-                        gap: 2, // Adds space between cards
-                      }}
-                    >
-                      {achievements.map((achievement, index) => (
-                        <Box
-                          key={index}
-                          sx={{
-                            minWidth: '200px', // Ensures cards have a minimum width
-                            textAlign: 'center',
-                            p: 2,
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            backgroundColor: '#f9f9f9',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 'bold',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              mb: 1, // Space between title and description
-                            }}
-                          >
-                            {achievement.ach_title}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'normal', // Allows for wrapping in description
-                            }}
-                          >
-                            {achievement.ach_detail}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: 'gray',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              mt: 1, // Space between description and date
-                            }}
-                          >
-                            {achievement.ach_date}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
             </Grid>
           </Grid>
+
+          {/* Replacing achievements section with LectureViewTable */}
+          <Grid item xs={12} mt={3}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="error"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="white">
+                  Subject-Wise Detailed Lecture Review
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3}>
+                <LectureViewTable semester={semester} />
+              </MDBox>
+            </Card>
+          </Grid>
+
           <Grid item xs={12} mt={1}>
-           <Grid container spacing={2}>
+            <Grid container spacing={2}>
               <Grid item xs={12} md={12} mt={3} mb={3}>
                 <Card>
                   <MDBox
@@ -313,28 +253,28 @@ function Performance() {
                     </MDTypography>
                   </MDBox>
                   <MDBox pt={3}>
-                  <AttendanceTable semester={semester} />
+                    <AttendanceTable semester={semester} />
                   </MDBox>
                 </Card>
-              </Grid> 
+              </Grid>
               <Grid item xs={12} md={12} mt={1} mb={3}>
-                  <ReportsBarChartWrapper semester={semester}/>
+                <ReportsBarChartWrapper semester={semester} />
               </Grid>
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12} md={12} lg={12} mt={3} mb={2}>
-                <MarksTable semester={semester}/>
+                <MarksTable semester={semester} />
               </Grid>
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12} md={12} lg={12} mt={4} mb={2}>
-                <LineGraph semester={semester}/>
+                <LineGraph semester={semester} />
               </Grid>
             </Grid>
           </Grid>
         </Grid>
       </MDBox>
-      <Footer/>
+      <Footer />
     </DashboardLayout>
   );
 }

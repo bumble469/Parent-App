@@ -17,8 +17,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from 'App';
-
-// Material Dashboard 2 React Context Provider
+import i18n from './i18n'; // Assuming your i18n setup is here
+import { I18nextProvider } from 'react-i18next';
 import { MaterialUIControllerProvider } from 'context';
 
 const container = document.getElementById('app');
@@ -26,8 +26,10 @@ const root = createRoot(container);
 
 root.render(
   <BrowserRouter>
-    <MaterialUIControllerProvider>
-      <App />
-    </MaterialUIControllerProvider>
-  </BrowserRouter>,
+    <I18nextProvider i18n={i18n}> 
+      <MaterialUIControllerProvider>
+        <App />
+      </MaterialUIControllerProvider>
+    </I18nextProvider>
+  </BrowserRouter>
 );

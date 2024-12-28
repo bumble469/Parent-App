@@ -9,6 +9,7 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import SidenavCollapse from 'examples/Sidenav/SidenavCollapse';
 import SidenavRoot from 'examples/Sidenav/SidenavRoot';
+import { useTranslation } from 'react-i18next';
 import {
   useMaterialUIController,
   setMiniSidenav,
@@ -18,18 +19,20 @@ import {
 
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
+  const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace('/', '');
   
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation(); // i18n is used to track the current language
 
   // Fetch student profile
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        const response = await fetch('http://localhost:8001/api/student/profile');
+        // Pass the selected language (i18n.language) to your API request
+        const response = await fetch(`http://localhost:8001/api/student/profile`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -43,7 +46,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     };
 
     fetchStudentProfile();
-  }, []);
+  }, [i18n.language]); // Trigger the fetch every time the language changes
 
   // Ensure hooks are called consistently
   useEffect(() => {
@@ -96,6 +99,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           mt={1}
           mb={1}
           ml={1}
+          fontSize={i18n.language === 'hi' ? '0.97rem' : '0.78rem'}
         >
           {title}
         </MDTypography>
@@ -104,10 +108,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       returnValue = (
         <Divider
           key={key}
-          light={
-            (!darkMode && !whiteSidenav && !transparentSidenav) ||
-            (darkMode && !transparentSidenav && whiteSidenav)
-          }
+          light={(!darkMode && !whiteSidenav && !transparentSidenav) || (darkMode && !transparentSidenav && whiteSidenav)}
         />
       );
     }
@@ -195,7 +196,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                 mb: 1,
               }}
             >
-              Welcome, {student.parentInfo[0]?.name} / {student.parentInfo[1]?.name}
+              {t("Welcome")}, {student.parentInfo[0]?.name} / {student.parentInfo[1]?.name}
             </MDTypography>          
           ) : (
             <MDTypography
@@ -211,7 +212,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                 mb: 1,
               }}
             >
-              Welcome, Parents
+              {t("Welcome")}, Parents
             </MDTypography>
           )}
         </MDBox>

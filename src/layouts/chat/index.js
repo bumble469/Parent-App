@@ -87,13 +87,13 @@ function Chat() {
       <Paper
         elevation={3}
         sx={{
-          padding: 2,
           margin: '10px auto', // Center the Paper by using auto margins
           height: 'calc(100vh - 150px)', // Responsive height
           display: 'flex',
           overflow: 'hidden',
           position: 'relative',
           width: { xs: '95%', sm: '100%' }, // Adjust width for mobile
+          padding: 2
         }}
       >
         <Drawer
@@ -117,6 +117,7 @@ function Chat() {
               flexDirection: 'column',
               height: '100%',
               padding: 2,
+              backgroundColor: 'grey'
             }}
           >
             <IconButton
@@ -158,7 +159,8 @@ function Chat() {
                         <Typography
                           variant="body1"
                           sx={{
-                            fontSize: { xs: '1rem', sm: '0.9rem' }, // Reduce font size in desktop view
+                            fontSize: { xs: '1rem', sm: '0.9rem' },
+                            fontWeight: 'bold'
                           }}
                         >
                           {`${teacher.teacher_fullname}`}
@@ -171,7 +173,7 @@ function Chat() {
                             fontSize: { xs: '0.9rem', sm: '0.8rem' }, // Reduce font size in desktop view
                           }}
                         >
-                          {teacher.subject_name || 'No subject available'}
+                          Subjects:&nbsp;{teacher.subject_name || 'No subject available'}
                         </Typography>
                       }
                     />
@@ -222,7 +224,7 @@ function Chat() {
                     setSelectedTeacher(teacher);
                   }}
                   sx={{
-                    marginBottom: 1,
+                    marginBottom: 3,
                     borderRadius: 2,
                     backgroundColor: selectedTeacher === teacher ? '#e3f2fd !important' : 'inherit',
                   }}
@@ -240,6 +242,7 @@ function Chat() {
                         variant="body1"
                         sx={{
                           fontSize: { xs: '1rem', sm: '0.9rem' }, // Reduce font size in desktop view
+                          fontWeight: 'bold'
                         }}
                       >
                         {`${teacher.teacher_fullname}`}
@@ -252,7 +255,7 @@ function Chat() {
                           fontSize: { xs: '0.9rem', sm: '0.8rem' }, // Reduce font size in desktop view
                         }}
                       >
-                        {teacher.subject_name || 'No subject available'}
+                        Subject:&nbsp;{teacher.subject_name || 'No subject available'}
                       </Typography>
                     }
                   />
@@ -307,7 +310,7 @@ function Chat() {
                   >
                     <Box
                       sx={{
-                        backgroundColor: msg.sender === 'parent' ? '#e1f5fe' : '#f1f1f1',
+                        backgroundColor: msg.sender === 'parent' ? '#f1f1f1' : '#e1f5fe',
                         borderRadius: '8px',
                         padding: 1,
                         maxWidth: '60%',

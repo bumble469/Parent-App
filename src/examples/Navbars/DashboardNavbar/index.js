@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import {FormControl, InputLabel, Select, MenuItem} from '@mui/material';
 import NotificationItem from 'examples/Items/NotificationItem';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Icon from '@mui/material/Icon';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
@@ -23,6 +23,7 @@ import Breadcrumbs from 'examples/Breadcrumbs';
 import profileImage from '../../../assets/images/bruce-mars.jpg';
 import '../../../Global';
 import LogoutDialog from './components/logoutdialog';
+import { useTranslation } from 'react-i18next';
 import {
   navbar,
   navbarContainer,
@@ -42,6 +43,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const route = useLocation().pathname.split('/').slice(1);
   const navigate = useNavigate();
+  const { i18n ,t } = useTranslation();
+
+  const handleLanguageChange = (event) => {
+    const selectedLanguage = event.target.value;
+    i18n.changeLanguage(selectedLanguage); 
+  };
 
   useEffect(() => {
     if (fixedNavbar) {
@@ -90,76 +97,48 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStudentDetails = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await fetch('http://localhost:8001/api/student/currentsemester');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setStudent(data);
-      } catch (error) {
-        console.error('Error fetching student profile:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStudentDetails();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:8001/api/dashboard/student/graph');
-        const data = await response.json();
-
-        const lowAttendanceAndMarks = data.map((subject) => {
-          const attendancePercentage =
-            (subject.lectures_attended / subject.lectures_total) * 100;
-          const marksPercentage =
-            (subject.totalMarks / subject.totalPossibleMarks) * 100;
-
+        const studentData = await response.json();
+        setStudent(studentData);
+  
+        const notificationResponse = await fetch('http://localhost:8001/api/dashboard/student/graph');
+        const notificationData = await notificationResponse.json();
+  
+        const lowAttendanceAndMarks = notificationData.map((subject) => {
+          const attendancePercentage = (subject.lectures_attended / subject.lectures_total) * 100;
+          const marksPercentage = (subject.totalMarks / subject.totalPossibleMarks) * 100;
+  
           const notifications = [];
-
-          // Check for low attendance
           if (attendancePercentage < 75) {
             notifications.push({
               icon: 'warning',
-              title: `${subject.sub_name} has low attendance: ${attendancePercentage.toFixed(
-                2
-              )}%`,
+              title: `${subject.sub_name} has low attendance: ${attendancePercentage.toFixed(2)}%`,
             });
           }
-
-          // Check for low marks
           if (marksPercentage < 75) {
             notifications.push({
               icon: 'warning',
-              title: `${subject.sub_name} has low marks: ${marksPercentage.toFixed(
-                2
-              )}%`,
+              title: `${subject.sub_name} has low marks: ${marksPercentage.toFixed(2)}%`,
             });
           }
-
           return notifications;
         });
-
-        // Flatten the array of notifications
-        setNotifications(lowAttendanceAndMarks.flat());
+  
+        setNotifications(lowAttendanceAndMarks.flat()); // Set notifications after both API calls
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
-        setLoading(false);
+        setLoading(false); // End loading after both data fetches
       }
     };
-
     fetchData();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  }, []); 
+  if(loading){
+    return <div>Loading...</div>
+  } 
 
   const iconsStyle = {
     fontSize: '2rem',
@@ -175,6 +154,29 @@ function DashboardNavbar({ absolute, light, isMini }) {
       <Toolbar sx={(theme) => navbarContainer(theme)}>
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
+          <MDBox pr={1} mt={2}>
+              <MDTypography
+                variant="caption"
+                color="textSecondary"
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: 'bold',
+                  fontFamily: '"Noto Sans", sans-serif',
+                }}
+              >
+                <FormControl sx={{padding:1}}>
+                  <InputLabel>Language</InputLabel>
+                  <Select
+                    value={i18n.language}
+                    onChange={handleLanguageChange}
+                    label="Language"
+                  >
+                    <MenuItem value="en">English</MenuItem>
+                    <MenuItem value="hi">हिंदी</MenuItem>
+                  </Select>
+                </FormControl>
+              </MDTypography>
+            </MDBox>
         </MDBox>
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
@@ -188,10 +190,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   fontFamily: '"Noto Sans", sans-serif',
                 }}
               >
-                Current Semester: {student.current_Sem}
+                Current Semester: {student.formattedProfile.current_Sem}
               </MDTypography>
             </MDBox>
-            <MDBox color={light ? 'white' : 'inherit'}>
               {/* Notification Icon */}
               <IconButton
                 size="large"
@@ -213,6 +214,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   <Icon>notifications</Icon>
                 </Badge>
               </IconButton>
+              
 
               {/* Profile Menu */}
               <IconButton
@@ -247,10 +249,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 <MenuItem sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
                   <Avatar sx={{ width: 56, height: 56, mb: 1 }} alt="User Name" src={profileImage} />
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    {student.stud_fullname}
+                    {student.formattedProfile.stud_fullname}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Rollno: {student.stud_rollno}
+                    {t("rollno")}: {student.formattedProfile.stud_rollno}
                   </Typography>
                 </MenuItem>
                 <Divider sx={{ my: 1 }} />
@@ -277,12 +279,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   {miniSidenav ? 'menu_open' : 'menu'}
                 </Icon>
               </IconButton>
-            </MDBox>
           </MDBox>
         )}
       </Toolbar>
-
-      {/* Notification Dialog */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
@@ -362,7 +361,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
           )}
         </DialogContent>
       </Dialog>
-
       <LogoutDialog
         open={logoutDialogOpen}
         onConfirm={handleConfirmLogout}
