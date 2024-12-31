@@ -4,13 +4,13 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Card } from '@mui/material';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import MDBox from 'components/MDBox';
 import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 import MDTypography from 'components/MDTypography';
-import LectureViewTable from "./data/lectures"; // Import LectureViewTable
+import LectureViewTable from "./data/lectures";
 import AttendanceTable from './data/detailed_attendance';
 import ReportsBarChartWrapper from './data/attendanceBar1';
 import MarksTable from './data/detailed_marks';
@@ -211,7 +211,6 @@ function Performance() {
             </Grid>
           </Grid>
 
-          {/* Replacing achievements section with LectureViewTable */}
           <Grid item xs={12} mt={3}>
             <Card>
               <MDBox

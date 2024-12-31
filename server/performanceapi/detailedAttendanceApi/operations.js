@@ -19,7 +19,7 @@ async function getStudentDetailedAttendanceForPerformance(studentId, semester) {
                 
                 JOIN master_subjects ms ON mt.subject_id = ms.subject_id
                 WHERE da.student_id = @studentId
-                AND ms.semester_id = @semester  -- Filter by semester from master_subjects
+                AND ms.semester_id = @semester
                 ORDER BY 
                     YEAR(da.scan_time) ASC,
                     MONTH(da.scan_time) ASC;

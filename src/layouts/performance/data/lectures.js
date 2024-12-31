@@ -5,37 +5,36 @@ const LectureViewTable = ({ semester }) => {
   const [lectureData, setLectureData] = useState({});
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all'); // New dropdown state
   const [currentPage, setCurrentPage] = useState(0);
-  const columnsPerPage = 8;
+  const columnsPerPage = 5;
 
-  const fetchLectureData = async (semester) => {
+  const fetchDetailedLectureViews = async (semester) => {
     try {
       const response = await fetch(
-        `http://localhost:8001/api/lectures?semester=${semester}`
+        `http://localhost:8001/api/performance/student/lectureviews?semester=${semester}`
       );
       const data = await response.json();
 
-      // Grouping lecture data by subject and date
-      const groupedData = data.reduce((acc, { subject_name, lecture_time, is_conducted }) => {
-        const parsedDate = new Date(lecture_time);
+      const groupedData = data.reduce((acc, { subject_name, lecture_date, viewed_status, view_time }) => {
+        const parsedDate = new Date(lecture_date);
         if (isNaN(parsedDate)) return acc;
 
         if (!acc[subject_name]) {
           acc[subject_name] = [];
         }
-        acc[subject_name].push({ date: parsedDate, is_conducted });
+        acc[subject_name].push({ date: parsedDate, viewed_status, view_time });
         return acc;
       }, {});
 
       setLectureData(groupedData);
     } catch (error) {
-      console.error('Error fetching lecture data:', error);
+      console.error('Error fetching detailed attendance:', error);
     }
   };
 
   useEffect(() => {
-    fetchLectureData(semester);
+    fetchDetailedLectureViews(semester);
   }, [semester]);
 
   const resetFilters = () => {
@@ -87,7 +86,7 @@ const LectureViewTable = ({ semester }) => {
         const monthIndex = parseInt(month) - 1;
         const dayIndex = parseInt(day);
 
-        const lectureRecord = subjectData.filter((item) => {
+        const attendanceRecord = subjectData.filter((item) => {
           const recordDate = item.date;
           return (
             recordDate.getDate() === dayIndex &&
@@ -96,21 +95,22 @@ const LectureViewTable = ({ semester }) => {
           );
         });
 
-        if (lectureRecord.length > 0) {
-          const lectureStatus = lectureRecord.map((record) => {
-            if (record.is_conducted === null || record.is_conducted === undefined) {
-              return { status: 'No Lecture', color: 'black' };
+        if (attendanceRecord.length > 0) {
+          const attendanceStatus = attendanceRecord.map((record) => {
+            if (record.viewed_status === 'Not Viewed') {
+              return { status: 'Not Viewed', color: 'red', view_time: null };
+            } else if (record.viewed_status === 'Viewed') {
+              return { status: 'Viewed', color: 'green', view_time: record.view_time };
+            } else {
+              return { status: 'Null', color: 'black', view_time: null };
             }
-            return record.is_conducted
-              ? { status: 'Conducted', color: 'green' }
-              : { status: 'Not Conducted', color: 'red' };
           });
 
-          if (selectedStatus === 'all' || lectureStatus[0].status === selectedStatus) {
-            row[formattedDate] = lectureStatus[0];
+          if (selectedStatus === 'all' || attendanceStatus[0].status === selectedStatus) {
+            row[formattedDate] = attendanceStatus[0];
           }
         } else if (selectedStatus === 'all' || selectedStatus === 'No Lecture') {
-          row[formattedDate] = { status: 'No Lecture', color: 'black' };
+          row[formattedDate] = { status: 'No Lecture', color: 'black', view_time: null };
         }
       });
 
@@ -131,7 +131,14 @@ const LectureViewTable = ({ semester }) => {
           Header: date,
           accessor: date,
           Cell: ({ value }) => (
-            <span style={{ color: value?.color || 'black' }}>{value?.status || ''}</span>
+            <div>
+              <span style={{ color: value?.color || 'black' }}>{value?.status || ''}</span>
+              {value?.view_time && value.status === 'Viewed' && (
+                <div style={{ fontSize: '0.8rem', color: '#555' }}>
+                  on: {new Date(value.view_time).toLocaleString()}
+                </div>
+              )}
+            </div>
           ),
         })),
     ];
@@ -176,7 +183,7 @@ const LectureViewTable = ({ semester }) => {
             border: '1px solid #f5c6cb',
             cursor: 'pointer',
             fontWeight: 'bold',
-            marginLeft: '1rem'
+            marginLeft: '1rem',
           }}
         >
           Clear Filters
@@ -230,8 +237,8 @@ const LectureViewTable = ({ semester }) => {
             }}
           >
             <option value="all">All Statuses</option>
-            <option value="Conducted">Conducted</option>
-            <option value="Not Conducted">Not Conducted</option>
+            <option value="Viewed">Viewed</option>
+            <option value="Not Viewed">Not Viewed</option>
             <option value="No Lecture">No Lecture</option>
           </select>
         </div>
