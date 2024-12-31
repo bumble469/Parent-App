@@ -145,6 +145,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
     color: 'inherit',
   };
 
+  const removeNotification = (index) => {
+    setNotifications((prevNotifications) => {
+      const updatedNotifications = [...prevNotifications];
+      updatedNotifications.splice(index, 1);
+      return updatedNotifications;
+    });
+  };
   return (
     <AppBar
       position={absolute ? 'absolute' : navbarType}
@@ -363,8 +370,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
       </Dialog>
       <LogoutDialog
         open={logoutDialogOpen}
-        onConfirm={handleConfirmLogout}
-        onCancel={handleCancelLogout}
+        handleConfirm={handleConfirmLogout}
+        handleClose={handleCancelLogout}
       />
     </AppBar>
   );

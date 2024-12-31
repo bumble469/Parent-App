@@ -194,15 +194,15 @@ function Chat() {
             padding: 2,
             height: '100%',
             overflowY: 'auto',
-            '::-webkit-scrollbar': {
-              width: '8px', // Width of the scrollbar
+            '&::-webkit-scrollbar': {
+              width: '8px',
             },
-            '::-webkit-scrollbar-thumb': {
-              backgroundColor: '#888', // Color of the scrollbar thumb
-              borderRadius: '4px',
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: 'rgba(0, 0, 0, 0.1)', // Light track color
             },
-            '::-webkit-scrollbar-thumb:hover': {
-              backgroundColor: '#555', // Color on hover
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'rgba(0, 0, 0, 0.3)', // Darker thumb color
+              borderRadius: '10px', // Rounded scrollbar thumb
             },
           }}
         >
