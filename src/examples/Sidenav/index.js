@@ -25,13 +25,11 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { t, i18n } = useTranslation(); // i18n is used to track the current language
+  const { t, i18n } = useTranslation(); 
 
-  // Fetch student profile
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        // Pass the selected language (i18n.language) to your API request
         const response = await fetch(`http://localhost:8001/api/student/profile`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -46,9 +44,8 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     };
 
     fetchStudentProfile();
-  }, [i18n.language]); // Trigger the fetch every time the language changes
+  }, []); 
 
-  // Ensure hooks are called consistently
   useEffect(() => {
     const handleMiniSidenav = () => {
       setMiniSidenav(dispatch, window.innerWidth < 1200);
@@ -168,7 +165,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
               component="h6"
               variant="button"
               fontWeight="medium"
-              sx={{ fontSize: '1.7rem', fontFamily: 'timesnewroman', textAlign: 'center' }}
+              sx={{ fontSize: '1.7rem', textAlign: 'center' }}
             >
               {brandName}
             </MDTypography>
@@ -186,13 +183,13 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             <MDTypography
               variant="caption"
               color="black"
-              fontSize="0.9rem"
+              fontSize={i18n.language==='hi'?'1rem':'0.93rem'}
               sx={{
                 display: 'block',
                 maxWidth: '100%',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'normal',  // Allows text to wrap if it's long
+                whiteSpace: 'normal',  
                 mb: 1,
               }}
             >
@@ -202,7 +199,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             <MDTypography
               variant="caption"
               color="black"
-              fontSize="0.9rem"
+              fontSize={i18n.language==='hi'?'1rem':'0.93rem'}
               sx={{
                 display: 'block',
                 maxWidth: '100%',
@@ -237,7 +234,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           marginTop: 'auto',
         }}
       >
-        A Parent-Oriented Initiative!
+        {t('AParentOrientedInitiative')}
       </MDBox>
     </SidenavRoot>
   );

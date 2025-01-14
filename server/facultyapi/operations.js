@@ -2,8 +2,12 @@ const NodeCache = require('node-cache');
 const { sql, poolPromise } = require('../utils/db');
 const { callFlaskDecryptAPI } = require('../utils/flask_api_call/flask_api_call');
 const { Buffer } = require('buffer');
+const pLimit = require('p-limit'); // To control concurrency
 
 const cache = new NodeCache({ stdTTL: 120, checkperiod: 120 });
+
+// Limit concurrency to 10 requests at a time
+const limit = pLimit(10);
 
 function chunkArray(array, size) {
     const chunks = [];
@@ -14,37 +18,40 @@ function chunkArray(array, size) {
 }
 
 async function batchDecryptData(encryptedDataArray) {
-    const batchSize = 50;
+    const batchSize = 200;
     let decryptedDataArray = [];
 
     try {
         const chunks = chunkArray(encryptedDataArray, batchSize);
 
+        // Execute decryption with limited concurrency
         const decryptedChunks = await Promise.all(
             chunks.map(async (chunk) => {
                 return await Promise.all(
-                    chunk.map(async (encryptedData) => {
-                        try {
-                            const { final_data, encrypted_aes_key } = JSON.parse(encryptedData);
+                    chunk.map((encryptedData) => {
+                        return limit(async () => {
+                            try {
+                                const { final_data, encrypted_aes_key } = JSON.parse(encryptedData);
 
-                            // Check if the decrypted data is already cached
-                            const cacheKey = `${final_data}_${encrypted_aes_key}`; // Unique cache key based on data
-                            const cachedData = cache.get(cacheKey);
-                            if (cachedData) {
-                                return cachedData; // Return cached decrypted data
+                                // Check if the decrypted data is already cached
+                                const cacheKey = `${final_data}_${encrypted_aes_key}`; // Unique cache key based on data
+                                const cachedData = cache.get(cacheKey);
+                                if (cachedData) {
+                                    return cachedData; // Return cached decrypted data
+                                }
+
+                                // If not cached, call Flask API to decrypt
+                                const decryptedData = await callFlaskDecryptAPI(final_data, encrypted_aes_key);
+
+                                // Cache the decrypted data
+                                cache.set(cacheKey, decryptedData);
+
+                                return decryptedData;
+                            } catch (error) {
+                                console.error('Decryption failed for data:', encryptedData, error.message);
+                                return null;
                             }
-
-                            // If not cached, call Flask API to decrypt
-                            const decryptedData = await callFlaskDecryptAPI(final_data, encrypted_aes_key);
-
-                            // Cache the decrypted data
-                            cache.set(cacheKey, decryptedData);
-
-                            return decryptedData;
-                        } catch (error) {
-                            console.error('Decryption failed for data:', encryptedData, error.message);
-                            return null;
-                        }
+                        });
                     })
                 );
             })

@@ -4,13 +4,17 @@ import Grid from '@mui/material/Grid';
 import MDTypography from 'components/MDTypography';
 import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const SubjectDashboard = () => {
+  const { t, i18n } = useTranslation(); // Hook to access translation functions
   const [strongSubjects, setStrongSubjects] = useState([]);
   const [weakSubjects, setWeakSubjects] = useState([]);
   const [lowAttendanceAlerts, setLowAttendanceAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const isHindi = i18n.language === 'hi';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,8 +60,8 @@ const SubjectDashboard = () => {
     fetchData();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (loading) return <div>{t('loading')}</div>;
+  if (error) return <div>{t('error', { message: error.message })}</div>;
 
   return (
     <MDBox mt={1}>
@@ -66,10 +70,10 @@ const SubjectDashboard = () => {
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="success"
-            title={`Strong Subjects (${strongSubjects.length})`}
+            title={<span style={{ fontSize: isHindi ? '1.1rem' : 'inherit' }}>{t('strongSubjects')} ({strongSubjects.length})</span>}
             icon="check_circle"
             sx={{ borderRadius: '12px', boxShadow: 3 }}
-            percentage={{ label: 'Great work, keep it up!' }}
+            percentage={{ label: t('greatWork') }}
           >
             <MDBox
               display="flex"
@@ -118,7 +122,7 @@ const SubjectDashboard = () => {
                 ))
               ) : (
                 <MDTypography variant="h6" color="textSecondary">
-                  No strong subjects
+                  {t('noStrongSubjects')}
                 </MDTypography>
               )}
             </MDBox>
@@ -129,10 +133,10 @@ const SubjectDashboard = () => {
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="error"
-            title={`Weak Subjects (${weakSubjects.length})`}
+            title={<span style={{fontSize:isHindi?'1.1rem':'inherit'}}>{t('weakSubjects')} ({weakSubjects.length})</span>}
             icon="warning"
             sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
-            percentage={{ label: 'Needs Improvement' }}
+            percentage={{ label: t('needsImprovement') }}
           >
             <MDBox
               display="flex"
@@ -181,7 +185,7 @@ const SubjectDashboard = () => {
                 ))
               ) : (
                 <MDTypography variant="h6" color="textSecondary">
-                  No weak subjects
+                  {t('noWeakSubjects')}
                 </MDTypography>
               )}
             </MDBox>
@@ -192,10 +196,10 @@ const SubjectDashboard = () => {
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="warning"
-            title={`Low Attendance Subjects (${lowAttendanceAlerts.length})`}
+            title={<span style={{fontSize:isHindi?'1rem':'inherit'}}>{t('lowAttendanceSubjects')} ({lowAttendanceAlerts.length})</span>}
             icon="access_time"
             sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
-            percentage={{ label: 'Below 75%' }}
+            percentage={{ label: t('below75') }}
           >
             <MDBox
               display="flex"
@@ -234,7 +238,7 @@ const SubjectDashboard = () => {
                   </MDBox>
                 ))
               ) : (
-                <MDTypography variant="body2">No low attendance subjects.</MDTypography>
+                <MDTypography variant="body2">{t('noLowAttendanceSubjects')}</MDTypography>
               )}
             </MDBox>
           </ComplexStatisticsCard>

@@ -4,10 +4,9 @@ async function getStudentDetailedAttendanceForPerformance(studentId, semester) {
     try {
         let pool = await poolPromise;
 
-        // Modify the query to filter by both studentId and semester
         let result = await pool.request()
             .input('studentId', sql.Int, studentId)  
-            .input('semester', sql.Int, semester)  // Add semester as input
+            .input('semester', sql.Int, semester)  
             .query(`
                SELECT
                     ms.subject_name,
@@ -29,12 +28,12 @@ async function getStudentDetailedAttendanceForPerformance(studentId, semester) {
 
         if (result.recordset.length === 0) {
             console.log(`No data found for student ${studentId} in semester ${semester}`);
-            return null;  // No data found for the student in the current semester
+            return null; 
         }
 
         const studentDetails = result.recordset;
 
-        return studentDetails; // Return the student details
+        return studentDetails;
     } catch (error) {
         console.error('Error fetching student performance details: ', error.message);
         console.error('Error details: ', error);

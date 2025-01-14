@@ -3,13 +3,11 @@ import ApexCharts from "react-apexcharts";
 import { Card } from "@mui/material";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
-
-// Function to generate the line chart data and configuration
+import { useTranslation } from 'react-i18next'; 
 const generateMarksLineChartData = (currentMarksData, threshold) => {
-  // Calculate the min and max values based on marks obtained
-  const maxMarks = Math.max(...currentMarksData.map((data) => data.total));
   const minMarks = Math.min(...currentMarksData.map((data) => data.total));
-
+  const {t,i18n} = useTranslation();
+  const isHindi = i18n.language === 'hi';
   return useMemo(
     () => ({
       series: [
@@ -31,22 +29,22 @@ const generateMarksLineChartData = (currentMarksData, threshold) => {
         xaxis: {
           categories: currentMarksData.map((data) => data.subject),
           title: {
-            text: "Subjects",
-            style: { fontSize: "14px", fontWeight: 600 },
+            text: t('subject'),
+            style: { fontSize: '0.9rem', fontWeight: 600 },
           },
         },
         yaxis: {
           title: {
-            text: "Total Marks",
-            style: { fontSize: "14px", fontWeight: 600 },
+            text: t('TotalMarks'),
+            style: { fontSize: "0.9rem", fontWeight: 600 },
           },
           labels: {
             formatter: (value) => value.toFixed(0),
-            style: { fontSize: "12px", fontWeight: 500 },
+            style: { fontSize: "0.8rem", fontWeight: 500 },
           },
           tickAmount: 15,
-          max: 145, // Add buffer to the max value
-          min: minMarks - 30, // Add buffer to the min value
+          max: 145, 
+          min: minMarks - 30, 
         },
         colors: ["#1E90FF"],
         dataLabels: {
@@ -79,8 +77,8 @@ const generateMarksLineChartData = (currentMarksData, threshold) => {
                   fontSize: "12px",
                   padding: { top: 3, bottom: 3, left: 3, right: 3 },
                 },
-                offsetX: -10, // Adjust this value to place the label nicely
-                offsetY: -30, // Adjust the vertical position to avoid overlap
+                offsetX: -10, 
+                offsetY: -30, 
               },
             },
           ],
@@ -92,10 +90,10 @@ const generateMarksLineChartData = (currentMarksData, threshold) => {
 };
 
 const LineGraph = ({ semester, threshold = 95 }) => {
+  const { t } = useTranslation(); 
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("All");
 
-  // Fetch marks data for the selected semester
   const fetchMarksData = async (semester) => {
     try {
       const response = await fetch(
@@ -117,7 +115,6 @@ const LineGraph = ({ semester, threshold = 95 }) => {
     fetchMarksData(semester);
   }, [semester]);
 
-  // Group data by subject
   const groupedMarksData = marksData.reduce((acc, { subject_name, marks_obtained }) => {
     if (!acc[subject_name]) {
       acc[subject_name] = { earned: 0, total: 0 };
@@ -139,7 +136,6 @@ const LineGraph = ({ semester, threshold = 95 }) => {
           },
         ];
 
-  // Generate chart data with dynamic Y-axis and threshold
   const chartData = generateMarksLineChartData(filteredMarksData, threshold);
 
   return (
@@ -155,18 +151,17 @@ const LineGraph = ({ semester, threshold = 95 }) => {
         coloredShadow="success"
       >
         <MDTypography variant="h6" color="white">
-          Total Marks Line Graph
+          {t('Total Marks Line Graph')} 
         </MDTypography>
       </MDBox>
       <MDBox pt={3} px={3}>
-        {/* Filter for Subjects */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
           <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
-            style={{ padding: '8px', borderRadius: '4px', fontSize: '14px', border: '1px solid #ddd', marginRight: '20px' }}
+            style={{ padding: '8px', borderRadius: '4px', fontSize: '0.95rem', border: '1px solid #ddd', marginRight: '20px' }}
           >
-            <option value="All">All Subjects</option>
+            <option value="All">{t('All Subjects')}</option> 
             {Object.keys(groupedMarksData).map((subject) => (
               <option key={subject} value={subject}>
                 {subject}

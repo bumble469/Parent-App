@@ -1,24 +1,40 @@
 const { sql, poolPromise } = require('../utils/db');
 const { Buffer } = require('buffer');
 const { callFlaskDecryptAPI } = require('../utils/flask_api_call/flask_api_call');
+const NodeCache = require('node-cache');
 
-// Helper function to decrypt the data
+const cache = new NodeCache({ stdTTL: 120 });
+
 async function decryptData(encryptedData) {
     try {
         const { final_data, encrypted_aes_key } = JSON.parse(encryptedData);
-        const decryptedData = await callFlaskDecryptAPI(final_data, encrypted_aes_key);
-        return decryptedData;
+        return await callFlaskDecryptAPI(final_data, encrypted_aes_key);
     } catch (error) {
         console.error('Decryption failed: ', error);
-        return null; 
+        return null;
     }
 }
 
-async function getStudentParentProfile(studentId) {
-    try {
-        let pool = await poolPromise;
+function formatDate(date) {
+    if (!date) return null;
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+}
 
-        let result = await pool.request()
+async function getStudentParentProfile(studentId) {
+    const cachedProfile = cache.get(studentId);
+    if (cachedProfile) {
+        console.log('Returning cached profile');
+        return cachedProfile;
+    }
+
+    try {
+        const pool = await poolPromise;
+
+        const result = await pool.request()
             .input('studentId', sql.Int, studentId)
             .query(`
                 SELECT 
@@ -53,50 +69,60 @@ async function getStudentParentProfile(studentId) {
             return null;
         }
 
-        const studentImage = result.recordset[0].studentImage
-            ? `data:image/jpeg;base64,${Buffer.from(result.recordset[0].studentImage).toString('base64')}`
+        const studentData = result.recordset[0];
+
+        const studentImage = studentData.studentImage
+            ? `data:image/jpeg;base64,${Buffer.from(studentData.studentImage).toString('base64')}`
             : null;
 
-        // Decrypt sensitive data for student
-        const decryptedFullName = await decryptData(result.recordset[0].studentFullName);
-        const decryptedRollNo = await decryptData(result.recordset[0].rollNo);
-        const decryptedEmail = await decryptData(result.recordset[0].studentEmail);
-        const decryptedPhone = await decryptData(result.recordset[0].studentContact);
-        const decryptedAddress = await decryptData(result.recordset[0].studentAddress);
+        const decryptedFullName = await decryptData(studentData.studentFullName);
+        const decryptedRollNo = await decryptData(studentData.rollNo);
+        const decryptedEmail = await decryptData(studentData.studentEmail);
+        const decryptedPhone = await decryptData(studentData.studentContact);
+        const decryptedAddress = await decryptData(studentData.studentAddress);
+
+        const dob = formatDate(studentData.dob);
+        const enrollmentDate = formatDate(studentData.enrollmentDate);
+        const transactionDate = formatDate(studentData.transaction_date);
 
         const studentInfo = {
-            fullName: decryptedFullName || "unable to decrypt",
-            rollNo: decryptedRollNo || "unable to decrypt",
-            age: result.recordset[0].age,
-            email: decryptedEmail || "unable to decrypt",
-            dob: result.recordset[0].dob,
-            enrollmentDate: result.recordset[0].enrollmentDate,
-            address: decryptedAddress || "unable to decrypt",
-            contactMobile: decryptedPhone || "unable to decrypt",
-            studentImage: studentImage, 
-            totalFees: result.recordset[0].total_fees,
-            feesPaid: result.recordset[0].fees_paid,
-            feesPending: result.recordset[0].fees_pending,
+            fullName: decryptedFullName || "could not decrypt",
+            rollNo: decryptedRollNo || "could not decrypt",
+            age: studentData.age,
+            email: decryptedEmail || "could not decrypt",
+            dob,
+            enrollmentDate,
+            address: decryptedAddress || "could not decrypt",
+            contactMobile: decryptedPhone || "could not decrypt",
+            studentImage, 
+            totalFees: studentData.total_fees,
+            feesPaid: studentData.fees_paid,
+            feesPending: studentData.fees_pending,
             transactionInfo: {
-                transactionId: result.recordset[0].transaction_id,
-                transactionDate: result.recordset[0].transaction_date,
-                transactionType: result.recordset[0].transaction_type,
-                paymentComplete: result.recordset[0].payment_complete,
-                transactionStatus: result.recordset[0].transaction_status,
+                transactionId: studentData.transaction_id,
+                transactionDate,
+                transactionType: studentData.transaction_type,
+                paymentComplete: studentData.payment_complete,
+                transactionStatus: studentData.transaction_status,
             },
         };
 
-        // Decrypt sensitive data for parent
-        const parentInfo = await Promise.all(result.recordset.map(async (row) => ({
-            name: await decryptData(row.parentFullName),
-            email: await decryptData(row.parentEmail),
-            contactMobile: await decryptData(row.parentContact),
-        })));
+        const parentInfo = [];
+        for (let row of result.recordset) {
+            const parent = {
+                name: await decryptData(row.parentFullName),
+                email: await decryptData(row.parentEmail),
+                contactMobile: await decryptData(row.parentContact),
+            };
+            parentInfo.push(parent);
+        }
 
         const response = {
             studentInfo,
             parentInfo,
         };
+
+        cache.set(studentId, response);
 
         return response;
     } catch (error) {

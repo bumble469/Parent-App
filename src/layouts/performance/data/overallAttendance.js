@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 
-function OverallAttendance({ semester }) {
+function OverallAttendance({ semester, t, i18n }) {
   const [overallAttendance, setOverallAttendance] = useState(0);
-
+  const isHindi = i18n.language === 'hi'
   useEffect(() => {
     const fetchAttendanceData = async () => {
       try {
@@ -30,12 +30,12 @@ function OverallAttendance({ semester }) {
     <ComplexStatisticsCard
       color="info"
       icon="check_circle"
-      title="Overall Attendance"
+      title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t('Overall Attendance')}</span>}
       count={`${overallAttendance}%`}
       percentage={{
         color: overallAttendance >= 75 ? 'success' : 'error',
         amount: `${overallAttendance >= 75 ? '+' : ''}${overallAttendance}%`,
-        label: overallAttendance >= 75 ? 'On track' : 'Below 75%',
+        label: overallAttendance >= 75 ? t('On track') : t('Below 75%'),
       }}
     >
       <Box width="100%">

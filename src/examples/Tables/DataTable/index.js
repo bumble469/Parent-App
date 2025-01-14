@@ -146,7 +146,22 @@ function DataTable({
   }
 
   return (
-    <TableContainer sx={{ boxShadow: 'none' }}>
+    <TableContainer 
+      sx={{ 
+        boxShadow: 'none' ,
+        '&::-webkit-scrollbar': {
+          width: '8px',
+          height:'10px'
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          borderRadius: '10px',
+        },
+      }}
+    >
       {entriesPerPage || canSearch ? (
         <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
           {entriesPerPage && (

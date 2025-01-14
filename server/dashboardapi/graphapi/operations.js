@@ -1,7 +1,16 @@
 const { sql, poolPromise } = require('../../utils/db');
+const NodeCache = require('node-cache');
+
+const studentCache = new NodeCache({ stdTTL: 120 });
 
 async function getStudentMarksAndAttendanceForCurrentSemester(studentId) {
     try {
+        const cachedData = studentCache.get(studentId);
+        if (cachedData) {
+            console.log('Returning cached marks and attendance data');
+            return cachedData;
+        }
+
         let pool = await poolPromise;
         let result = await pool.request()
             .input('studentId', sql.Int, studentId)
@@ -9,17 +18,16 @@ async function getStudentMarksAndAttendanceForCurrentSemester(studentId) {
                 SELECT 
                     subject_id,
                     subject_name,
-                    SUM(marks_obtained) AS totalMarks,    -- Sum of marks_obtained
-                    SUM(max_marks) AS totalPossibleMarks,  -- Sum of max_marks
-                    SUM(total_lectures_attended) AS total_lectures_attended,  -- Total lectures attended
-                    SUM(total_lectures_conducted) AS total_lectures_conducted -- Total lectures conducted
+                    SUM(marks_obtained) AS totalMarks,
+                    SUM(max_marks) AS totalPossibleMarks,
+                    SUM(total_lectures_attended) AS total_lectures_attended,
+                    SUM(total_lectures_conducted) AS total_lectures_conducted
                 FROM 
                     vw_student_dashboard
                 WHERE 
                     student_id = @studentId
                 GROUP BY 
                     subject_id, subject_name
-
             `);
 
         console.log('Database Query Result:', result.recordset);
@@ -29,7 +37,6 @@ async function getStudentMarksAndAttendanceForCurrentSemester(studentId) {
             return null;
         }
 
-        // Return transformed subject-wise data with subject names
         const transformedData = result.recordset.map(row => ({
             sub_id: row.subject_id,
             sub_name: row.subject_name,
@@ -38,6 +45,8 @@ async function getStudentMarksAndAttendanceForCurrentSemester(studentId) {
             lectures_attended: row.total_lectures_attended,
             lectures_total: row.total_lectures_conducted
         }));
+
+        studentCache.set(studentId, transformedData);
 
         return transformedData;
 

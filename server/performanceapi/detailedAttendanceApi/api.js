@@ -3,11 +3,10 @@ const express = require('express');
 const router = express.Router();
 const { getStudentDetailedAttendanceForPerformance } = require('./operations'); // Import the function from operations.js
 
-// Updated route to include semester in the query
 router.get('/student/detailedattendance', async (req, res) => {
     try {
-        const studentId = global.student_id; // Assuming you have a way to retrieve the student ID (e.g., from session, JWT, etc.)
-        const { semester } = req.query; // Get the semester from the query string
+        const studentId = global.student_id;
+        const { semester } = req.query;
 
         if (!studentId) {
             return res.status(400).json({ message: 'Student ID is missing in the session.' });

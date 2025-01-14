@@ -1,19 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const facultyRoutes = require('./facultyapi/api');  
-const chatRoutes = require('./chatapi/api');  
+
+const facultyRoutes = require('./facultyapi/api');
+const chatRoutes = require('./chatapi/api');
 const eventsRoutes = require('./dashboardapi/events/events_api');
 const studentProfileRoutes = require('./profileapi/api');
 const studentDashboardStarRoutes = require('./dashboardapi/starapi/api');
-const studentDashboardGraphRoutes = require('./dashboardapi/graphapi/api')
+const studentDashboardGraphRoutes = require('./dashboardapi/graphapi/api');
 const studentPerformanceRoutes = require('./performanceapi/api');
 const studentCurrentSemesterRoutes = require('./navbarapi/api');
-const getStudentAchievementsForPerformance = require('./performanceapi/achievementsapi/api');
-const getStudentDetailedAttendanceForPerformance = require('./performanceapi/detailedAttendanceApi/api')
+const getStudentDetailedAttendanceForPerformance = require('./performanceapi/detailedAttendanceApi/api');
 const getStudentDetailedMarksForPerformance = require('./performanceapi/detailedMarksApi/api');
 const getStudentDashboardAttendance = require('./dashboardapi/attendanceapi/api');
 const getLectureDetails = require('./performanceapi/lectureApi/api');
+
 const app = express();
 const port = process.env.PORT || 8001;
 
@@ -26,20 +27,36 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/api', facultyRoutes); 
-app.use('/api/chat', chatRoutes); 
-app.use('/api/events', eventsRoutes);
-app.use('/api/student', studentProfileRoutes);
-app.use('/api/dashboard', studentDashboardStarRoutes);
-app.use('/api/dashboard', studentDashboardGraphRoutes);
-app.use('/api/performance', studentPerformanceRoutes);
-app.use('/api/student', studentCurrentSemesterRoutes);
-app.use('/api/performance', getStudentAchievementsForPerformance);
-app.use('/api/performance', getStudentDetailedAttendanceForPerformance)
-app.use('/api/performance',getStudentDetailedMarksForPerformance);
-app.use('/api/dashboard', getStudentDashboardAttendance);
-app.use('/api/performance', getLectureDetails);
+const loadRoutes = async () => {
+    try {
+        console.log("Preloading routes...");
+        await loadRoute('/api/student', studentProfileRoutes, studentCurrentSemesterRoutes);
+        await loadRoute('/api/dashboard', studentDashboardStarRoutes, studentDashboardGraphRoutes, getStudentDashboardAttendance);
+        await loadRoute('/api/events', eventsRoutes);
+        await loadRoute('/api/performance', studentPerformanceRoutes);
+        await loadRoute('/api/performance', getLectureDetails);
+        await loadRoute('/api/performance', getStudentDetailedAttendanceForPerformance);
+        await loadRoute('/api/performance', getStudentDetailedMarksForPerformance);
+        await loadRoute('/api', facultyRoutes);
 
-app.listen(port, () => {
+        app.use('/api/chat', chatRoutes);
+
+        console.log("Routes loaded successfully.");
+    } catch (error) {
+        console.error("Error loading routes:", error);
+    }
+};
+
+const loadRoute = async (routePath, ...routes) => {
+    try {
+        app.use(routePath, ...routes);
+    } catch (error) {
+        console.error(`Error loading route ${routePath}:`, error);
+        throw error; 
+    }
+};
+
+app.listen(port, async () => {
+    await loadRoutes();
     console.log(`Server is running at http://localhost:${port}`);
 });

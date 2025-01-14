@@ -1,21 +1,16 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react/function-component-definition */
-
-// @mui material components
 import React, { useEffect, useState } from 'react'; // Import React and hooks
 import Card from '@mui/material/Card';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
-import CircularProgress from '@mui/material/CircularProgress'; // Import CircularProgress for loading state
 import Icon from '@mui/material/Icon'; // Import Icon component
 import axios from 'axios'; // Import axios for API calls
 import DataTable from 'examples/Tables/DataTable';
-
+import { useTranslation } from 'react-i18next';
 export default function Data() {
   const [events, setEvents] = useState([]); // State to store events
   const [loading, setLoading] = useState(true); // State for loading status
   const [error, setError] = useState(null); // State for error handling
-
+  const { t } = useTranslation();
   // Fetch events from the API
   useEffect(() => {
     const fetchEvents = async () => {
@@ -54,9 +49,7 @@ export default function Data() {
   // Show loading or error messages if applicable
   if (loading) {
     return (
-      <MDBox display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </MDBox>
+      <MDTypography>Loading...</MDTypography>
     );
   }
 
@@ -66,36 +59,28 @@ export default function Data() {
     );
   }
 
-  // Define columns for the DataTable
   const columns = [
-    { Header: 'Subject', accessor: 'subject_name', width: '20%', align: 'left' },
-    { Header: 'Teacher', accessor: 'teacher_fullname', width: '25%', align: 'left' },
-    { Header: 'Date', accessor: 'lecture_date', width: '15%', align: 'left' },
-    { Header: 'Time', accessor: 'lecture_time', width: '15%', align: 'center' },
-    { Header: 'Location', accessor: 'lecture_location', width: '15%', align: 'center' },
-    { Header: 'Holiday', accessor: 'is_holiday', width: '10%', align: 'center' },
+    { Header: t('subject'), accessor: 'subject_name', width: '20%', align: 'left' },
+    { Header: t('teacher'), accessor: 'teacher_fullname', width: '25%', align: 'left' },
+    { Header: t('date'), accessor: 'lecture_date', width: '15%', align: 'left' },
+    { Header: t('time'), accessor: 'lecture_time', width: '15%', align: 'center' },
+    { Header: t('location'), accessor: 'lecture_location', width: '15%', align: 'center' },
+    { Header: t('holiday'), accessor: 'is_holiday', width: '10%', align: 'center' },
   ];
 
-  // Return the Card component with the DataTable
   return (
     <Card sx={{ borderRadius: '3px' }}>
       <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
         <MDBox>
           <MDTypography variant="h6" gutterBottom>
-            Upcoming Events
+            {t('upcomingEvents')}
           </MDTypography>
           <MDBox display="flex" alignItems="center" lineHeight={0}>
-            <Icon
-              sx={{
-                fontWeight: 'bold',
-                color: ({ palette: { info } }) => info.main,
-                mt: -0.5,
-              }}
-            >
+            <Icon sx={{ fontWeight: 'bold', color: ({ palette: { info } }) => info.main, mt: -0.5 }}>
               done
             </Icon>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              &nbsp;<strong>{rows.length} events</strong> found
+              &nbsp;<strong>{rows.length} {t('eventCount', { count: rows.length })}</strong>
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -105,20 +90,20 @@ export default function Data() {
           </Icon>
         </MDBox>
       </MDBox>
-      <MDBox
-        height="250px"
-        sx={{
+      <MDBox 
+        height="250px" 
+        sx={{ 
           overflow: 'auto',
-          borderRadius: '0 0 3px 3px', // Apply border-radius to bottom corners only
-          '::-webkit-scrollbar': {
-            width: '8px', // Width of the scrollbar
+          borderRadius: '0 0 3px 3px' ,
+          '&::-webkit-scrollbar': {
+          width: '8px',
           },
-          '::-webkit-scrollbar-thumb': {
-            backgroundColor: '#888', // Color of the scrollbar thumb
-            borderRadius: '4px',
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'rgba(0, 0, 0, 0.1)', // Light track color
           },
-          '::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: '#555', // Color when hovering over scrollbar thumb
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0, 0, 0, 0.3)', // Darker thumb color
+            borderRadius: '10px', // Rounded scrollbar thumb
           },
         }}
       >

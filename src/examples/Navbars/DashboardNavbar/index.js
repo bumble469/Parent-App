@@ -49,7 +49,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     const selectedLanguage = event.target.value;
     i18n.changeLanguage(selectedLanguage); 
   };
-
+  const isHindi = i18n.language === 'hi';
   useEffect(() => {
     if (fixedNavbar) {
       setNavbarType('sticky');
@@ -163,12 +163,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
           <MDBox pr={1} mt={2}>
               <MDTypography
-                variant="caption"
                 color="textSecondary"
                 sx={{
-                  fontSize: '0.875rem',
                   fontWeight: 'bold',
-                  fontFamily: '"Noto Sans", sans-serif',
+                  fontSize:'1.2rem !important'
                 }}
               >
                 <FormControl sx={{padding:1}}>
@@ -177,6 +175,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     value={i18n.language}
                     onChange={handleLanguageChange}
                     label="Language"
+                    sx={{fontSize:'1rem', width:'5rem'}}
                   >
                     <MenuItem value="en">English</MenuItem>
                     <MenuItem value="hi">हिंदी</MenuItem>
@@ -192,12 +191,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 variant="caption"
                 color="textSecondary"
                 sx={{
-                  fontSize: '0.875rem',
-                  fontWeight: 'bold',
-                  fontFamily: '"Noto Sans", sans-serif',
+                  fontSize: isHindi ? '1rem':'0.9rem',
+                  fontWeight: 'bold'
                 }}
               >
-                Current Semester: {student.formattedProfile.current_Sem}
+                {t('currentSem')}: {student.formattedProfile.current_Sem}
               </MDTypography>
             </MDBox>
               {/* Notification Icon */}

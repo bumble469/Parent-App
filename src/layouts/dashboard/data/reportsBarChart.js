@@ -4,8 +4,10 @@ import ReportsBarChart from 'examples/Charts/BarCharts/ReportsBarChart'; // Impo
 import DataTable from 'examples/Tables/DataTable';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
+import { useTranslation } from 'react-i18next';
 
 const ReportsBarChartWrapper = () => {
+  const { t } = useTranslation(); // Use the translation hook
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true); // State for loading
   const [error, setError] = useState(null); // State for errors
@@ -54,23 +56,23 @@ const ReportsBarChartWrapper = () => {
   }));
 
   const columns = [
-    { Header: 'Subject', accessor: 'subject', width: '45%', align: 'left' },
-    { Header: 'Lectures Attended', accessor: 'attendedLectures', width: '20%', align: 'left' },
-    { Header: 'Lectures Occurred', accessor: 'totalLectures', align: 'center' },
+    { Header: t('subject'), accessor: 'subject', width: '45%', align: 'left' },
+    { Header: t('lecturesAttended'), accessor: 'attendedLectures', width: '20%', align: 'left' },
+    { Header: t('lecturesOccurred'), accessor: 'totalLectures', align: 'center' },
   ];
 
   if (loading) {
-    return <div>Loading...</div>; // Show loading state
+    return <div>{t('loading')}</div>; // Show loading state
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>; // Show error message if there's an issue
+    return <div>{t('error')}: {error.message}</div>; // Show error message if there's an issue
   }
 
   // Handle no data case
   if (!attendanceData.length) {
     return (
-      <div>No data available</div> // Display message if there's no data
+      <div>{t('noDataAvailable')}</div> // Display message if there's no data
     );
   }
 
@@ -78,7 +80,7 @@ const ReportsBarChartWrapper = () => {
   return (
     <ReportsBarChart
       color="info"
-      title="Subject-Wise Attendance"
+      title={t('subjectWiseAttendance')}
       description={
         <MDBox
           sx={{
@@ -98,7 +100,7 @@ const ReportsBarChartWrapper = () => {
             },
           }}
         >
-          <MDTypography sx={{ fontSize: '13px' }}>Lectures Attended | Lectures Occurred</MDTypography>
+          <MDTypography sx={{ fontSize: '0.9rem' }}>{t('lecturesAttended')} | {t('lecturesOccurred')}</MDTypography>
           <DataTable
             table={{ columns, rows }}
             showTotalEntries={false}

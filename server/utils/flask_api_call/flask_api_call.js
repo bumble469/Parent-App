@@ -1,5 +1,5 @@
 const axios = require('axios');
-const FLASK_API_URL = "http://127.0.0.1:5000";
+const FLASK_API_URL = "https://parent-encryption.onrender.com";
 
 async function callFlaskEncryptAPI(endpoint, data) {
     try {

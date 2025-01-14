@@ -13,22 +13,20 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-// prop-types is a library for typechecking of props
 import PropTypes from 'prop-types';
 
-// @mui material components
 import Icon from '@mui/material/Icon';
 
-// Material Dashboard 2 React components
 import MDBox from 'components/MDBox';
 
-// Material Dashboard 2 React contexts
 import { useMaterialUIController } from 'context';
-
+import { useTranslation } from 'react-i18next';
 function DataTableHeadCell({ width, children, sorted, align, ...rest }) {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
+  const {i18n} = useTranslation();
 
+  const isHindi = i18n.language === 'hi';
   return (
     <MDBox
       component="th"
@@ -45,7 +43,7 @@ function DataTableHeadCell({ width, children, sorted, align, ...rest }) {
         textAlign={align}
         color={darkMode ? 'white' : 'secondary'}
         sx={({ typography: { size, fontWeightBold } }) => ({
-          fontSize: size.xs,
+          fontSize: isHindi?'0.9rem':'0.8rem',
           fontWeight: fontWeightBold,
           textTransform: 'uppercase',
           cursor: sorted && 'pointer',

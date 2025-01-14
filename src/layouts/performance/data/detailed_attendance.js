@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import DataTable from 'examples/Tables/DataTable';
+import { useTranslation } from 'react-i18next';
 
 const AttendanceTable = ({ semester }) => {
+  const { t } = useTranslation(); // Hook for translations
+
   const [attendanceData, setAttendanceData] = useState({});
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all'); // New dropdown state
+  const [selectedStatus, setSelectedStatus] = useState('all'); 
   const [currentPage, setCurrentPage] = useState(0);
   const columnsPerPage = 8;
 
@@ -98,28 +101,28 @@ const AttendanceTable = ({ semester }) => {
         if (attendanceRecord.length > 0) {
           const attendanceStatus = attendanceRecord.map((record) => {
             if (record.is_present === null || record.is_present === undefined) {
-              return { status: 'No Lecture', color: 'black' };
+              return { status: t('No Lecture'), color: 'black' };
             }
             return record.is_present
-              ? { status: 'Present', color: 'green' }
-              : { status: 'Absent', color: 'red' };
+              ? { status: t('Present'), color: 'green' }
+              : { status: t('Absent'), color: 'red' };
           });
 
           if (selectedStatus === 'all' || attendanceStatus[0].status === selectedStatus) {
             row[formattedDate] = attendanceStatus[0];
           }
         } else if (selectedStatus === 'all' || selectedStatus === 'No Lecture') {
-          row[formattedDate] = { status: 'No Lecture', color: 'black' };
+          row[formattedDate] = { status: t('No Lecture'), color: 'black' };
         }
       });
 
       return row;
     });
-  }, [attendanceData, uniqueDates, selectedSubject, selectedMonth, selectedStatus]);
+  }, [attendanceData, uniqueDates, selectedSubject, selectedMonth, selectedStatus, t]);
 
   const columns = useMemo(() => {
     return [
-      { Header: 'Subject', accessor: 'subject' },
+      { Header: t('subject'), accessor: 'subject' },
       ...uniqueDates
         .filter((date) => {
           if (!selectedMonth) return true;
@@ -134,7 +137,7 @@ const AttendanceTable = ({ semester }) => {
           ),
         })),
     ];
-  }, [uniqueDates, selectedMonth]);
+  }, [uniqueDates, selectedMonth, t]);
 
   const paginatedColumns = columns.slice(
     currentPage * columnsPerPage,
@@ -175,10 +178,10 @@ const AttendanceTable = ({ semester }) => {
             border: '1px solid #f5c6cb',
             cursor: 'pointer',
             fontWeight: 'bold',
-            marginLeft: '1rem'
+            marginLeft: '1rem',
           }}
         >
-          Clear Filters
+          {t('Clear Filters')}
         </button>
 
         <div style={{ display: 'flex', gap: '10px', marginRight: '1rem' }}>
@@ -188,11 +191,11 @@ const AttendanceTable = ({ semester }) => {
             style={{
               padding: '8px',
               borderRadius: '4px',
-              fontSize: '14px',
+              fontSize: '0.95rem',
               border: '1px solid #ddd',
             }}
           >
-            <option value="all">All Subjects</option>
+            <option value="all">{t('All Subjects')}</option>
             {Object.keys(attendanceData).map((subject) => (
               <option key={subject} value={subject}>
                 {subject}
@@ -206,11 +209,11 @@ const AttendanceTable = ({ semester }) => {
             style={{
               padding: '8px',
               borderRadius: '4px',
-              fontSize: '14px',
+              fontSize: '0.95rem',
               border: '1px solid #ddd',
             }}
           >
-            <option value="">All Months</option>
+            <option value="">{t('All Months')}</option>
             {uniqueMonths.map((month) => (
               <option key={month} value={month}>
                 {month}
@@ -224,14 +227,14 @@ const AttendanceTable = ({ semester }) => {
             style={{
               padding: '8px',
               borderRadius: '4px',
-              fontSize: '14px',
+              fontSize: '0.95rem',
               border: '1px solid #ddd',
             }}
           >
-            <option value="all">All Statuses</option>
-            <option value="Present">Present</option>
-            <option value="Absent">Absent</option>
-            <option value="No Lecture">No Lecture</option>
+            <option value='all'>{t('All Statuses')}</option>
+            <option value={t('Present')}>{t('Present')}</option>
+            <option value={t('Absent')}>{t('Absent')}</option>
+            <option value={t('No Lecture')}>{t('No Lecture')}</option>
           </select>
         </div>
       </div>
@@ -266,12 +269,20 @@ const AttendanceTable = ({ semester }) => {
             border: 'none',
             borderRadius: '4px',
             cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
+            fontSize: '0.95rem',
             transition: 'background-color 0.3s ease',
           }}
         >
-          Previous
+          {t('Previous')}
         </button>
+        <span
+          style={{
+            fontSize: '1rem',
+            color: '#333',
+          }}
+        >
+          {t('Page')} {currentPage + 1} {t('of')} {totalPages}
+        </span>
         <button
           onClick={goToNextPage}
           disabled={currentPage >= totalPages - 1}
@@ -282,20 +293,12 @@ const AttendanceTable = ({ semester }) => {
             border: 'none',
             borderRadius: '4px',
             cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
+            fontSize: '0.95rem',
             transition: 'background-color 0.3s ease',
           }}
         >
-          Next
+          {t('Next')}
         </button>
-        <span
-          style={{
-            fontSize: '1rem',
-            color: '#333',
-          }}
-        >
-          Page {currentPage + 1} of {totalPages}
-        </span>
       </div>
     </div>
   );

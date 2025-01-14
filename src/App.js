@@ -1,26 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
-// react-router components
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-// @mui material components
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-// Material Dashboard 2 React example components
 import Sidenav from 'examples/Sidenav';
-// Material Dashboard 2 React themes
 import theme from 'assets/theme';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-// Images
 import logo from 'assets/images/web_logo.png';
-import Profile from './layouts/profile'; // Profile Component
-import Dashboard from './layouts/dashboard'; // Dashboard Component
-import Performance from './layouts/performance'; // Performance Component
-import Predictions from './layouts/predictions'; // Predictions Component
-import Faculty from './layouts/faculty'; // Faculty Component
-import Chat from './layouts/chat'; // Chat Component
-import Reporting from './layouts/reporting'; // Reporting Component
-// Material Dashboard 2 React contexts
+import Profile from './layouts/profile'; 
+import Dashboard from './layouts/dashboard'; 
+import Performance from './layouts/performance'; 
+import Predictions from './layouts/predictions'; 
+import Faculty from './layouts/faculty'; 
+import Chat from './layouts/chat'; 
+import Reporting from './layouts/reporting'; 
 import { useMaterialUIController, setMiniSidenav } from 'context';
 import { Typography, Icon } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -30,8 +24,8 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  const { t } = useTranslation();
-  // Cache for the rtl
+  const { t,i18n } = useTranslation();
+  const isHindi = i18n.language === 'hi';
   useMemo(() => {
     const cacheRtl = createCache({
       key: 'rtl',
@@ -41,7 +35,6 @@ export default function App() {
     setRtlCache(cacheRtl);
   }, []);
 
-  // Open sidenav when mouse enter on mini sidenav
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
       setMiniSidenav(dispatch, false);
@@ -49,7 +42,6 @@ export default function App() {
     }
   };
 
-  // Close sidenav when mouse leave mini sidenav
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {
       setMiniSidenav(dispatch, true);
@@ -57,12 +49,10 @@ export default function App() {
     }
   };
 
-  // Setting the dir attribute for the body element
   useEffect(() => {
     document.body.setAttribute('dir', direction);
   }, [direction]);
 
-  // Setting page scroll to 0 when changing the route
   useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -77,7 +67,7 @@ export default function App() {
     {
       type: 'collapse',
       name: (
-        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
           {t('Dashboard')}
         </Typography>
       ),
@@ -98,7 +88,7 @@ export default function App() {
     {
       type: 'collapse',
       name: (
-        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
           {t('Performance')}
         </Typography>
       ),
@@ -110,7 +100,7 @@ export default function App() {
     {
       type: 'collapse',
       name: (
-        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
           {t('Predictions')}
         </Typography>
       ),
@@ -131,7 +121,7 @@ export default function App() {
     {
       type: 'collapse',
       name: (
-        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
           {t('Faculty')}
         </Typography>
       ),
@@ -143,7 +133,7 @@ export default function App() {
     {
       type: 'collapse',
       name: (
-        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
           {t('Chat')}
         </Typography>
       ),
@@ -164,7 +154,7 @@ export default function App() {
     {
       type: 'collapse',
       name: (
-        <Typography sx={{ fontFamily: '"Noto Sans", sans-serif', fontSize: '0.9rem' }}>
+        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
           {t('Feedback')}
         </Typography>
       ),
@@ -175,11 +165,10 @@ export default function App() {
     },
   ];
 
-  // Recursive function to map routes
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
       if (route.collapse) {
-        return getRoutes(route.collapse); // Recursively handle nested routes
+        return getRoutes(route.collapse); 
       }
 
       if (route.route) {
@@ -200,7 +189,7 @@ export default function App() {
             color={sidenavColor}
             brand={logo}
             brandName="Material Dashboard 2"
-            routes={routes} // Pass routes to the sidebar
+            routes={routes} 
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
@@ -219,7 +208,7 @@ export default function App() {
           color={sidenavColor}
           brand={logo}
           brandName="P-SAT"
-          routes={routes} // Pass routes to the sidebar
+          routes={routes} 
           onMouseEnter={handleOnMouseEnter}
           onMouseLeave={handleOnMouseLeave}
         />

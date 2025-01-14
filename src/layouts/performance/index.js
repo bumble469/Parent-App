@@ -17,15 +17,17 @@ import MarksTable from './data/detailed_marks';
 import LineGraph from './data/marksGraphs';
 import Footer from 'examples/Footer';
 import OverallAttendance from './data/overallAttendance';
+import { useTranslation } from 'react-i18next';
 
 function Performance() {
-  const [semester, setSemester] = useState(''); // Initialize semester state
-  const [semesters, setSemesters] = useState([]); // Store list of semesters
-  const [marksData, setMarksData] = useState([]); // Store marks data
-  const [averageMarks, setAverageMarks] = useState(0); // Store average marks
-
+  const [semester, setSemester] = useState(''); 
+  const [semesters, setSemesters] = useState([]); 
+  const [marksData, setMarksData] = useState([]); 
+  const [averageMarks, setAverageMarks] = useState(0); 
+  const { t, i18n } = useTranslation();
+  const isHindi = i18n.language === 'hi'
   const handleSemesterChange = (event) => {
-    setSemester(event.target.value); // Update semester when changed
+    setSemester(event.target.value); 
   };
 
   useEffect(() => {
@@ -33,23 +35,22 @@ function Performance() {
       try {
         const response = await fetch('http://localhost:8001/api/performance/student');
         const data = await response.json();
-        // Extract unique semesters
         const uniqueSemesters = Array.from(new Set(data.map(item => item.semester_id)))
           .map(id => ({
             id,
-            name: `Semester ${id}`,
+            name: `${t('Semester')} ${id}`,
           }));
         setSemesters(uniqueSemesters);
         if (uniqueSemesters.length > 0) {
-          setSemester(uniqueSemesters[0].id); // Default to the first semester
+          setSemester(uniqueSemesters[0].id); 
         }
-        setMarksData(data); // Save the marks data for later processing
+        setMarksData(data); 
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
     fetchData();
-  }, []);
+  }, [t]); // Adding t as a dependency to ensure translations are updated
 
   useEffect(() => {
     // Calculate average marks for the selected semester
@@ -103,14 +104,14 @@ function Performance() {
                     padding: '0 8px',
                   }}
                 >
-                  SEMESTER
+                  {t('Select Semester')}
                 </InputLabel>
                 <Select
                   labelId="semester-select-label"
                   id="semester-select"
                   value={semester}
                   onChange={handleSemesterChange}
-                  label="Semester"
+                  label={t('Select Semester')}
                   sx={{
                     '& .MuiSelect-outlined': {
                       padding: '12px 16px',
@@ -138,7 +139,7 @@ function Performance() {
                       </MenuItem>
                     ))
                   ) : (
-                    <MenuItem disabled>No semesters available</MenuItem>
+                    <MenuItem disabled>{t('No semesters available')}</MenuItem>
                   )}
                 </Select>
               </FormControl>
@@ -148,19 +149,19 @@ function Performance() {
           <Grid item xs={12}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <OverallAttendance semester={semester} />
+                <OverallAttendance semester={semester} t={t} i18n = {i18n} />
               </Grid>
               <Grid item xs={12} md={4}>
                 <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
                     color="success"
                     icon="leaderboard"
-                    title="Average Grade"
+                    title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Average Grade")}</span>}
                     count={`${averageMarks.toFixed(2)}%`}
                     percentage={{
-                      color: 'success',
-                      amount: '+3%',
-                      label: 'than last semester',
+                      color: averageMarks >= 75 ? 'success':'error',
+                      amount: `${averageMarks.toFixed(2)}%`,
+                      label: averageMarks >= 75 ? t('On track') : t('Below 75%'),
                     }}
                   >
                     <MDBox width="100%">
@@ -178,7 +179,7 @@ function Performance() {
                   <ComplexStatisticsCard
                     color="warning"
                     icon="star"
-                    title="Extra Curricular Activities"
+                    title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t('Extra Curricular Activities')}</span>}
                     percentage={{
                       label: `Rank: 5`,
                     }}
@@ -189,7 +190,7 @@ function Performance() {
                         overflowY: 'auto',
                         padding: '8px',
                         '::-webkit-scrollbar': {
-                            width: '8px',
+                          width: '8px',
                         },
                         '::-webkit-scrollbar-thumb': {
                           backgroundColor: '#888',
@@ -219,12 +220,12 @@ function Performance() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="error"
+                bgColor="info"
                 borderRadius="lg"
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Subject-Wise Detailed Lecture Review
+                  {t('Subject-Wise Detailed Lecture Review')}
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -248,7 +249,7 @@ function Performance() {
                     coloredShadow="info"
                   >
                     <MDTypography variant="h6" color="white">
-                      Subject-Wise Detailed Attendance
+                      {t('Subject-Wise Detailed Attendance')}
                     </MDTypography>
                   </MDBox>
                   <MDBox pt={3}>

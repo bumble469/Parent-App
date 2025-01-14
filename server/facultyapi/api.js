@@ -2,24 +2,19 @@ const operations = require('./operations');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const router = express.Router(); // Use router instead of app
+const router = express.Router(); 
 
-// Middleware setup for the router
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 router.use(cors());
 
-// Middleware for logging
 router.use((req, res, next) => {
-    console.log('Middleware activated for faculty API');
     next();
 });
 
-// Define the endpoint to get faculty details
 router.route('/faculty').get(async (req, res) => {
     try {
         const result = await operations.getFaculty();
-        console.log('Fetched data:', result);
         res.json(result);
     } catch (error) {
         console.error('Error fetching faculty:', error);
@@ -27,4 +22,4 @@ router.route('/faculty').get(async (req, res) => {
     }
 });
 
-module.exports = router; // Export the router
+module.exports = router;

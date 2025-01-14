@@ -1,27 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
-
-// @mui icons
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
-
-// Material Dashboard 2 React components
 import MDBox from 'components/MDBox';
-
-// Material Dashboard 2 React example components
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import ProfileInfoCard from 'examples/Cards/InfoCards/ProfileInfoCard';
-
-// Overview page components
 import Header from 'layouts/profile/components/Header';
 import PlatformSettings from 'layouts/profile/components/PlatformSettings';
+import { useTranslation } from 'react-i18next';
 
 function Overview() {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchStudentProfile = async () => {
@@ -43,13 +37,9 @@ function Overview() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Optionally, add a spinner or loading indicator
+    return <div>{t('loading')}</div>;
   }
 
-  // Debugging: Log the student object to check the structure
-  console.log(student);
-
-  // Ensure student and parentInfo are correctly populated before rendering
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -63,33 +53,35 @@ function Overview() {
             <Grid item xs={12} md={8}>
               {student && (
                 <ProfileInfoCard
-                  title="Profile Information"
-                  description="Detailed information about the student and parents."
+                  title={t('profileInfoTitle')}
+                  description={t('profileInfoDescription')}
                   info={{
-                    'Student Information': {
-                      'Full Name': student.studentInfo.fullName,
-                      'Roll No': student.studentInfo.rollNo,
-                      Age: student.studentInfo.age,
-                      Email: student.studentInfo.email,
-                      'Date of Birth': student.studentInfo.dob,
-                      'Enrollment Date': student.studentInfo.enrollmentDate,
-                      Address: student.studentInfo.address,
-                      'Contact Mobile': student.studentInfo.contactMobile,
+                    [t('studentInfo')]: {
+                      [t('fullName')]: student.studentInfo.fullName,
+                      [t('rollNo')]: student.studentInfo.rollNo,
+                      [t('age')]: student.studentInfo.age,
+                      [t('email')]: student.studentInfo.email,
+                      [t('dob')]: student.studentInfo.dob,
+                      [t('enrollmentDate')]: student.studentInfo.enrollmentDate,
+                      [t('address')]: student.studentInfo.address,
+                      [t('contactMobile')]: student.studentInfo.contactMobile,
                     },
-                    'Parent Information': student.parentInfo && student.parentInfo.length > 0 ? {
-                      'Father Name': student.parentInfo[0]?.name || 'N/A',
-                      'Father Email': student.parentInfo[0]?.email || 'N/A',
-                      'Father Mobile': student.parentInfo[0]?.contactMobile || 'N/A',
-                      'Mother Name': student.parentInfo[1]?.name || 'N/A',
-                      'Mother Email': student.parentInfo[1]?.email || 'N/A',
-                      'Mother Mobile': student.parentInfo[1]?.contactMobile || 'N/A',
-                    } : { 'Parent Details': 'N/A' }, // Safely handle empty or undefined parentInfo
-                    'Course & Fees Information': {
-                      'Total Fees': student.studentInfo.totalFees || 'N/A',
-                      'Fees Paid': student.studentInfo.feesPaid || 'N/A',
-                      'Fees Pending': student.studentInfo.feesPending || 'N/A',
-                      'Transaction Status': student.studentInfo.transactionInfo?.transactionStatus || 'N/A',
-                    }
+                    [t('parentInfo')]: student.parentInfo && student.parentInfo.length > 0
+                      ? {
+                          [t('fatherName')]: student.parentInfo[0]?.name || t('na'),
+                          [t('fatherEmail')]: student.parentInfo[0]?.email || t('na'),
+                          [t('fatherMobile')]: student.parentInfo[0]?.contactMobile || t('na'),
+                          [t('motherName')]: student.parentInfo[1]?.name || t('na'),
+                          [t('motherEmail')]: student.parentInfo[1]?.email || t('na'),
+                          [t('motherMobile')]: student.parentInfo[1]?.contactMobile || t('na'),
+                        }
+                      : { [t('parentDetails')]: t('na') },
+                    [t('courseFeesInfo')]: {
+                      [t('totalFees')]: student.studentInfo.totalFees || t('na'),
+                      [t('feesPaid')]: student.studentInfo.feesPaid || t('na'),
+                      [t('feesPending')]: student.studentInfo.feesPending || t('na'),
+                      [t('transactionStatus')]: student.studentInfo.transactionInfo?.transactionStatus || t('na'),
+                    },
                   }}
                   social={[
                     {
@@ -108,7 +100,7 @@ function Overview() {
                       color: 'instagram',
                     },
                   ]}
-                  action={{ route: '', tooltip: 'Edit Profile' }}
+                  action={{ route: '', tooltip: t('editProfile') }}
                   shadow={false}
                 />
               )}

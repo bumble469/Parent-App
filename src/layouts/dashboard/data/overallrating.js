@@ -1,5 +1,5 @@
-// Utility function to calculate star rating and provide messages
-export function calculateStarRating(overallMarks, averageAttendance) {
+export function calculateStarRating(overallMarks, averageAttendance, t) {
+  
   // Check for invalid input and return a default value if either marks or attendance is invalid
   if (overallMarks == null || averageAttendance == null || isNaN(overallMarks) || isNaN(averageAttendance)) {
     return {
@@ -7,7 +7,7 @@ export function calculateStarRating(overallMarks, averageAttendance) {
       fullStars: 0,
       halfStar: 0,
       emptyStars: 5,
-      ratingMessage: 'No rating available',
+      ratingMessage: t('noRatingAvailable'), // Use translation for 'No rating available'
     };
   }
 
@@ -29,17 +29,17 @@ export function calculateStarRating(overallMarks, averageAttendance) {
   // Generate a message based on the star rating
   let ratingMessage = '';
   if (starRating <= 1) {
-    ratingMessage = 'Very Poor: Please attend to your child immediately.';
+    ratingMessage = t('veryPoor'); // Use translation for 'Very Poor'
   } else if (starRating <= 2) {
-    ratingMessage = 'Bad: Needs a lot of improvement.';
+    ratingMessage = t('bad'); // Use translation for 'Bad'
   } else if (starRating <= 3) {
-    ratingMessage = 'Average: Has room for improvement.';
+    ratingMessage = t('average'); // Use translation for 'Average'
   } else if (starRating <= 4) {
-    ratingMessage = 'Good: Keep going.';
+    ratingMessage = t('good'); // Use translation for 'Good'
   } else if (starRating > 4 && starRating <= 5) {
-    ratingMessage = 'Excellent: Great job!';
+    ratingMessage = t('excellent'); // Use translation for 'Excellent'
   } else {
-    ratingMessage = "No rating for now..";
+    ratingMessage = t('noRatingForNow'); // Use translation for 'No rating for now'
   }
 
   return { starRating: starRating.toFixed(1), fullStars, halfStar, emptyStars, ratingMessage };

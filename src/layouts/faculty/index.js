@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next'; // Import for localization
 import Grid from '@mui/material/Grid';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
@@ -13,10 +14,11 @@ import Footer from 'examples/Footer'; // Adjust path if needed
 import axios from 'axios';
 
 function Faculty() {
-  const [tabValue, setTabValue] = useState(0);  // State to manage selected tab
-  const [staffData, setStaffData] = useState([]);  // Store fetched staff data
-  const [loading, setLoading] = useState(true);  // Loading state
-  const [error, setError] = useState(null);  // Error state
+  const { t } = useTranslation(); // Initialize localization hook
+  const [tabValue, setTabValue] = useState(0); // State to manage selected tab
+  const [staffData, setStaffData] = useState([]); // Store fetched staff data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,8 +29,8 @@ function Faculty() {
         // URL based on selected tab
         const apiUrl =
           tabValue === 0
-            ? 'http://localhost:8001/api/faculty'  // For Overall filter
-            : 'http://localhost:8001/api/chat/chat-list';  // For Current Semester filter
+            ? 'http://localhost:8001/api/faculty' // For Overall filter
+            : 'http://localhost:8001/api/chat/chat-list'; // For Current Semester filter
 
         // Fetch data from the selected API
         const response = await axios.get(apiUrl);
@@ -41,10 +43,10 @@ function Faculty() {
     };
 
     fetchData();
-  }, [tabValue]);  // Effect runs when tabValue changes
+  }, [tabValue]); // Effect runs when tabValue changes
 
   const handleSetTabValue = (event, newValue) => {
-    setTabValue(newValue);  // Update the tab value
+    setTabValue(newValue); // Update the tab value
   };
 
   const groupedStaff = staffData.reduce((acc, item) => {
@@ -52,7 +54,6 @@ function Faculty() {
     if (!acc[key]) {
       acc[key] = {
         teacher_fullname: item.teacher_fullname,
-
         teacher_type: item.teacher_type,
         teacher_image: item.teacher_image,
         subjects: [],
@@ -71,11 +72,11 @@ function Faculty() {
   const staffArray = Object.values(groupedStaff);
 
   if (loading) {
-    return <Typography variant="h6">Loading...</Typography>;
+    return <Typography variant="h6">{t('loading')}</Typography>;
   }
 
   if (error) {
-    return <Typography variant="h6" color="error">Error: {error}</Typography>;
+    return <Typography variant="h6" color="error">{t('error')}{error}</Typography>;
   }
 
   return (
@@ -92,11 +93,11 @@ function Faculty() {
                 aria-label="faculty tabs"
               >
                 <Tab
-                  label="Overall"
+                  label={t('overall')}
                   icon={<Icon>group</Icon>}
                 />
                 <Tab
-                  label="Current Sem"
+                  label={t('currentSem')}
                   icon={<Icon>calendar_today</Icon>}
                 />
               </Tabs>
@@ -136,13 +137,13 @@ function Faculty() {
                         {staff.teacher_fullname}
                       </Typography>
                       <Typography variant="body2">
-                        <b>Type:</b> {staff.teacher_type}
+                        <b>{t('type')}</b> {staff.teacher_type}
                       </Typography>
                       <Typography variant="body2">
-                        <b>Subjects:</b> {staff.subjects.join(', ')}
+                        <b>{t('subject')}</b> {staff.subjects.join(', ')}
                       </Typography>
                       <Typography variant="body2">
-                        <b>Semesters:</b> {staff.semesters.join(', ')}
+                        <b>{t('semesters')}</b> {staff.semesters.join(', ')}
                       </Typography>
                     </Box>
                   </Box>
@@ -150,7 +151,7 @@ function Faculty() {
               ))
             ) : (
               <Typography variant="h6" color="text.primary">
-                No faculty members available.
+                {t('noFaculty')}
               </Typography>
             )}
           </Grid>

@@ -3,7 +3,6 @@ const { sql, poolPromise } = require('../utils/db');
 const { callFlaskDecryptAPI } = require('../utils/flask_api_call/flask_api_call');
 const { Buffer } = require('buffer');
 
-// Create an in-memory cache with a TTL of 120 seconds
 const cache = new NodeCache({ stdTTL: 120, checkperiod: 120 });
 
 async function batchDecryptData(encryptedDataArray) {

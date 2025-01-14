@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import DataTable from 'examples/Tables/DataTable';
+import { useTranslation } from 'react-i18next';
 
 const LectureViewTable = ({ semester }) => {
   const [lectureData, setLectureData] = useState({});
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all'); // New dropdown state
+  const [selectedStatus, setSelectedStatus] = useState('all'); 
   const [currentPage, setCurrentPage] = useState(0);
   const columnsPerPage = 5;
+  const {t, i18n} = useTranslation();
+  const isHindi = i18n.language === 'hi';
 
   const fetchDetailedLectureViews = async (semester) => {
     try {
@@ -98,19 +101,19 @@ const LectureViewTable = ({ semester }) => {
         if (attendanceRecord.length > 0) {
           const attendanceStatus = attendanceRecord.map((record) => {
             if (record.viewed_status === 'Not Viewed') {
-              return { status: 'Not Viewed', color: 'red', view_time: null };
+              return { status: t('Not Viewed'), color: 'red', view_time: null };
             } else if (record.viewed_status === 'Viewed') {
-              return { status: 'Viewed', color: 'green', view_time: record.view_time };
+              return { status: t('Viewed'), color: 'green', view_time: record.view_time };
             } else {
-              return { status: 'Null', color: 'black', view_time: null };
+              return { status: t('Null'), color: 'black', view_time: null };
             }
           });
 
           if (selectedStatus === 'all' || attendanceStatus[0].status === selectedStatus) {
             row[formattedDate] = attendanceStatus[0];
           }
-        } else if (selectedStatus === 'all' || selectedStatus === 'No Lecture') {
-          row[formattedDate] = { status: 'No Lecture', color: 'black', view_time: null };
+        } else if (selectedStatus === 'all' || selectedStatus === t('No Lecture')) {
+          row[formattedDate] = { status: t('No Lecture'), color: 'black', view_time: null };
         }
       });
 
@@ -120,7 +123,7 @@ const LectureViewTable = ({ semester }) => {
 
   const columns = useMemo(() => {
     return [
-      { Header: 'Subject', accessor: 'subject' },
+      { Header: t('subject'), accessor: 'subject' },
       ...uniqueDates
         .filter((date) => {
           if (!selectedMonth) return true;
@@ -133,9 +136,9 @@ const LectureViewTable = ({ semester }) => {
           Cell: ({ value }) => (
             <div>
               <span style={{ color: value?.color || 'black' }}>{value?.status || ''}</span>
-              {value?.view_time && value.status === 'Viewed' && (
-                <div style={{ fontSize: '0.8rem', color: '#555' }}>
-                  on: {new Date(value.view_time).toLocaleString()}
+              {value?.view_time && value.status === t('Viewed') && (
+                <div style={{ fontSize: isHindi?'0.95rem':'0.9rem', color: '#555' }}>
+                  {t('on')}: {new Date(value.view_time).toLocaleString()}
                 </div>
               )}
             </div>
@@ -186,7 +189,7 @@ const LectureViewTable = ({ semester }) => {
             marginLeft: '1rem',
           }}
         >
-          Clear Filters
+          {t('Clear Filters')}
         </button>
 
         <div style={{ display: 'flex', gap: '10px', marginRight: '1rem' }}>
@@ -196,11 +199,11 @@ const LectureViewTable = ({ semester }) => {
             style={{
               padding: '8px',
               borderRadius: '4px',
-              fontSize: '14px',
+              fontSize: '0.95',
               border: '1px solid #ddd',
             }}
           >
-            <option value="all">All Subjects</option>
+            <option value="all">{t('All Subjects')}</option>
             {Object.keys(lectureData).map((subject) => (
               <option key={subject} value={subject}>
                 {subject}
@@ -214,11 +217,11 @@ const LectureViewTable = ({ semester }) => {
             style={{
               padding: '8px',
               borderRadius: '4px',
-              fontSize: '14px',
+              fontSize: '0.95rem',
               border: '1px solid #ddd',
             }}
           >
-            <option value="">All Months</option>
+            <option value="">{t('All Months')}</option>
             {uniqueMonths.map((month) => (
               <option key={month} value={month}>
                 {month}
@@ -230,16 +233,16 @@ const LectureViewTable = ({ semester }) => {
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             style={{
-              padding: '8px',
+              padding: '10px',
               borderRadius: '4px',
-              fontSize: '14px',
+              fontSize: '0.95',
               border: '1px solid #ddd',
             }}
           >
-            <option value="all">All Statuses</option>
-            <option value="Viewed">Viewed</option>
-            <option value="Not Viewed">Not Viewed</option>
-            <option value="No Lecture">No Lecture</option>
+            <option value="all">{t('All Statuses')}</option>
+            <option value={t('Viewed')}>{t('Viewed')}</option>
+            <option value={t('Not Viewed')}>{t('Not Viewed')}</option>
+            <option value={t('No Lecture')}>{t('No Lecture')}</option>
           </select>
         </div>
       </div>
@@ -260,50 +263,27 @@ const LectureViewTable = ({ semester }) => {
           justifyContent: 'center',
           marginTop: '15px',
           alignItems: 'center',
-          gap: '15px',
-          marginBottom: '15px',
+          marginBottom: '1rem',
+          fontSize:'1rem'
         }}
       >
         <button
           onClick={goToPreviousPage}
           disabled={currentPage === 0}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: currentPage === 0 ? '#d3d3d3' : '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
-            transition: 'background-color 0.3s ease',
-          }}
+          style={{ padding: '5px 10px', cursor: 'pointer' }}
         >
-          Previous
+          {t('Previous')}
         </button>
+        <span style={{ margin: '0 10px' }}>
+          {t('Page')} {currentPage + 1} / {totalPages}
+        </span>
         <button
           onClick={goToNextPage}
-          disabled={currentPage >= totalPages - 1}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: currentPage >= totalPages - 1 ? '#d3d3d3' : '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
-            transition: 'background-color 0.3s ease',
-          }}
+          disabled={currentPage === totalPages - 1}
+          style={{ padding: '5px 10px', cursor: 'pointer' }}
         >
-          Next
+          {t('Next')}
         </button>
-        <span
-          style={{
-            fontSize: '1rem',
-            color: '#333',
-          }}
-        >
-          Page {currentPage + 1} of {totalPages}
-        </span>
       </div>
     </div>
   );

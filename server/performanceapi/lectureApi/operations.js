@@ -1,5 +1,8 @@
 const { sql, poolPromise } = require('../../utils/db');
 const { callFlaskDecryptAPI } = require('../../utils/flask_api_call/flask_api_call');
+const NodeCache = require('node-cache');
+
+const lectureViewsCache = new NodeCache({ stdTTL: 120 });
 
 async function batchDecryptData(encryptedDataArray) {
     try {
@@ -23,12 +26,18 @@ async function batchDecryptData(encryptedDataArray) {
 
 async function getLectureViewsForStudent(studentId, semester) {
     try {
+        const cacheKey = `${studentId}-${semester}`;
+        const cachedData = lectureViewsCache.get(cacheKey);
+        if (cachedData) {
+            console.log('Returning cached lecture views data');
+            return cachedData;
+        }
+
         let pool = await poolPromise;
 
-        // Modify the query to join with student_data based on course_id and semester
         let result = await pool.request()
             .input('studentId', sql.Int, studentId)
-            .input('semester', sql.Int, semester)  // Add semester as input
+            .input('semester', sql.Int, semester)
             .query(`
                 SELECT 
                     lv.student_id,
@@ -49,22 +58,19 @@ async function getLectureViewsForStudent(studentId, semester) {
 
         if (result.recordset.length === 0) {
             console.log(`No data found for student ${studentId} in semester ${semester}`);
-            return null;  // No data found for the student in the current semester
+            return null; 
         }
 
-        const lectureViewsArray = result.recordset; // All rows for the student
+        const lectureViewsArray = result.recordset;
 
-        // Extract the encrypted viewed_status field for decryption
         const encryptedViewedStatus = lectureViewsArray.map(view => view.viewed_status);
 
-        // Decrypt the viewed_status fields
         const decryptedViewedStatus = await batchDecryptData(encryptedViewedStatus);
 
         let fieldIndex = 0;
         const lectureViewsData = lectureViewsArray.map(view => {
             const decryptedStatus = decryptedViewedStatus[fieldIndex++] || "could not decrypt!";
 
-            // Return the full data with decrypted viewed_status and course_id
             return {
                 student_id: view.student_id,
                 lecture_id: view.lecture_id,
@@ -72,13 +78,14 @@ async function getLectureViewsForStudent(studentId, semester) {
                 viewed_status: view.viewed_status,
                 view_time: view.view_time,
                 status: view.status,
-                course_id: view.course_id,
                 subject_name: view.subject_name,
                 lecture_date: view.lecture_date
             };
         });
 
-        return lectureViewsData; // Return the full lecture views data
+        lectureViewsCache.set(cacheKey, lectureViewsData);
+
+        return lectureViewsData;
     } catch (error) {
         console.error('Error fetching student lecture views details: ', error.message);
         console.error('Error details: ', error);

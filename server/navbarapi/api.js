@@ -10,11 +10,14 @@ router.get('/currentsemester', async (req, res) => {
             return res.status(400).json({ message: 'Student ID is missing in the session.' });
         }
 
+        // Fetch the student details
         const studentDetails = await getStudentCurrentSemester(studentId);
 
         if (!studentDetails) {
             return res.status(404).json({ message: 'No data found for the student in the current semester' });
         }
+
+        // Send the response
         res.json(studentDetails);
     } catch (error) {
         console.error('Error in student-performance route: ', error.message);

@@ -1,11 +1,10 @@
 // collapseItem.js
 function collapseItem(theme, ownerState) {
-  const { palette, transitions, breakpoints, boxShadows, borders, functions } = theme;
-  const { active, whiteSidenav, sidenavColor } = ownerState;
+  const { palette, transitions, breakpoints, functions } = theme;
+  const { active, sidenavColor } = ownerState;
 
-  const { transparent, grey, gradients } = palette;
-  const { md } = boxShadows;
-  const { pxToRem, rgba, linearGradient } = functions;
+  const { transparent,gradients } = palette;
+  const { pxToRem, linearGradient } = functions;
 
   return {
     background: active ? 'linear-gradient(90deg, #3D97EE, #257EEA)' : transparent.main,

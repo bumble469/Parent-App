@@ -14,11 +14,15 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarHalfIcon from '@mui/icons-material/StarHalf';
 import SubjectDashboard from './data/strongweaksubjects';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [studentData, setStudentData] = useState(null);
+  const { t, i18n } = useTranslation();
+
+  const isHindi = i18n.language === 'hi';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,16 +42,14 @@ function Dashboard() {
   // If still loading, show loading indicator
   if (loading) return <div>Loading...</div>;
   
-  // If an error occurred, show error message
   if (error) return <div>Error: {error.message}</div>;
 
-  // If no data is received, show a message
   if (!studentData || studentData.length === 0) {
     return (
       <DashboardLayout>
         <DashboardNavbar />
         <MDBox py={2} mt={3} mb={2}>
-          <div>No data available to display.</div>
+          <div style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{t('No data available to display.')}</div>
         </MDBox>
         <Footer />
       </DashboardLayout>
@@ -73,7 +75,8 @@ function Dashboard() {
 
   const { starRating, fullStars, halfStar, emptyStars, ratingMessage } = calculateStarRating(
     overallMarksFromAPI,
-    averageAttendanceFromAPI
+    averageAttendanceFromAPI,
+    t
   );
 
   let labelMessageForOverallMarks = {
@@ -86,31 +89,31 @@ function Dashboard() {
   };
 
   if (overallMarksFromAPI < 50) {
-    labelMessageForOverallMarks.message = "Needs Improvement!";
+    labelMessageForOverallMarks.message = t("Needs Improvement!");
     labelMessageForOverallMarks.color = "error";
   } else if (overallMarksFromAPI < 75) {
-    labelMessageForOverallMarks.message = "Can do better..";
+    labelMessageForOverallMarks.message = t("Can do better..");
     labelMessageForOverallMarks.color = "warning";
   } else if (overallMarksFromAPI >= 75 && overallMarksFromAPI <= 100){
-    labelMessageForOverallMarks.message = "Good, Keep It Up!";
+    labelMessageForOverallMarks.message = t("Good, Keep It Up!");
     labelMessageForOverallMarks.color = "success";
   } else{
-    labelMessageForOverallMarks.message = "No marks records detected..";
+    labelMessageForOverallMarks.message = t("No marks records detected..");
     labelMessageForOverallMarks.color = "info";
   }
 
   if (overallAttendancePercentage < 50) {
-    labelMessageForOverallAttendance.message = "Needs Improvement!";
+    labelMessageForOverallAttendance.message = t("Needs Improvement!");
     labelMessageForOverallAttendance.color = "error";
   } else if (overallAttendancePercentage < 75) {
-    labelMessageForOverallAttendance.message = "Can do better..";
+    labelMessageForOverallAttendance.message = t("Can do better..");
     labelMessageForOverallAttendance.color = "warning";
   } else if (overallAttendancePercentage >= 75 && overallAttendancePercentage <= 100){
-    labelMessageForOverallAttendance.message = "Good, Keep It Up!";
+    labelMessageForOverallAttendance.message = t("Good, Keep It Up!");
     labelMessageForOverallAttendance.color = "success";
   }
   else {
-    labelMessageForOverallAttendance.message = "No attendance records detected..";
+    labelMessageForOverallAttendance.message = t("No attendance records detected..");
     labelMessageForOverallAttendance.color = "info";
   }
 
@@ -125,11 +128,11 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="weekend"
-                title="Overall Attendance"
-                count={averageAttendanceFromAPI ? `${averageAttendanceFromAPI.toFixed(2)}%` : "N/A"}
+                title={<span style={{ fontSize: isHindi ? '1rem' : '1rem' }}>{t("Overall Attendance")}</span>}
+                count={<span>{averageAttendanceFromAPI ? `${averageAttendanceFromAPI.toFixed(2)}%` : "N/A"}</span>}
                 percentage={{
                   color: labelMessageForOverallAttendance.color,
-                  amount: labelMessageForOverallAttendance.message || "No data available"
+                  amount: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{labelMessageForOverallAttendance.message || "No data available"}</span>
                 }}
               >
                 <MDBox width="100%">
@@ -148,11 +151,11 @@ function Dashboard() {
             <MDBox>
               <ComplexStatisticsCard
                 icon="leaderboard"
-                title="Overall Performance"
-                count={overallMarksFromAPI ? `${overallMarksFromAPI.toFixed(2)}%` : "N/A"}
+                title={<span style={{ fontSize: isHindi ? '1rem' : '1rem' }}>{t("Overall Performance")}</span>}
+                count={<span>{overallMarksFromAPI ? `${overallMarksFromAPI.toFixed(2)}%` : "N/A"}</span>}
                 percentage={{
                   color: labelMessageForOverallMarks.color,
-                  amount: labelMessageForOverallMarks.message || "No data available"
+                  amount: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{labelMessageForOverallMarks.message || "No data available"}</span>
                 }}
               >
                 <MDBox width="100%">
@@ -172,11 +175,11 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="warning"
                 icon="star"
-                title="Rating"
-                count={starRating ? `${starRating}/5` : "N/A"}
+                title={<span style={{ fontSize: isHindi ? '1rem' : '1rem' }}>{t("Rating")}</span>}
+                count={<span>{starRating ? `${starRating}/5` : "N/A"}</span>}
                 percentage={{
                   color: 'success',
-                  label: ratingMessage || "No data available"
+                  label: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{ratingMessage || "No data available"}</span>
                 }}
               >
                 <MDBox

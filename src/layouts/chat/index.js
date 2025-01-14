@@ -24,7 +24,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile'; // Document icon
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
-
+import { useTranslation } from 'react-i18next';
 function Chat() {
   const [teachers, setTeachers] = useState([]); // State to hold teachers data
   const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -33,7 +33,7 @@ function Chat() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+  const { t } = useTranslation();
   useEffect(() => {
     // Fetch teacher data from API
     const fetchTeachers = async () => {
@@ -173,7 +173,7 @@ function Chat() {
                             fontSize: { xs: '0.9rem', sm: '0.8rem' }, // Reduce font size in desktop view
                           }}
                         >
-                          Subjects:&nbsp;{teacher.subject_name || 'No subject available'}
+                          {t('subject')}&nbsp;{teacher.subject_name || t('No subject available')}
                         </Typography>
                       }
                     />
@@ -198,11 +198,11 @@ function Chat() {
               width: '8px',
             },
             '&::-webkit-scrollbar-track': {
-              backgroundColor: 'rgba(0, 0, 0, 0.1)', // Light track color
+              backgroundColor: 'rgba(0, 0, 0, 0.1)', 
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'rgba(0, 0, 0, 0.3)', // Darker thumb color
-              borderRadius: '10px', // Rounded scrollbar thumb
+              backgroundColor: 'rgba(0, 0, 0, 0.3)', 
+              borderRadius: '10px', 
             },
           }}
         >
@@ -252,10 +252,10 @@ function Chat() {
                       <Typography
                         variant="body2"
                         sx={{
-                          fontSize: { xs: '0.9rem', sm: '0.8rem' }, // Reduce font size in desktop view
+                          fontSize: { xs: '0.9rem', sm: '0.9rem', lg:'1rem' }, // Reduce font size in desktop view
                         }}
                       >
-                        Subject:&nbsp;{teacher.subject_name || 'No subject available'}
+                        {t('subject')}:&nbsp;{teacher.subject_name || 'No subject available'}
                       </Typography>
                     }
                   />

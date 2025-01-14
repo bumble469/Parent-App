@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import ReportsBarChart from 'examples/Charts/BarCharts/ReportsBarChart';
 import DataTable from 'examples/Tables/DataTable';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 
 const ReportsBarChartWrapper = ({ semester }) => {
+  const { t } = useTranslation(); // Access the translation function
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
   
-  // Fallback to default semester value if semester is not passed or invalid
   const validSemester = semester >= 1 && semester <= 6 ? semester : 1;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Ensure that semester is valid before making the API request
         if (validSemester < 1 || validSemester > 6) {
           throw new Error("Invalid semester value");
         }
@@ -26,24 +26,22 @@ const ReportsBarChartWrapper = ({ semester }) => {
         console.log('API Response:', response.data);
 
         if (Array.isArray(response.data)) {
-          // Step 1: Process the data to calculate attended and total lectures, excluding null values
           const subjectsData = response.data.reduce((acc, item) => {
-            if (item.is_present !== null) { // Exclude null values
+            if (item.is_present !== null) { 
               if (!acc[item.subject_name]) {
                 acc[item.subject_name] = {
                   attended: 0,
                   total: 0,
                 };
               }
-              acc[item.subject_name].total += 1; // Every entry counts as a total lecture
+              acc[item.subject_name].total += 1; 
               if (item.is_present) {
-                acc[item.subject_name].attended += 1; // Count attended lectures (true)
+                acc[item.subject_name].attended += 1; 
               }
             }
             return acc;
           }, {});
 
-          // Step 2: Map the processed data to chart format
           const chartData = {
             labels: Object.keys(subjectsData),
             datasets: {
@@ -70,7 +68,7 @@ const ReportsBarChartWrapper = ({ semester }) => {
     };
 
     fetchData();
-  }, [validSemester]); // Dependency array now uses `validSemester`
+  }, [validSemester]); 
 
   const rows = attendanceData.map((data) => ({
     subject: data.sub_name,
@@ -79,44 +77,44 @@ const ReportsBarChartWrapper = ({ semester }) => {
   }));
 
   const columns = [
-    { Header: 'Subject', accessor: 'subject', width: '45%', align: 'left' },
-    { Header: 'Lectures Attended', accessor: 'attendedLectures', width: '20%', align: 'left' },
-    { Header: 'Lectures Occurred', accessor: 'totalLectures', align: 'center' },
+    { Header: t('subject'), accessor: 'subject', width: '45%', align: 'left' },
+    { Header: t('lecturesAttended'), accessor: 'attendedLectures', width: '20%', align: 'left' },
+    { Header: t('lecturesOccurred'), accessor: 'totalLectures', align: 'center' },
   ];
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t('loading')}</div>;
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div>{t('error')}: {error.message}</div>;
   }
 
   return (
     <ReportsBarChart
       color="info"
-      title="Subject-Wise Attendance"
+      title={t('subjectWiseAttendance')}
       description={
         <MDBox
           sx={{
-            height: '200px', // Set the height of the scrollable container
-            overflowY: 'auto', // Enable vertical scrolling
-            overflowX: 'hidden', // Disable horizontal scrolling
-            borderRadius: '8px', // Optional: Add rounded corners
+            height: '200px', 
+            overflowY: 'auto', 
+            overflowX: 'hidden', 
+            borderRadius: '8px', 
             '::-webkit-scrollbar': {
-              width: '8px', // Width of the scrollbar
+              width: '8px', 
             },
             '::-webkit-scrollbar-thumb': {
-              backgroundColor: '#888', // Color of the scrollbar thumb
+              backgroundColor: '#888', 
               borderRadius: '4px',
             },
             '::-webkit-scrollbar-thumb:hover': {
-              backgroundColor: '#555', // Color on hover
+              backgroundColor: '#555',
             },
           }}
         >
           <MDTypography sx={{ fontSize: '13px' }}>
-            Lectures Attended | Lectures Occurred
+            {t('lecturesAttended')} | {t('lecturesOccurred')}
           </MDTypography>
           <DataTable
             table={{ columns, rows }}
