@@ -116,5 +116,17 @@
     "Total":"Total",
     "TotalMarks":"Total Marks",
     "Total Marks Line Graph":"Total Marks Line Graph",
-    "AParentOrientedInitiative":"A Parent-Oriented Initiative!"
+    "AParentOrientedInitiative":"A Parent-Oriented Initiative!",
+    "ConfirmLogout":"Confirm Logout",
+    "LogoutSurety":"Are your sure you want to logout?",
+    "okay": "OK",
+    "cancel":"Cancel",
+    "studentProfile":"Student Profile",
+    "logout":"Logout",
+    "notifications":"Notifications",
+    "loadingNotifications":"Loading Notifications...",
+    "noNotifications":"No notifications",
+    "hasLowMarks":"has low marks: ",
+    "hasLowAttendance":"has low attendance: ",
+    "language":"Language"
 }

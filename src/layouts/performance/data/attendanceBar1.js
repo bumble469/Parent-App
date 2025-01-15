@@ -21,10 +21,7 @@ const ReportsBarChartWrapper = ({ semester }) => {
         if (validSemester < 1 || validSemester > 6) {
           throw new Error("Invalid semester value");
         }
-
         const response = await axios.get(`http://localhost:8001/api/performance/student/detailedattendance?semester=${validSemester}`);
-        console.log('API Response:', response.data);
-
         if (Array.isArray(response.data)) {
           const subjectsData = response.data.reduce((acc, item) => {
             if (item.is_present !== null) { 

@@ -116,5 +116,17 @@
   "Total":"कुल",
   "TotalMarks":"कुल अंक",
   "Total Marks Line Graph":"कुल अंकों का रेखाचित्र",
-  "AParentOrientedInitiative":"माता-पिता केंद्रित पहल!"
+  "AParentOrientedInitiative":"माता-पिता केंद्रित पहल!",
+  "ConfirmLogout": "लॉगआउट की पुष्टि करें",
+  "LogoutSurety": "क्या आप वाकई लॉगआउट करना चाहते हैं?",
+  "okay": "ठीक है",
+  "cancel": "रद्द करें",
+  "studentProfile":"छात्र प्रोफ़ाइल",
+  "logout":"लॉगआउट",
+  "notifications": "सूचनाएं",
+  "loadingNotifications": "सूचनाएं लोड हो रही हैं...",
+  "noNotifications": "कोई सूचनाएं नहीं हैं",
+  "hasLowMarks": "में कम अंक हैं: ",
+  "hasLowAttendance": "में कम उपस्थिति है: ",
+  "language":"भाषा"
 }

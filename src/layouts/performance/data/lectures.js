@@ -199,7 +199,7 @@ const LectureViewTable = ({ semester }) => {
             style={{
               padding: '8px',
               borderRadius: '4px',
-              fontSize: '0.95',
+              fontSize: '0.95rem',
               border: '1px solid #ddd',
             }}
           >
@@ -235,7 +235,7 @@ const LectureViewTable = ({ semester }) => {
             style={{
               padding: '10px',
               borderRadius: '4px',
-              fontSize: '0.95',
+              fontSize: '0.95rem',
               border: '1px solid #ddd',
             }}
           >

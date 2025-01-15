@@ -44,7 +44,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const route = useLocation().pathname.split('/').slice(1);
   const navigate = useNavigate();
   const { i18n ,t } = useTranslation();
-
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
     i18n.changeLanguage(selectedLanguage); 
@@ -95,7 +94,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const hasLowAttendance = t('hasLowAttendance');
+  const hasLowMarks = t('hasLowMarks');
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -115,29 +115,28 @@ function DashboardNavbar({ absolute, light, isMini }) {
           if (attendancePercentage < 75) {
             notifications.push({
               icon: 'warning',
-              title: `${subject.sub_name} has low attendance: ${attendancePercentage.toFixed(2)}%`,
+              title: `${subject.sub_name} ${hasLowAttendance} ${attendancePercentage.toFixed(2)}%`,
             });
           }
           if (marksPercentage < 75) {
             notifications.push({
               icon: 'warning',
-              title: `${subject.sub_name} has low marks: ${marksPercentage.toFixed(2)}%`,
+              title: `${subject.sub_name} ${hasLowMarks} ${marksPercentage.toFixed(2)}%`,
             });
           }
           return notifications;
         });
-  
-        setNotifications(lowAttendanceAndMarks.flat()); // Set notifications after both API calls
+        setNotifications(lowAttendanceAndMarks.flat()); 
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
-        setLoading(false); // End loading after both data fetches
+        setLoading(false); 
       }
     };
     fetchData();
-  }, []); 
+  }, [i18n.language]); 
   if(loading){
-    return <div>Loading...</div>
+    return <div>{t('loading')}</div>
   } 
 
   const iconsStyle = {
@@ -166,16 +165,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 color="textSecondary"
                 sx={{
                   fontWeight: 'bold',
-                  fontSize:'1.2rem !important'
+                  fontSize:'1.2rem'
                 }}
               >
                 <FormControl sx={{padding:1}}>
-                  <InputLabel>Language</InputLabel>
+                  <InputLabel sx={{fontSize:isHindi?'1.25rem !important':'1.15rem'}}>{t('language')}</InputLabel>
                   <Select
                     value={i18n.language}
                     onChange={handleLanguageChange}
                     label="Language"
-                    sx={{fontSize:'1rem', width:'5rem'}}
+                    sx={{fontSize:'1rem', width:'5rem', marginTop:'0.25rem'}}
                   >
                     <MenuItem value="en">English</MenuItem>
                     <MenuItem value="hi">हिंदी</MenuItem>
@@ -262,14 +261,14 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 </MenuItem>
                 <Divider sx={{ my: 1 }} />
                 <MenuItem onClick={handleRedirectToProfile}>
-                  <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem', color: 'text.secondary' }}>
+                  <Icon sx={{ fontSize: '1.4rem !important', marginRight: '0.75rem', color: 'text.secondary' }}>
                     account_circle
                   </Icon>
-                  Student Profile
+                  <Typography sx={{fontSize:isHindi?'1.1rem':'1rem'}}>{t('studentProfile')}</Typography>
                 </MenuItem>
                 <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
-                  <Icon sx={{ fontSize: '1.5rem', marginRight: '0.75rem' }}>logout</Icon>
-                  Logout
+                  <Icon sx={{ fontSize: '1.4rem !important', marginRight: '0.75rem' }}>logout</Icon>
+                  <Typography sx={{fontSize:isHindi?'1.1rem':'1rem'}}>{t('logout')}</Typography>
                 </MenuItem>
               </Menu>
 
@@ -307,7 +306,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               textAlign: 'center',
             }}
           >
-            Notifications
+            {t('notifications')}
           </DialogTitle>
           <IconButton
             onClick={handleCloseDialog}
@@ -338,7 +337,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
           }}
         >
           {loading ? (
-            <Box sx={{ textAlign: 'center', py: 2 }}>Loading notifications...</Box>
+            <Box sx={{ textAlign: 'center', py: 2 }}>{t('loadingNotifications')}</Box>
           ) : notifications.length > 0 ? (
             notifications.map((notification, index) => (
               <React.Fragment key={index}>
@@ -362,7 +361,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               </React.Fragment>
             ))
           ) : (
-            <Box sx={{ textAlign: 'center', py: 2 }}>No notifications</Box>
+            <Box sx={{ textAlign: 'center', py: 2 }}>{t('noNotifications')}</Box>
           )}
         </DialogContent>
       </Dialog>

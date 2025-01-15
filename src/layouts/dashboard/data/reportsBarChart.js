@@ -17,7 +17,6 @@ const ReportsBarChartWrapper = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8001/api/dashboard/student/attendance');
-        console.log('API Response:', response.data); // Log to check the data
         if (Array.isArray(response.data)) {
           setAttendanceData(response.data);
         } else {
