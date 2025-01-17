@@ -178,6 +178,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   >
                     <MenuItem value="en">English</MenuItem>
                     <MenuItem value="hi">हिंदी</MenuItem>
+                    <MenuItem value="mr">मराठी</MenuItem>
+                    <MenuItem value="ur">اردو</MenuItem>
+                    <MenuItem value="gj"> ગુજરાતી</MenuItem>
                   </Select>
                 </FormControl>
               </MDTypography>
