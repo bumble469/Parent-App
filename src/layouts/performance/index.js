@@ -25,7 +25,7 @@ function Performance() {
   const [marksData, setMarksData] = useState([]); 
   const [averageMarks, setAverageMarks] = useState(0); 
   const { t, i18n } = useTranslation();
-  const isHindi = i18n.language === 'hi'
+  const isHindi = i18n.language != 'en'
   const handleSemesterChange = (event) => {
     setSemester(event.target.value); 
   };

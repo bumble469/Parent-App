@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import DataTable from 'examples/Tables/DataTable';
 import { useTranslation } from 'react-i18next';
+import loading_image from '../../../assets/images/icons8-loading.gif';
 
 const LectureViewTable = ({ semester }) => {
   const [lectureData, setLectureData] = useState({});
@@ -8,12 +9,14 @@ const LectureViewTable = ({ semester }) => {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all'); 
   const [currentPage, setCurrentPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);  // Add state for loading status
   const columnsPerPage = 5;
-  const {t, i18n} = useTranslation();
-  const isHindi = i18n.language === 'hi';
+  const { t, i18n } = useTranslation();
+  const isHindi = i18n.language !== 'en';
 
   const fetchDetailedLectureViews = async (semester) => {
     try {
+      setIsLoading(true);  // Set loading to true when the fetch starts
       const response = await fetch(
         `http://localhost:8001/api/performance/student/lectureviews?semester=${semester}`
       );
@@ -31,8 +34,10 @@ const LectureViewTable = ({ semester }) => {
       }, {});
 
       setLectureData(groupedData);
+      setIsLoading(false);  // Set loading to false when the fetch is complete
     } catch (error) {
       console.error('Error fetching detailed attendance:', error);
+      setIsLoading(false);  // Ensure loading is set to false even if there's an error
     }
   };
 
@@ -137,7 +142,7 @@ const LectureViewTable = ({ semester }) => {
             <div>
               <span style={{ color: value?.color || 'black' }}>{value?.status || ''}</span>
               {value?.view_time && value.status === t('Viewed') && (
-                <div style={{ fontSize: isHindi?'0.95rem':'0.9rem', color: '#555' }}>
+                <div style={{ fontSize: isHindi ? '0.95rem' : '0.9rem', color: '#555' }}>
                   {t('on')}: {new Date(value.view_time).toLocaleString()}
                 </div>
               )}
@@ -167,124 +172,132 @@ const LectureViewTable = ({ semester }) => {
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '10px',
-          marginBottom: '20px',
-        }}
-      >
-        <button
-          onClick={resetFilters}
-          style={{
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            padding: '5px 10px',
-            borderRadius: '3px',
-            border: '1px solid #f5c6cb',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            marginLeft: '1rem',
-          }}
-        >
-          {t('Clear Filters')}
-        </button>
-
-        <div style={{ display: 'flex', gap: '10px', marginRight: '1rem' }}>
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            style={{
-              padding: '8px',
-              borderRadius: '4px',
-              fontSize: '0.95rem',
-              border: '1px solid #ddd',
-            }}
-          >
-            <option value="all">{t('All Subjects')}</option>
-            {Object.keys(lectureData).map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            style={{
-              padding: '8px',
-              borderRadius: '4px',
-              fontSize: '0.95rem',
-              border: '1px solid #ddd',
-            }}
-          >
-            <option value="">{t('All Months')}</option>
-            {uniqueMonths.map((month) => (
-              <option key={month} value={month}>
-                {month}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{
-              padding: '10px',
-              borderRadius: '4px',
-              fontSize: '0.95rem',
-              border: '1px solid #ddd',
-            }}
-          >
-            <option value="all">{t('All Statuses')}</option>
-            <option value={t('Viewed')}>{t('Viewed')}</option>
-            <option value={t('Not Viewed')}>{t('Not Viewed')}</option>
-            <option value={t('No Lecture')}>{t('No Lecture')}</option>
-          </select>
+      {isLoading ? (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <img src={loading_image} alt="Loading..." />
         </div>
-      </div>
+      ) : (
+        <>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '20px',
+            }}
+          >
+            <button
+              onClick={resetFilters}
+              style={{
+                backgroundColor: '#f8d7da',
+                color: '#721c24',
+                padding: '5px 10px',
+                borderRadius: '3px',
+                border: '1px solid #f5c6cb',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                marginLeft: '1rem',
+              }}
+            >
+              {t('Clear Filters')}
+            </button>
 
-      <DataTable
-        table={{
-          columns: paginatedColumns,
-          rows: tableData,
-        }}
-        isSorted={true}
-        entriesPerPage={false}
-        showTotalEntries={false}
-      />
+            <div style={{ display: 'flex', gap: '10px', marginRight: '1rem' }}>
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                style={{
+                  padding: '8px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  border: '1px solid #ddd',
+                }}
+              >
+                <option value="all">{t('All Subjects')}</option>
+                {Object.keys(lectureData).map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '15px',
-          alignItems: 'center',
-          marginBottom: '1rem',
-          fontSize:'1rem'
-        }}
-      >
-        <button
-          onClick={goToPreviousPage}
-          disabled={currentPage === 0}
-          style={{ padding: '5px 10px', cursor: 'pointer' }}
-        >
-          {t('Previous')}
-        </button>
-        <span style={{ margin: '0 10px' }}>
-          {t('Page')} {currentPage + 1} / {totalPages}
-        </span>
-        <button
-          onClick={goToNextPage}
-          disabled={currentPage === totalPages - 1}
-          style={{ padding: '5px 10px', cursor: 'pointer' }}
-        >
-          {t('Next')}
-        </button>
-      </div>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                style={{
+                  padding: '8px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  border: '1px solid #ddd',
+                }}
+              >
+                <option value="">{t('All Months')}</option>
+                {uniqueMonths.map((month) => (
+                  <option key={month} value={month}>
+                    {month}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{
+                  padding: '10px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  border: '1px solid #ddd',
+                }}
+              >
+                <option value="all">{t('All Statuses')}</option>
+                <option value={t('Viewed')}>{t('Viewed')}</option>
+                <option value={t('Not Viewed')}>{t('Not Viewed')}</option>
+                <option value={t('No Lecture')}>{t('No Lecture')}</option>
+              </select>
+            </div>
+          </div>
+
+          <DataTable
+            table={{
+              columns: paginatedColumns,
+              rows: tableData,
+            }}
+            isSorted={true}
+            entriesPerPage={false}
+            showTotalEntries={false}
+          />
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '15px',
+              alignItems: 'center',
+              marginBottom: '1rem',
+              fontSize: '1rem',
+            }}
+          >
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 0}
+              style={{ padding: '5px 10px', cursor: 'pointer' }}
+            >
+              {t('Previous')}
+            </button>
+            <span style={{ margin: '0 10px' }}>
+              {t('Page')} {currentPage + 1} / {totalPages}
+            </span>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages - 1}
+              style={{ padding: '5px 10px', cursor: 'pointer' }}
+            >
+              {t('Next')}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

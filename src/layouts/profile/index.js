@@ -11,7 +11,8 @@ import ProfileInfoCard from 'examples/Cards/InfoCards/ProfileInfoCard';
 import Header from 'layouts/profile/components/Header';
 import PlatformSettings from 'layouts/profile/components/PlatformSettings';
 import { useTranslation } from 'react-i18next';
-
+import loading_image from '../../assets/images/icons8-loading.gif';
+import { Box } from '@mui/material';
 function Overview() {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,9 +38,18 @@ function Overview() {
   }, []);
 
   if (loading) {
-    return <div>{t('loading')}</div>;
+    return(
+      <Box sx={{
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        padding: 2
+      }}>
+        <img src={loading_image} alt="Loading" style={{ width: '40px', height: '40px' }} />
+      </Box>
+    );
   }
-
   return (
     <DashboardLayout>
       <DashboardNavbar />

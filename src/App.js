@@ -7,7 +7,7 @@ import theme from 'assets/theme';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-import logo from 'assets/images/web_logo.png';
+import logo from 'assets/images/logo.png';
 import Profile from './layouts/profile'; 
 import Dashboard from './layouts/dashboard'; 
 import Performance from './layouts/performance'; 
@@ -25,7 +25,7 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const { t,i18n } = useTranslation();
-  const isHindi = i18n.language === 'hi';
+  const isHindi = i18n.language != 'en';
   useMemo(() => {
     const cacheRtl = createCache({
       key: 'rtl',
@@ -188,7 +188,6 @@ export default function App() {
           <Sidenav
             color={sidenavColor}
             brand={logo}
-            brandName="Material Dashboard 2"
             routes={routes} 
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
@@ -207,7 +206,7 @@ export default function App() {
         <Sidenav
           color={sidenavColor}
           brand={logo}
-          brandName="P-SAT"
+          brandName="SCAS"
           routes={routes} 
           onMouseEnter={handleOnMouseEnter}
           onMouseLeave={handleOnMouseLeave}

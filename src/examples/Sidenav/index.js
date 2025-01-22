@@ -5,11 +5,14 @@ import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import Icon from '@mui/material/Icon';
+import { IconButton } from "@mui/material";
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import SidenavCollapse from 'examples/Sidenav/SidenavCollapse';
 import SidenavRoot from 'examples/Sidenav/SidenavRoot';
 import { useTranslation } from 'react-i18next';
+import GuidModal from '../../components/Guide/index';
+import './styles/styles.css';
 import {
   useMaterialUIController,
   setMiniSidenav,
@@ -22,11 +25,19 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace('/', '');
-  
-  const [student, setStudent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const { t, i18n } = useTranslation(); 
+  const [isModalOpen, setModalOpen] = useState(false);
 
+  const toggleModal = () => {
+    setModalOpen(!isModalOpen);
+  };
+  const [student, setStudent] = useState(null);
+  const { t, i18n } = useTranslation(); 
+  const [isSpinning, setIsSpinning] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsSpinning(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
@@ -38,8 +49,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
         setStudent(data);
       } catch (error) {
         console.error('Error fetching student profile:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -96,7 +105,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           mt={1}
           mb={1}
           ml={1}
-          fontSize={i18n.language === 'hi' ? '0.97rem' : '0.78rem'}
+          fontSize={i18n.language != 'en' ? '0.97rem' : '0.78rem'}
         >
           {title}
         </MDTypography>
@@ -111,10 +120,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     }
     return returnValue;
   });
-
-  if (loading) {
-    return <div>Loading...</div>;  // Show loading until student data is fetched
-  }
 
   return (
     <SidenavRoot
@@ -154,18 +159,25 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           display="flex"
           alignItems="center"
           flexDirection="row"
-          pt={1}
-          pb={1}
           px={1}
-          sx={{ width: '100%', textDecoration: 'none' }}
+          sx={{ width: "100%", textDecoration: "none" }}
         >
-          {brand && <MDBox component="img" src={brand} alt="Brand" width="3.3rem" sx={{ mr: 2 }} />}
+          {brand && (
+            <MDBox
+              component="img"
+              src={brand}
+              alt="Brand"
+              width="4rem"
+              sx={{ mr: 1 }}
+              className={isSpinning ? "logo-spin" : ""}
+            />
+          )}
           <MDBox display="flex" flexDirection="column" alignItems="flex-start" width="auto">
             <MDTypography
               component="h6"
               variant="button"
               fontWeight="medium"
-              sx={{ fontSize: '1.7rem', textAlign: 'center' }}
+              sx={{ fontSize: "1.7rem", textAlign: "center" }}
             >
               {brandName}
             </MDTypography>
@@ -236,6 +248,12 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       >
         {t('AParentOrientedInitiative')}
       </MDBox>
+      <IconButton>
+        <GuidModal isOpen={isModalOpen} onClose={toggleModal} />
+        <Icon onClick={toggleModal} sx={{ fontSize: '1.5rem', color: '#000000' }}>
+          help_outline
+        </Icon>
+      </IconButton>
     </SidenavRoot>
   );
 }

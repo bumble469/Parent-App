@@ -5,9 +5,10 @@ import ReportsBarChart from 'examples/Charts/BarCharts/ReportsBarChart';
 import DataTable from 'examples/Tables/DataTable';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
-
+import loading_image from '../../../assets/images/icons8-loading.gif';
+import { Box } from '@mui/material';
 const ReportsBarChartWrapper = ({ semester }) => {
-  const { t } = useTranslation(); // Access the translation function
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -79,16 +80,18 @@ const ReportsBarChartWrapper = ({ semester }) => {
     { Header: t('lecturesOccurred'), accessor: 'totalLectures', align: 'center' },
   ];
 
-  if (loading) {
-    return <div>{t('loading')}</div>;
-  }
-
   if (error) {
     return <div>{t('error')}: {error.message}</div>;
   }
 
   return (
-    <ReportsBarChart
+    <div>
+      {loading?(
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
+        <img src={loading_image} alt="Loading" style={{ width: '50px', height: '50px' }} />
+      </Box>
+    ):(
+      <ReportsBarChart
       color="info"
       title={t('subjectWiseAttendance')}
       description={
@@ -135,6 +138,8 @@ const ReportsBarChartWrapper = ({ semester }) => {
         },
       }}
     />
+    )}
+    </div>
   );
 };
 

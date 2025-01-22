@@ -128,5 +128,22 @@
     "noNotifications":"No notifications",
     "hasLowMarks":"has low marks: ",
     "hasLowAttendance":"has low attendance: ",
-    "language":"Language"
+    "language":"Language",
+    "title": "Share Your Feedback",
+    "subtitle": "Please share your thoughts, suggestions, and any areas where you feel the interface could be enhanced. Your input will help us ensure that the platform meets your needs and expectations in the best possible way.",
+    "name": "Name",
+    "feedbackType": "Feedback Type",
+    "rating": "Rating (1-10)",
+    "yourFeedback": "Your Feedback",
+    "generalFeedback": "General Feedback",
+    "featureSuggestion": "Feature Suggestion",
+    "bugReport": "Bug Report",
+    "testimonial": "Testimonial",
+    "submitFeedback": "Submit Feedback",
+    "clear": "Clear",
+    "thankYouMessage": "Thank you for your feedback! A confirmation email has been sent to you.",
+    "errorMessage": "Failed to send feedback. Please try again later.",
+    "emailInvalid": "Please enter a valid email address.",
+    "ratingInvalid": "Please enter a rating between 1 and 10.",
+    "feedbackInvalid": "Feedback must be less than 80 words."
 }

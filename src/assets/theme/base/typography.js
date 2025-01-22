@@ -28,7 +28,7 @@ import pxToRem from 'assets/theme/functions/pxToRem';
 const { dark } = colors;
 
 const baseProperties = {
-  fontFamily: 'roboto !important', // Updated font family
+  fontFamily: 'noto sans !important', // Updated font family
   fontWeightLighter: 100,
   fontWeightLight: 300,
   fontWeightRegular: 400,

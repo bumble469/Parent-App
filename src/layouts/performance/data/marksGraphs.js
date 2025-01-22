@@ -4,10 +4,11 @@ import { Card } from "@mui/material";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import { useTranslation } from 'react-i18next'; 
+import loading_image from '../../../assets/images/icons8-loading.gif'; // Add the loading gif import
+
 const generateMarksLineChartData = (currentMarksData, threshold) => {
   const minMarks = Math.min(...currentMarksData.map((data) => data.total));
-  const {t,i18n} = useTranslation();
-  const isHindi = i18n.language === 'hi';
+  const {t} = useTranslation();
   return useMemo(
     () => ({
       series: [
@@ -93,9 +94,11 @@ const LineGraph = ({ semester, threshold = 95 }) => {
   const { t } = useTranslation(); 
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("All");
+  const [loading, setLoading] = useState(true);  // Add loading state
 
   const fetchMarksData = async (semester) => {
     try {
+      setLoading(true); // Set loading to true before fetching data
       const response = await fetch(
         `http://localhost:8001/api/performance/student/detailedmarks?semester=${semester}`
       );
@@ -108,6 +111,8 @@ const LineGraph = ({ semester, threshold = 95 }) => {
       }
     } catch (error) {
       console.error("Error fetching marks data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after data fetching
     }
   };
 
@@ -155,28 +160,37 @@ const LineGraph = ({ semester, threshold = 95 }) => {
         </MDTypography>
       </MDBox>
       <MDBox pt={3} px={3}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            style={{ padding: '8px', borderRadius: '4px', fontSize: '0.95rem', border: '1px solid #ddd', marginRight: '20px' }}
-          >
-            <option value="All">{t('All Subjects')}</option> 
-            {Object.keys(groupedMarksData).map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Loading indicator */}
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            <img src={loading_image} alt="Loading..." />
+          </div>
+        ) : (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                style={{ padding: '8px', borderRadius: '4px', fontSize: '0.95rem', border: '1px solid #ddd', marginRight: '20px' }}
+              >
+                <option value="All">{t('All Subjects')}</option> 
+                {Object.keys(groupedMarksData).map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Line Graph */}
-        <ApexCharts
-          type="line"
-          series={chartData.series}
-          options={chartData.chartOptions}
-          height={350}
-        />
+            {/* Line Graph */}
+            <ApexCharts
+              type="line"
+              series={chartData.series}
+              options={chartData.chartOptions}
+              height={350}
+            />
+          </>
+        )}
       </MDBox>
     </Card>
   );

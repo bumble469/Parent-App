@@ -4,7 +4,7 @@ import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatist
 
 function OverallAttendance({ semester, t, i18n }) {
   const [overallAttendance, setOverallAttendance] = useState(0);
-  const isHindi = i18n.language === 'hi'
+  const isHindi = i18n.language != 'en'
   useEffect(() => {
     const fetchAttendanceData = async () => {
       try {

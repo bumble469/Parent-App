@@ -5,7 +5,7 @@ import DataTable from 'examples/Tables/DataTable';
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import { useTranslation } from 'react-i18next';
-
+import loading_image from '../../../assets/images/icons8-loading.gif'
 const ReportsBarChartWrapper = () => {
   const { t } = useTranslation(); // Use the translation hook
   const [data, setData] = useState(null);
@@ -20,14 +20,13 @@ const ReportsBarChartWrapper = () => {
         if (Array.isArray(response.data)) {
           setAttendanceData(response.data);
         } else {
-          throw new Error('Invalid data format'); // Throw error for unexpected data structure
+          throw new Error('Invalid data format'); 
         }
-        // Mapping the API response data to the required chart format
+        
         const subjects = response.data.map(item => item.sub_name);
         const attended_lects = response.data.map(item => item.lectures_attended);
         const total_lects = response.data.map(item => item.lectures_total);
 
-        // Construct the data object to match the chart format
         const chartData = {
           labels: subjects,
           datasets: {
@@ -60,71 +59,74 @@ const ReportsBarChartWrapper = () => {
     { Header: t('lecturesOccurred'), accessor: 'totalLectures', align: 'center' },
   ];
 
-  if (loading) {
-    return <div>{t('loading')}</div>; // Show loading state
-  }
-
   if (error) {
-    return <div>{t('error')}: {error.message}</div>; // Show error message if there's an issue
+    return <div>{t('error')}: {error.message}</div>;
   }
 
-  // Handle no data case
   if (!attendanceData.length) {
     return (
-      <div>{t('noDataAvailable')}</div> // Display message if there's no data
+      <div>{t('noDataAvailable')}</div> 
     );
   }
 
-  // If data is successfully fetched, render the ReportsBarChart
   return (
-    <ReportsBarChart
-      color="info"
-      title={t('subjectWiseAttendance')}
-      description={
-        <MDBox
-          sx={{
-            height: '200px', // Set the height of the scrollable container
-            overflowY: 'auto', // Enable vertical scrolling
-            overflowX: 'hidden', // Disable horizontal scrolling
-            borderRadius: '8px', // Optional: Add rounded corners
-            '::-webkit-scrollbar': {
-              width: '8px', // Width of the scrollbar
-            },
-            '::-webkit-scrollbar-thumb': {
-              backgroundColor: '#888', // Color of the scrollbar thumb
-              borderRadius: '4px',
-            },
-            '::-webkit-scrollbar-thumb:hover': {
-              backgroundColor: '#555', // Color on hover
+    <div>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
+         <img src={loading_image} alt="Loading" style={{ width: '50px', height: '50px' }} />
+        </Box>
+      ) : (
+        <ReportsBarChart
+          color="info"
+          title={t('subjectWiseAttendance')}
+          description={
+            <MDBox
+              sx={{
+                height: '200px', // Set the height of the scrollable container
+                overflowY: 'auto', // Enable vertical scrolling
+                overflowX: 'hidden', // Disable horizontal scrolling
+                borderRadius: '8px', // Optional: Add rounded corners
+                '::-webkit-scrollbar': {
+                  width: '8px', // Width of the scrollbar
+                },
+                '::-webkit-scrollbar-thumb': {
+                  backgroundColor: '#888', // Color of the scrollbar thumb
+                  borderRadius: '4px',
+                },
+                '::-webkit-scrollbar-thumb:hover': {
+                  backgroundColor: '#555', // Color on hover
+                },
+              }}
+            >
+              <MDTypography sx={{ fontSize: '0.9rem' }}>
+                {t('lecturesAttended')} | {t('lecturesOccurred')}
+              </MDTypography>
+              <DataTable
+                table={{ columns, rows }}
+                showTotalEntries={false}
+                isSorted={false}
+                noEndBorder
+                entriesPerPage={false}
+              />
+            </MDBox>
+          }
+          date="date"
+          chart={data} // Pass the mapped data to the chart
+          options={{
+            scales: {
+              x: {
+                ticks: {
+                  autoSkip: false,
+                  maxRotation: 45,
+                  minRotation: 45,
+                },
+              },
             },
           }}
-        >
-          <MDTypography sx={{ fontSize: '0.9rem' }}>{t('lecturesAttended')} | {t('lecturesOccurred')}</MDTypography>
-          <DataTable
-            table={{ columns, rows }}
-            showTotalEntries={false}
-            isSorted={false}
-            noEndBorder
-            entriesPerPage={false}
-          />
-        </MDBox>
-      }
-      date="date"
-      chart={data} // Pass the mapped data to the chart
-      options={{
-        // Adding x-axis label rotation for better visibility
-        scales: {
-          x: {
-            ticks: {
-              autoSkip: false, // Prevent auto-skipping of labels
-              maxRotation: 45, // Rotate labels by 45 degrees
-              minRotation: 45, // Set minimum rotation for consistency
-            },
-          },
-        },
-      }}
-    />
-  );
+        />
+      )}
+    </div>
+  );  
 };
 
 export default ReportsBarChartWrapper;

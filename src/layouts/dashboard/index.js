@@ -15,14 +15,14 @@ import StarHalfIcon from '@mui/icons-material/StarHalf';
 import SubjectDashboard from './data/strongweaksubjects';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-
+import loading_image from '../../assets/images/icons8-loading.gif';
 function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [studentData, setStudentData] = useState(null);
   const { t, i18n } = useTranslation();
 
-  const isHindi = i18n.language === 'hi';
+  const isHindi = i18n.language != 'en';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,10 +37,7 @@ function Dashboard() {
     };
 
     fetchData();
-  }, []);
-
-  // If still loading, show loading indicator
-  if (loading) return <div>Loading...</div>;
+  }, []);  
   
   if (error) return <div>Error: {error.message}</div>;
 
@@ -128,7 +125,7 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="weekend"
-                title={<span style={{ fontSize: isHindi ? '1rem' : '1rem' }}>{t("Overall Attendance")}</span>}
+                title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Overall Attendance")}</span>}
                 count={<span>{averageAttendanceFromAPI ? `${averageAttendanceFromAPI.toFixed(2)}%` : "N/A"}</span>}
                 percentage={{
                   color: labelMessageForOverallAttendance.color,
@@ -151,7 +148,7 @@ function Dashboard() {
             <MDBox>
               <ComplexStatisticsCard
                 icon="leaderboard"
-                title={<span style={{ fontSize: isHindi ? '1rem' : '1rem' }}>{t("Overall Performance")}</span>}
+                title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Overall Performance")}</span>}
                 count={<span>{overallMarksFromAPI ? `${overallMarksFromAPI.toFixed(2)}%` : "N/A"}</span>}
                 percentage={{
                   color: labelMessageForOverallMarks.color,
@@ -175,7 +172,7 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="warning"
                 icon="star"
-                title={<span style={{ fontSize: isHindi ? '1rem' : '1rem' }}>{t("Rating")}</span>}
+                title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Rating")}</span>}
                 count={<span>{starRating ? `${starRating}/5` : "N/A"}</span>}
                 percentage={{
                   color: 'success',

@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { exec } = require('child_process');
 
 const facultyRoutes = require('./facultyapi/api');
 const chatRoutes = require('./chatapi/api');
@@ -27,6 +28,9 @@ app.use((req, res, next) => {
     next();
 });
 
+const RETRY_LIMIT = 5;
+const RETRY_DELAY = 1000;
+
 const loadRoutes = async () => {
     try {
         console.log("Preloading routes...");
@@ -38,12 +42,34 @@ const loadRoutes = async () => {
         await loadRoute('/api/performance', getStudentDetailedAttendanceForPerformance);
         await loadRoute('/api/performance', getStudentDetailedMarksForPerformance);
         await loadRoute('/api', facultyRoutes);
-
         app.use('/api/chat', chatRoutes);
 
         console.log("Routes loaded successfully.");
     } catch (error) {
         console.error("Error loading routes:", error);
+        for (let i = 0; i < RETRY_LIMIT; i++) {
+            console.log(`Retrying route loading... Attempt ${i + 1}`);
+            try {
+                await loadRoute('/api/student', studentProfileRoutes, studentCurrentSemesterRoutes);
+                await loadRoute('/api/dashboard', studentDashboardStarRoutes, studentDashboardGraphRoutes, getStudentDashboardAttendance);
+                await loadRoute('/api/events', eventsRoutes);
+                await loadRoute('/api/performance', studentPerformanceRoutes);
+                await loadRoute('/api/performance', getLectureDetails);
+                await loadRoute('/api/performance', getStudentDetailedAttendanceForPerformance);
+                await loadRoute('/api/performance', getStudentDetailedMarksForPerformance);
+                await loadRoute('/api', facultyRoutes);
+                app.use('/api/chat', chatRoutes);
+                console.log("Routes loaded successfully after retry.");
+                break;
+            } catch (retryError) {
+                console.error("Retry failed:", retryError);
+                if (i === RETRY_LIMIT - 1) {
+                    console.error("Maximum retry attempts reached. Server will restart.");
+                    restartServer();
+                }
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+            }
+        }
     }
 };
 
@@ -51,9 +77,19 @@ const loadRoute = async (routePath, ...routes) => {
     try {
         app.use(routePath, ...routes);
     } catch (error) {
-        console.error(`Error loading route ${routePath}:`, error);
-        throw error; 
+        throw error;
     }
+};
+
+const restartServer = () => {
+    console.log("Restarting the server...");
+    exec('pm2 restart server', (err, stdout, stderr) => {
+        if (err) {
+            console.error(`Error restarting server: ${err}`);
+            return;
+        }
+        console.log(`Server restarted: ${stdout}`);
+    });
 };
 
 app.listen(port, async () => {

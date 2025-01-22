@@ -24,6 +24,7 @@ import profileImage from '../../../assets/images/bruce-mars.jpg';
 import '../../../Global';
 import LogoutDialog from './components/logoutdialog';
 import { useTranslation } from 'react-i18next';
+import loading_image from '../../../assets/images/icons8-loading.gif';
 import {
   navbar,
   navbarContainer,
@@ -48,7 +49,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     const selectedLanguage = event.target.value;
     i18n.changeLanguage(selectedLanguage); 
   };
-  const isHindi = i18n.language === 'hi';
+  const isHindi = i18n.language != 'en';
   useEffect(() => {
     if (fixedNavbar) {
       setNavbarType('sticky');
@@ -136,7 +137,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
     fetchData();
   }, [i18n.language]); 
   if(loading){
-    return <div>{t('loading')}</div>
+    return <div className='d-flex justify-content-center'>
+      <img src={loading_image} alt={t('loading')} height="40px" width="40px"></img>
+    </div>
   } 
 
   const iconsStyle = {

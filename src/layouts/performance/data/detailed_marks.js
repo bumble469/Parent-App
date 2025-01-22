@@ -4,11 +4,13 @@ import DataTable from 'examples/Tables/DataTable';
 import MDTypography from 'components/MDTypography';
 import { Card } from '@mui/material';
 import MDBox from 'components/MDBox';
+import loading_image from '../../../assets/images/icons8-loading.gif';
 
 const MarksTable = ({ semester }) => {
   const { t, i18n } = useTranslation(); 
   const [marksData, setMarksData] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState(t('All Subjects')); 
+  const [selectedSubject, setSelectedSubject] = useState(t('All Subjects'));
+  const [isLoading, setIsLoading] = useState(true); // New loading state
 
   const fetchMarksData = async (semester) => {
     try {
@@ -20,8 +22,10 @@ const MarksTable = ({ semester }) => {
       } else {
         console.error("Fetched data is not an array:", data);
       }
+      setIsLoading(false); // Set loading to false once data is fetched
     } catch (error) {
       console.error("Error fetching marks data:", error);
+      setIsLoading(false); // Set loading to false even if there's an error
     }
   };
 
@@ -62,11 +66,11 @@ const MarksTable = ({ semester }) => {
         subjectData.forEach(({ exam_type, marks_obtained, max_marks }) => {
           totalMarks += marks_obtained;
           maxMarks += max_marks;
-          row[exam_type] = `${marks_obtained}`; 
+          row[exam_type] = `${marks_obtained}`;
         });
 
-        row["total"] = `${totalMarks} / ${maxMarks}`; 
-        row["grade"] = calculateGrade(totalMarks, maxMarks); 
+        row["total"] = `${totalMarks} / ${maxMarks}`;
+        row["grade"] = calculateGrade(totalMarks, maxMarks);
 
         return row;
       })
@@ -90,15 +94,14 @@ const MarksTable = ({ semester }) => {
     })),
     {
       Header: t('Total'),
-      accessor: 'total', 
+      accessor: 'total',
     },
     {
       Header: t('OverallGrade'),
-      accessor: 'grade', 
+      accessor: 'grade',
     },
   ];
 
-  // Calculate grand total and overall percentage
   const totalMarksAllSubjects = marksTableData.reduce((acc, row) => {
     const [marksObtained, marksTotal] = row.total.split(' / ').map(Number);
     return acc + marksObtained;
@@ -133,32 +136,41 @@ const MarksTable = ({ semester }) => {
         </MDTypography>
       </MDBox>
       <MDBox pt={2} px={2}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            style={{ padding: '8px', borderRadius: '4px', fontSize: '0.95rem', border: '1px solid #ddd', marginRight: '20px' }}
-          >
-            {subjects.map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
-          </select>
-        </div>
-        <DataTable
-          table={{ columns: marksColumns, rows: filteredMarksTableData }}
-          isSorted={false}
-          entriesPerPage={false}
-          showTotalEntries={false}
-          noEndBorder
-        />
-        <hr />
-        <div style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', marginTop: '10px' }}>
-          <p>{t('TotalMarks')}: {totalMarksAllSubjects} / {maxMarksAllSubjects}</p>
-          <p>{t('OverallPercentage')}: {overallPercentage.toFixed(2)}%</p>
-          <p>{t('OverallGrade')}: {overallGrade}</p>
-        </div>
+        {/* If loading, display the loading image */}
+        {isLoading ? (
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <img src={loading_image} alt={t('loading')} style={{ width: '50px', height: '50px' }} />
+          </div>
+        ) : (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', gap: '10px' }}>
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                style={{ padding: '8px', borderRadius: '4px', fontSize: '0.95rem', border: '1px solid #ddd', marginRight: '20px' }}
+              >
+                {subjects.map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <DataTable
+              table={{ columns: marksColumns, rows: filteredMarksTableData }}
+              isSorted={false}
+              entriesPerPage={false}
+              showTotalEntries={false}
+              noEndBorder
+            />
+            <hr />
+            <div style={{ fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', marginTop: '10px' }}>
+              <p>{t('TotalMarks')}: {totalMarksAllSubjects} / {maxMarksAllSubjects}</p>
+              <p>{t('OverallPercentage')}: {overallPercentage.toFixed(2)}%</p>
+              <p>{t('OverallGrade')}: {overallGrade}</p>
+            </div>
+          </>
+        )}
       </MDBox>
     </Card>
   );

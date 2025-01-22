@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next'; // Import for localization
+import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
@@ -7,18 +7,19 @@ import Tab from '@mui/material/Tab';
 import Icon from '@mui/material/Icon';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import MDBox from 'components/MDBox'; // Adjust path if needed
-import DashboardLayout from 'examples/LayoutContainers/DashboardLayout'; // Adjust path if needed
-import DashboardNavbar from 'examples/Navbars/DashboardNavbar'; // Adjust path if needed
-import Footer from 'examples/Footer'; // Adjust path if needed
+import MDBox from 'components/MDBox';
+import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
+import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
+import Footer from 'examples/Footer';
 import axios from 'axios';
+import loading_image from '../../assets/images/icons8-loading.gif';
 
 function Faculty() {
-  const { t } = useTranslation(); // Initialize localization hook
-  const [tabValue, setTabValue] = useState(0); // State to manage selected tab
-  const [staffData, setStaffData] = useState([]); // Store fetched staff data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const { t } = useTranslation();
+  const [tabValue, setTabValue] = useState(0);
+  const [staffData, setStaffData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,13 +27,11 @@ function Faculty() {
       setError(null);
 
       try {
-        // URL based on selected tab
         const apiUrl =
           tabValue === 0
-            ? 'http://localhost:8001/api/faculty' // For Overall filter
-            : 'http://localhost:8001/api/chat/chat-list'; // For Current Semester filter
+            ? 'http://localhost:8001/api/faculty'
+            : 'http://localhost:8001/api/chat/chat-list';
 
-        // Fetch data from the selected API
         const response = await axios.get(apiUrl);
         setStaffData(response.data);
         setLoading(false);
@@ -43,10 +42,10 @@ function Faculty() {
     };
 
     fetchData();
-  }, [tabValue]); // Effect runs when tabValue changes
+  }, [tabValue]);
 
   const handleSetTabValue = (event, newValue) => {
-    setTabValue(newValue); // Update the tab value
+    setTabValue(newValue);
   };
 
   const groupedStaff = staffData.reduce((acc, item) => {
@@ -71,10 +70,6 @@ function Faculty() {
 
   const staffArray = Object.values(groupedStaff);
 
-  if (loading) {
-    return <Typography variant="h6">{t('loading')}</Typography>;
-  }
-
   if (error) {
     return <Typography variant="h6" color="error">{t('error')}{error}</Typography>;
   }
@@ -82,81 +77,90 @@ function Faculty() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={3} pb={3}>
-        {/* Tabs */}
-        <Grid container spacing={3} justifyContent="left">
-          <Grid item xs={12} md={6} lg={4}>
-            <AppBar position="static">
-              <Tabs
-                value={tabValue}
-                onChange={handleSetTabValue}
-                aria-label="faculty tabs"
-              >
-                <Tab
-                  label={t('overall')}
-                  icon={<Icon>group</Icon>}
-                />
-                <Tab
-                  label={t('currentSem')}
-                  icon={<Icon>calendar_today</Icon>}
-                />
-              </Tabs>
-            </AppBar>
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+        >
+          <img src={loading_image} alt={t('loading')} height="40px" width="40px" />
+        </Box>
+      ) : (
+        <MDBox pt={3} pb={3}>
+          <Grid container spacing={3} justifyContent="left">
+            <Grid item xs={12} md={6} lg={4}>
+              <AppBar position="static">
+                <Tabs
+                  value={tabValue}
+                  onChange={handleSetTabValue}
+                  aria-label="faculty tabs"
+                >
+                  <Tab
+                    label={t('overall')}
+                    icon={<Icon>group</Icon>}
+                  />
+                  <Tab
+                    label={t('currentSem')}
+                    icon={<Icon>calendar_today</Icon>}
+                  />
+                </Tabs>
+              </AppBar>
+            </Grid>
           </Grid>
-        </Grid>
 
-        {/* Faculty Cards */}
-        <MDBox mt={3}>
-          <Grid container spacing={3}>
-            {staffArray.length > 0 ? (
-              staffArray.map((staff, index) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "100%", // Allow the card to stretch fully
-                      border: "1px solid #ddd",
-                      borderRadius: "8px",
-                      overflow: "hidden",
-                      boxShadow: 3,
-                    }}
-                  >
+          <MDBox mt={3}>
+            <Grid container spacing={3}>
+              {staffArray.length > 0 ? (
+                staffArray.map((staff, index) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                     <Box
-                      component="img"
-                      src={staff.teacher_image || 'path/to/default/image.jpg'}
-                      alt={staff.teacher_fullname}
                       sx={{
-                        height: "180px", // Fixed height for the image
-                        objectFit: "cover",
-                        width: "100%",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        boxShadow: 3,
                       }}
-                    />
-                    <Box sx={{ p: 2, flexGrow: 1 }}>
-                      <Typography gutterBottom variant="h6">
-                        {staff.teacher_fullname}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>{t('type')}</b> {staff.teacher_type}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>{t('subject')}</b> {staff.subjects.join(', ')}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>{t('semesters')}</b> {staff.semesters.join(', ')}
-                      </Typography>
+                    >
+                      <Box
+                        component="img"
+                        src={staff.teacher_image || 'path/to/default/image.jpg'}
+                        alt={staff.teacher_fullname}
+                        sx={{
+                          height: '180px',
+                          objectFit: 'cover',
+                          width: '100%',
+                        }}
+                      />
+                      <Box sx={{ p: 2, flexGrow: 1 }}>
+                        <Typography gutterBottom variant="h6">
+                          {staff.teacher_fullname}
+                        </Typography>
+                        <Typography variant="body2">
+                          <b>{t('type')}</b> {staff.teacher_type}
+                        </Typography>
+                        <Typography variant="body2">
+                          <b>{t('subject')}</b> {staff.subjects.join(', ')}
+                        </Typography>
+                        <Typography variant="body2">
+                          <b>{t('semesters')}</b> {staff.semesters.join(', ')}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                </Grid>
-              ))
-            ) : (
-              <Typography variant="h6" color="text.primary">
-                {t('noFaculty')}
-              </Typography>
-            )}
-          </Grid>
+                  </Grid>
+                ))
+              ) : (
+                <Typography variant="h6" color="text.primary">
+                  {t('noFaculty')}
+                </Typography>
+              )}
+            </Grid>
+          </MDBox>
         </MDBox>
-      </MDBox>
+      )}
       <Footer />
     </DashboardLayout>
   );

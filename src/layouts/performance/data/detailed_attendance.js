@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import DataTable from 'examples/Tables/DataTable';
 import { useTranslation } from 'react-i18next';
+import loading_image from '../../../assets/images/icons8-loading.gif';
 
 const AttendanceTable = ({ semester }) => {
   const { t } = useTranslation(); // Hook for translations
@@ -8,11 +9,14 @@ const AttendanceTable = ({ semester }) => {
   const [attendanceData, setAttendanceData] = useState({});
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all'); 
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(true); // Loading state
+
   const columnsPerPage = 8;
 
   const fetchDetailedAttendance = async (semester) => {
+    setLoading(true); // Start loading
     try {
       const response = await fetch(
         `http://localhost:8001/api/performance/student/detailedattendance?semester=${semester}`
@@ -33,6 +37,8 @@ const AttendanceTable = ({ semester }) => {
       setAttendanceData(groupedData);
     } catch (error) {
       console.error('Error fetching detailed attendance:', error);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -159,147 +165,155 @@ const AttendanceTable = ({ semester }) => {
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '10px',
-          marginBottom: '20px',
-        }}
-      >
-        <button
-          onClick={resetFilters}
-          style={{
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            padding: '5px 10px',
-            borderRadius: '3px',
-            border: '1px solid #f5c6cb',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            marginLeft: '1rem',
-          }}
-        >
-          {t('Clear Filters')}
-        </button>
-
-        <div style={{ display: 'flex', gap: '10px', marginRight: '1rem' }}>
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            style={{
-              padding: '8px',
-              borderRadius: '4px',
-              fontSize: '0.95rem',
-              border: '1px solid #ddd',
-            }}
-          >
-            <option value="all">{t('All Subjects')}</option>
-            {Object.keys(attendanceData).map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            style={{
-              padding: '8px',
-              borderRadius: '4px',
-              fontSize: '0.95rem',
-              border: '1px solid #ddd',
-            }}
-          >
-            <option value="">{t('All Months')}</option>
-            {uniqueMonths.map((month) => (
-              <option key={month} value={month}>
-                {month}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{
-              padding: '8px',
-              borderRadius: '4px',
-              fontSize: '0.95rem',
-              border: '1px solid #ddd',
-            }}
-          >
-            <option value='all'>{t('All Statuses')}</option>
-            <option value={t('Present')}>{t('Present')}</option>
-            <option value={t('Absent')}>{t('Absent')}</option>
-            <option value={t('No Lecture')}>{t('No Lecture')}</option>
-          </select>
+      {loading ? (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <img src={loading_image} alt="Loading..." />
         </div>
-      </div>
+      ) : (
+        <>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '20px',
+            }}
+          >
+            <button
+              onClick={resetFilters}
+              style={{
+                backgroundColor: '#f8d7da',
+                color: '#721c24',
+                padding: '5px 10px',
+                borderRadius: '3px',
+                border: '1px solid #f5c6cb',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                marginLeft: '1rem',
+              }}
+            >
+              {t('Clear Filters')}
+            </button>
 
-      <DataTable
-        table={{
-          columns: paginatedColumns,
-          rows: tableData,
-        }}
-        isSorted={true}
-        entriesPerPage={false}
-        showTotalEntries={false}
-      />
+            <div style={{ display: 'flex', gap: '10px', marginRight: '1rem' }}>
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                style={{
+                  padding: '8px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  border: '1px solid #ddd',
+                }}
+              >
+                <option value="all">{t('All Subjects')}</option>
+                {Object.keys(attendanceData).map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '15px',
-          alignItems: 'center',
-          gap: '15px',
-          marginBottom: '15px',
-        }}
-      >
-        <button
-          onClick={goToPreviousPage}
-          disabled={currentPage === 0}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: currentPage === 0 ? '#d3d3d3' : '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
-            fontSize: '0.95rem',
-            transition: 'background-color 0.3s ease',
-          }}
-        >
-          {t('Previous')}
-        </button>
-        <span
-          style={{
-            fontSize: '1rem',
-            color: '#333',
-          }}
-        >
-          {t('Page')} {currentPage + 1} {t('of')} {totalPages}
-        </span>
-        <button
-          onClick={goToNextPage}
-          disabled={currentPage >= totalPages - 1}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: currentPage >= totalPages - 1 ? '#d3d3d3' : '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
-            fontSize: '0.95rem',
-            transition: 'background-color 0.3s ease',
-          }}
-        >
-          {t('Next')}
-        </button>
-      </div>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                style={{
+                  padding: '8px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  border: '1px solid #ddd',
+                }}
+              >
+                <option value="">{t('All Months')}</option>
+                {uniqueMonths.map((month) => (
+                  <option key={month} value={month}>
+                    {month}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{
+                  padding: '8px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  border: '1px solid #ddd',
+                }}
+              >
+                <option value='all'>{t('All Statuses')}</option>
+                <option value={t('Present')}>{t('Present')}</option>
+                <option value={t('Absent')}>{t('Absent')}</option>
+                <option value={t('No Lecture')}>{t('No Lecture')}</option>
+              </select>
+            </div>
+          </div>
+
+          <DataTable
+            table={{
+              columns: paginatedColumns,
+              rows: tableData,
+            }}
+            isSorted={true}
+            entriesPerPage={false}
+            showTotalEntries={false}
+          />
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '15px',
+              alignItems: 'center',
+              gap: '15px',
+              marginBottom: '15px',
+            }}
+          >
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 0}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: currentPage === 0 ? '#d3d3d3' : '#007bff',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
+                fontSize: '0.95rem',
+                transition: 'background-color 0.3s ease',
+              }}
+            >
+              {t('Previous')}
+            </button>
+            <span
+              style={{
+                fontSize: '1rem',
+                color: '#333',
+              }}
+            >
+              {t('Page')} {currentPage + 1} {t('of')} {totalPages}
+            </span>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage >= totalPages - 1}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: currentPage >= totalPages - 1 ? '#d3d3d3' : '#007bff',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
+                fontSize: '0.95rem',
+                transition: 'background-color 0.3s ease',
+              }}
+            >
+              {t('Next')}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

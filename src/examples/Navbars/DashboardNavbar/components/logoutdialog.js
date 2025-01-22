@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 function LogoutDialog({ open, handleClose, handleConfirm }) {
   const {t,i18n} = useTranslation();
-  const isHindi = i18n.language === 'hi';
+  const isHindi = i18n.language != 'en';
   return (
     <Dialog
       open={open}

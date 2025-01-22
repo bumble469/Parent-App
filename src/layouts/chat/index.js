@@ -18,13 +18,14 @@ import {
   useTheme,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'; // Arrow icon
 import CloseIcon from '@mui/icons-material/Close';
-import AttachFileIcon from '@mui/icons-material/AttachFile'; // Document icon
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import { useTranslation } from 'react-i18next';
+import loading_image from '../../assets/images/icons8-loading.gif';  // Your loading spinner image
+
 function Chat() {
   const [teachers, setTeachers] = useState([]); // State to hold teachers data
   const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -32,10 +33,9 @@ function Chat() {
   const [error, setError] = useState(null); // State for error handling
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { t } = useTranslation();
+
   useEffect(() => {
-    // Fetch teacher data from API
     const fetchTeachers = async () => {
       try {
         const response = await fetch('http://localhost:8001/api/chat/chat-list'); // Replace with your API URL
@@ -80,7 +80,7 @@ function Chat() {
       console.log('Selected file:', file); // Handle file here
     }
   };
-  
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -131,7 +131,9 @@ function Chat() {
             </Typography>
             <List>
               {loading ? (
-                <Typography>Loading...</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
+                  <img src={loading_image} alt="Loading" style={{ width: '50px', height: '50px' }} />
+                </Box>
               ) : error ? (
                 <Typography color="error">{error}</Typography>
               ) : (
@@ -144,7 +146,7 @@ function Chat() {
                       setSelectedTeacher(teacher);
                     }}
                     sx={{
-                      marginBottom: { xs: 2, sm: 0 }, // Add margin below each list item in mobile view
+                      marginBottom: { xs: 2, sm: 0 },
                     }}
                   >
                     <ListItemIcon>
@@ -170,7 +172,7 @@ function Chat() {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontSize: { xs: '0.9rem', sm: '0.8rem' }, // Reduce font size in desktop view
+                            fontSize: { xs: '0.9rem', sm: '0.8rem' },
                           }}
                         >
                           {t('subject')}&nbsp;{teacher.subject_name || t('No subject available')}
@@ -211,7 +213,9 @@ function Chat() {
           </Typography>
           <List>
             {loading ? (
-              <Typography>Loading...</Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
+                <img src={loading_image} alt="Loading" style={{ width: '50px', height: '50px' }} />
+              </Box>
             ) : error ? (
               <Typography color="error">{error}</Typography>
             ) : (
@@ -232,7 +236,7 @@ function Chat() {
                   <ListItemIcon>
                     <Avatar
                       alt={`${teacher.teacher_fullname}`}
-                      src={teacher.teacher_image ? teacher.teacher_image : 'default-image-url.jpg'} // Use the teacher's image
+                      src={teacher.teacher_image ? teacher.teacher_image : 'default-image-url.jpg'}
                       sx={{ width: 50, height: 50 }}
                     />
                   </ListItemIcon>
@@ -241,7 +245,7 @@ function Chat() {
                       <Typography
                         variant="body1"
                         sx={{
-                          fontSize: { xs: '1rem', sm: '0.9rem' }, // Reduce font size in desktop view
+                          fontSize: { xs: '1rem', sm: '0.9rem' },
                           fontWeight: 'bold'
                         }}
                       >
@@ -252,7 +256,7 @@ function Chat() {
                       <Typography
                         variant="body2"
                         sx={{
-                          fontSize: { xs: '0.9rem', sm: '0.9rem', lg:'1rem' }, // Reduce font size in desktop view
+                          fontSize: { xs: '0.9rem', sm: '0.9rem', lg:'1rem' },
                         }}
                       >
                         {t('subject')}:&nbsp;{teacher.subject_name || 'No subject available'}
@@ -272,29 +276,14 @@ function Chat() {
             display: 'flex',
             flexDirection: 'column',
             padding: 2,
-            position: 'relative', // Position relative for absolute positioning of the button
+            position: 'relative',
           }}
         >
-          {/* Mobile Menu Icon */}
-          {isMobile && !drawerOpen && (
-            <IconButton
-              onClick={() => setDrawerOpen(true)}
-              sx={{
-                position: 'absolute',
-                zIndex: 1300,
-                color: 'text.primary', // Dark color for the icon
-                left: -5,
-              }}
-            >
-              <ArrowForwardIosIcon />
-            </IconButton>
-          )}
-
           <Box
             sx={{
               flex: 1,
               overflowY: 'auto',
-              maxHeight: 'calc(100% - 60px)', // Adjust based on input height
+              maxHeight: 'calc(100% - 60px)', 
               paddingBottom: '16px',
             }}
           >
@@ -332,7 +321,7 @@ function Chat() {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
-                    color: 'grey.500', // Grey color
+                    color: 'grey.500',
                     marginTop: "7rem"
                   }}
                 >
@@ -345,40 +334,50 @@ function Chat() {
           <Divider />
 
           {/* Input Field Section */}
-          <Grid container spacing={2} alignItems="center" sx={{ padding: 1 }}>
-            <Grid item xs>
+          <Grid container spacing={2} alignItems="center" sx={{ paddingTop: 2 }}>
+            <Grid item xs={8}>
               <TextField
-                variant="outlined"
-                placeholder="Type a message..."
                 fullWidth
-                inputProps={{
-                  style: {
-                    fontSize: '0.875rem', // Reduce input font size
-                  },
+                variant="outlined"
+                placeholder="Type your message"
+                size="small"
+                sx={{
+                  backgroundColor: '#fff',
+                  borderRadius: '16px',
                 }}
               />
             </Grid>
-            <Grid item>
-              <Fab
-                color="primary"
-                onClick={() => console.log('Send message')}
-                sx={{ marginLeft: 1 }}
-              >
-                <SendIcon />
-              </Fab>
-            </Grid>
-            <Grid item>
-              <IconButton onClick={handleFileClick}>
-                <AttachFileIcon />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  style={{ display: 'none' }} // Hide the default file input
-                />
-              </IconButton>
+            <Grid item xs={4}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <IconButton
+                  color="primary"
+                  onClick={handleFileClick}
+                  sx={{
+                    backgroundColor: '#e0e0e0',
+                    '&:hover': {
+                      backgroundColor: '#bdbdbd',
+                    },
+                  }}
+                >
+                  <AttachFileIcon />
+                </IconButton>
+                <Fab
+                  color="primary"
+                  size="small"
+                  onClick={() => alert('Send message functionality')}
+                >
+                  <SendIcon />
+                </Fab>
+              </Box>
             </Grid>
           </Grid>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
         </Box>
       </Paper>
       <Footer />

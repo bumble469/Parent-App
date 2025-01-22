@@ -6,6 +6,7 @@ import Icon from '@mui/material/Icon'; // Import Icon component
 import axios from 'axios'; // Import axios for API calls
 import DataTable from 'examples/Tables/DataTable';
 import { useTranslation } from 'react-i18next';
+import loading_image from '../../../assets/images/icons8-loading.gif';
 export default function Data() {
   const [events, setEvents] = useState([]); // State to store events
   const [loading, setLoading] = useState(true); // State for loading status
@@ -46,12 +47,13 @@ export default function Data() {
     is_holiday: event.is_holiday ? 'Yes' : 'No', // Display if it's a holiday
   }));
 
-  // Show loading or error messages if applicable
   if (loading) {
     return (
-      <MDTypography>Loading...</MDTypography>
+      <div className="d-flex justify-content-center align-items-center vh-100 vw-100">
+        <img src={loading_image} alt={t('loading')} height="40px" width="40px" />
+      </div>
     );
-  }
+  }  
 
   if (error) {
     return (

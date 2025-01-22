@@ -5,7 +5,7 @@ import MDTypography from 'components/MDTypography';
 import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-
+import loading_image from '../../../assets/images/icons8-loading.gif';
 const SubjectDashboard = () => {
   const { t, i18n } = useTranslation(); // Hook to access translation functions
   const [strongSubjects, setStrongSubjects] = useState([]);
@@ -14,7 +14,7 @@ const SubjectDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const isHindi = i18n.language === 'hi';
+  const isHindi = i18n.language != 'en';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +60,13 @@ const SubjectDashboard = () => {
     fetchData();
   }, []);
 
-  if (loading) return <div>{t('loading')}</div>;
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100 vw-100">
+        <img src={loading_image} alt={t('loading')} height="40px" width="40px" />
+      </div>
+    );
+  }  
   if (error) return <div>{t('error', { message: error.message })}</div>;
 
   return (
@@ -70,7 +76,7 @@ const SubjectDashboard = () => {
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="success"
-            title={<span style={{ fontSize: isHindi ? '1.1rem' : 'inherit' }}>{t('strongSubjects')} ({strongSubjects.length})</span>}
+            title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t('strongSubjects')} ({strongSubjects.length})</span>}
             icon="check_circle"
             sx={{ borderRadius: '12px', boxShadow: 3 }}
             percentage={{ label: t('greatWork') }}
@@ -133,7 +139,7 @@ const SubjectDashboard = () => {
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="error"
-            title={<span style={{fontSize:isHindi?'1.1rem':'inherit'}}>{t('weakSubjects')} ({weakSubjects.length})</span>}
+            title={<span style={{fontSize:isHindi?'1.1rem':'1rem'}}>{t('weakSubjects')} ({weakSubjects.length})</span>}
             icon="warning"
             sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
             percentage={{ label: t('needsImprovement') }}
@@ -196,7 +202,7 @@ const SubjectDashboard = () => {
         <Grid item xs={12} md={4} lg={4}>
           <ComplexStatisticsCard
             color="warning"
-            title={<span style={{fontSize:isHindi?'1rem':'inherit'}}>{t('lowAttendanceSubjects')} ({lowAttendanceAlerts.length})</span>}
+            title={<span style={{fontSize:isHindi?'1rem':'0.9rem'}}>{t('lowAttendanceSubjects')} ({lowAttendanceAlerts.length})</span>}
             icon="access_time"
             sx={{ borderRadius: '12px', boxShadow: 3, p: 2 }}
             percentage={{ label: t('below75') }}
