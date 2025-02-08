@@ -21,6 +21,9 @@ function FeedbackPage() {
     const templateParams = {
       to_name: name,
       to_email: email,
+      feedback_type: feedbackType,
+      feedback_rating: rating,
+      feedback_body: feedback,
     };
     emailjs.send('service_85cp6qt', 'template_zu5zdkd', templateParams, '24y_NZ0sWWKtDZw3J')
       .then((result) => {
@@ -58,23 +61,44 @@ function FeedbackPage() {
     }
   
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if there are no errors
+    return Object.keys(newErrors).length === 0; 
   };
   
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      sendEmail(e);
-      setName('');
-      setEmail('');
-      setFeedbackType('General Feedback');
-      setFeedback('');
-      setRating('');
-      setErrors({}); // Clear the errors
+        const feedbackData = {
+            feedbackType,
+            feedbackRating: rating,
+            feedbackBody: feedback,
+            dateTime: new Date().toISOString() 
+        };
+
+        try {
+            const response = await fetch('http://localhost:8001/api/feedback/feedback-insert', { // Assuming '/api/feedback' is the endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(feedbackData),
+            });
+
+            if (response.ok) {
+                sendEmail(e);
+                alert(t('Feedback sent successfully!'));
+                handleClear();
+            } else {
+                alert(t('Failed to send feedback. Please try again later.'));
+            }
+        } catch (error) {
+            console.error('Error sending feedback:', error);
+            alert(t('some error occurred! please try again later:('));
+        }
     }
-  };
+};
+  
 
   const handleClear = () => {
     setName('');

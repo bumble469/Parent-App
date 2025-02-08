@@ -1,11 +1,11 @@
-require('../../src/Global')
 const express = require('express');
 const router = express.Router();
-const { getStudentDetailsForPerformance } = require('./operations'); // Import the function from operations.js
-
+const cookieParser = require('cookie-parser');
+const { getStudentDetailsForPerformance } = require('./operations');
+router.use(cookieParser());
 router.get('/student', async (req, res) => {
     try {
-        const studentId = global.student_id; 
+        const studentId = req.cookies.student_id ? parseInt(req.cookies.student_id, 10) : 1001;
         if (!studentId) {
             return res.status(400).json({ message: 'Student ID is missing in the session.' });
         }

@@ -11,6 +11,20 @@ import strongSubjects_image from '../../assets/images/snapshots/dashboard/strong
 import weakSubjects_image from '../../assets/images/snapshots/dashboard/weakSubjects.png';
 import lowAttendanceSubjects_image from '../../assets/images/snapshots/dashboard/lowAttendanceSubjects.png';
 import upcomingEvents_image from '../../assets/images/snapshots/dashboard/upcomingEvents.png';
+import overall_attendance_performance from '../../assets/images/snapshots/performance/Overall-attendance.png';
+import average_grade_performance from '../../assets/images/snapshots/performance/Average-grade.png';
+import extra_curricular_activities_performance from '../../assets/images/snapshots/performance/Extra-curricular-activities.png';
+import subject_wise_detailed_lecture_review_performance from '../../assets/images/snapshots/performance/Subject-wise-detailed-lecture-review.png';
+import subject_wise_detailed_attendance_performance from '../../assets/images/snapshots/performance/Subject-wise-detailed-attendance.png';
+import subject_wise_graph_visualization_of_attendance_performance from '../../assets/images/snapshots/performance/Subject-wise-graph-visualization-of-attendance.png';
+import marks_category_wise_performance from '../../assets/images/snapshots/performance/Marks_category-wise.png';
+import Graph_visualization_of_marks_by_category_wise from '../../assets/images/snapshots/performance/Graph-visualization-of-marks-by-category-wise.png';
+import select_semester_performance from '../../assets/images/snapshots/performance/Select-semester.png';
+import overiew_performance from '../../assets/images/snapshots/performance/Overview.png';
+import faculty_page_image   from '../../assets/images/snapshots/Faculty/Faculty.png';
+import chat_page_image from '../../assets/images/snapshots/Chat/chat.png';
+import feedback_page_image from '../../assets/images/snapshots/Feedback/feedback.png';
+import student_profile_page_image from '../../assets/images/snapshots/Student-profile/student-profile.png';
 
 const GuideModal = ({ isOpen, onClose = () => {} }) => {
   const [selectedContentIndex, setSelectedContentIndex] = useState(0);
@@ -110,7 +124,85 @@ const GuideModal = ({ isOpen, onClose = () => {} }) => {
               "The Performance page gives in detail information about all the past as well as current semester",
               "It includes overall attendance, marks, lecture video review, detailed attendance, detailed marks."
             ],
+            image: overiew_performance
           },
+          {
+            subheading: "Semester Selection",
+            text: [
+              "This allows parents to select semester",
+              "Data corresponding to that semester will be visible."
+            ],
+            image:select_semester_performance
+          },
+          {
+            subheading:'Overall Attendance',
+            text: [
+              "It will display the overall attendance for all subjects in the selected semester",
+            
+              
+            ],
+            image: overall_attendance_performance
+
+          
+          },
+
+          {
+            subheading:'Average Grade',
+            text: [
+              "It will display the overall percentage of marks obtained in all subjects across all exams in the selected semester."
+
+            ],
+            image:average_grade_performance
+          },
+          {
+            subheading:'Extra Curricular Activities',
+            text:[
+              "It will highlights the student's participation in various extracurricular activities, showcasing their interests and skills outside the classroom.",
+              "It provides an overview of the student's involvement in clubs, sports, and community events, reflecting their commitment to personal growth and teamwork."
+
+            ],
+            image: extra_curricular_activities_performance
+          },
+          {
+            subheading:'Subject-Wise Detailed Lecture Review',
+            text:[
+              "It will display a detailed review of lectures for each subject as well as all subject, covering each week, months and the entire duration of the course.",
+              "This section offers a comprehensive overview of lecture content and student performance across time."
+            ],
+            image:subject_wise_detailed_lecture_review_performance
+          },
+          {
+            subheading:'Subject-Wise Detailed Attendance',
+            text:[
+              "It will display subject-wise attendance, including the number of days present, absent, and days with no lecture, for each subject on a weekly, monthly, and overall basis.",
+              
+            ],
+            image: subject_wise_detailed_attendance_performance
+          },
+          {
+            subheading:'Graph Visualization of Subject-wise Detailed Attendance',
+            text:[
+              "A graph representing attendance trends and comparing the total number of lectures attended to the total number of lectures held for each subject."
+
+            ],
+            image: subject_wise_graph_visualization_of_attendance_performance
+          },
+          {
+            subheading:'Marks Category-Wise',
+            text:[
+              "It will display the marks for each subject, as well as for all subjects, across categories including Interim, SLE, Practicals, Theory, and Total, along with the overall grade.",
+             
+            ],
+            image: marks_category_wise_performance
+          },
+          {
+            subheading:'Graphic Visualization of Marks by Category-wise',
+            text:[
+              "It will display a graph to visualize the student's performance, highlighting the total marks of the subjects with the highest and lowest scores."
+            ],
+            image: Graph_visualization_of_marks_by_category_wise
+          },
+
         ],
     },
     {
@@ -124,6 +216,45 @@ const GuideModal = ({ isOpen, onClose = () => {} }) => {
               "Parent must take action if the predictions are not good."
             ],
           },
+          {
+            subheading:'Strong Subject',
+            text:[
+              "It will display the all strong subject of student."
+            ]
+          },
+          {
+            subheading:'Weak Subject',
+            text: [
+              "It will display the all weakest subject Student."
+            ]
+          },
+          {
+            subheading:'Improvement Recommendations',
+            text: [
+              "This section provides students with personalized recommendations on the subjects or areas that need improvement.", 
+              "It also suggests specific actions they can take to enhance their performance in those subjects."
+            ]
+          },
+          {
+            subheading:'Recommended Career Pathways',
+            text: [
+              "This section provides students with personalized career suggestions based on their academic performance, strengths, and interests.", 
+              "It helps them explore suitable career options and the steps required to achieve their goals."
+            ]
+          },
+          {
+            subheading:'Predicted Attendance Graph',
+            text: [
+              "This graph provides an estimate of the student's future attendance trends based on past attendance records.", 
+              "It helps in identifying patterns and predicting potential attendance issues."
+            ]
+          },
+          {
+            subheading:'Predicted Performance Graph',
+            text: [
+              "This graph forecasts the student's future academic performance based on past results and trends, helping to identify areas where improvement may be needed."
+            ]
+          },
         ],
     },
     {
@@ -136,6 +267,7 @@ const GuideModal = ({ isOpen, onClose = () => {} }) => {
               "The teachers that have taught the student in the past and the teachers that are currently teaching the student.",
               "Details about the faculty are also shown such has which semesters they have taught, and which subjects."
             ],
+            image: faculty_page_image
           },
         ],
     },
@@ -147,6 +279,7 @@ const GuideModal = ({ isOpen, onClose = () => {} }) => {
             text: [
               "This page allows parents to ocassionally connect with the current semester's faculty.",
             ],
+            image: chat_page_image
           },
         ],
     },
@@ -160,6 +293,7 @@ const GuideModal = ({ isOpen, onClose = () => {} }) => {
               "This feedback is taken into consideration by the college to improve the quality of education.",
               "Improvements to the website can also be suggested here."
             ],
+            image: feedback_page_image
           },
         ],
     },
@@ -172,6 +306,7 @@ const GuideModal = ({ isOpen, onClose = () => {} }) => {
               "This page shows the student's profile details.",
               "The student's name, roll number, email, phone number, and other details are shown here.",
             ],
+            image: student_profile_page_image
           },
         ],
     },

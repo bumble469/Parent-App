@@ -174,7 +174,7 @@ const LectureViewTable = ({ semester }) => {
     <div style={{ overflowX: 'auto' }}>
       {isLoading ? (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <img src={loading_image} alt="Loading..." />
+          <img src={loading_image} alt="Loading..." style={{ width: '50px', height: '50px' }}/>
         </div>
       ) : (
         <>

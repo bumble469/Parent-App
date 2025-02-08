@@ -1,12 +1,14 @@
-require('../../../src/Global');
 const express = require('express');
 const router = express.Router();
 const { getStudentDetailedMarksForPerformance } = require('./operations'); // Import the function from operations.js
+const cookieParser = require('cookie-parser');
+
+router.use(cookieParser());
 
 // Updated route to include semester in the query
 router.get('/student/detailedmarks', async (req, res) => {
     try {
-        const studentId = global.student_id; // Assuming you have a way to retrieve the student ID (e.g., from session, JWT, etc.)
+        const studentId = req.cookies.student_id ? parseInt(req.cookies.student_id, 10) : 1001;
         const { semester } = req.query; // Get the semester from the query string
 
         if (!studentId) {

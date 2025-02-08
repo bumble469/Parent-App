@@ -1,10 +1,13 @@
-require('../../../src/Global')
 const express = require('express');
 const router = express.Router();
-const { getStudentAttendanceForCurrentSemester } = require('./operation'); // Import the function from operations.js
+const { getStudentAttendanceForCurrentSemester } = require('./operation');
+const cookieParser = require('cookie-parser');
+
+router.use(cookieParser());
+
 router.get('/student/attendance', async (req, res) => {
     try {
-        const studentId = global.student_id; // Assuming the stud_id is stored in the session after login
+        const studentId = req.cookies.student_id ? parseInt(req.cookies.student_id, 10) : 1001;
         if (!studentId) {
             return res.status(400).json({ message: 'Student ID is missing in the session.' });
         }

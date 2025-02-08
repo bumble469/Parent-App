@@ -21,10 +21,11 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import Breadcrumbs from 'examples/Breadcrumbs';
 import profileImage from '../../../assets/images/bruce-mars.jpg';
-import '../../../Global';
 import LogoutDialog from './components/logoutdialog';
 import { useTranslation } from 'react-i18next';
 import loading_image from '../../../assets/images/icons8-loading.gif';
+import Cookies from 'js-cookie';
+import GuidModal from '../../../components/Guide/index';
 import {
   navbar,
   navbarContainer,
@@ -45,11 +46,17 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const route = useLocation().pathname.split('/').slice(1);
   const navigate = useNavigate();
   const { i18n ,t } = useTranslation();
+  const [isModalOpen, setModalOpen] = useState(false);
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
     i18n.changeLanguage(selectedLanguage); 
   };
   const isHindi = i18n.language != 'en';
+
+  const toggleModal = () => {
+    setModalOpen(!isModalOpen);
+  };
+  
   useEffect(() => {
     if (fixedNavbar) {
       setNavbarType('sticky');
@@ -83,13 +90,17 @@ function DashboardNavbar({ absolute, light, isMini }) {
   };
 
   const handleConfirmLogout = () => {
+    sessionStorage.clear();
+    Cookies.remove('student_id');
     alert('Logged out');
     setLogoutDialogOpen(false);
-  };
+    navigate('/login');
+  }
 
   const handleCancelLogout = () => {
     setLogoutDialogOpen(false);
   };
+
 
   const handleOpenNavbar = () => setMiniSidenav(dispatch, !miniSidenav);
 
@@ -203,7 +214,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 {t('currentSem')}: {student.formattedProfile.current_Sem}
               </MDTypography>
             </MDBox>
-              {/* Notification Icon */}
+            <IconButton>
+              <GuidModal isOpen={isModalOpen} onClose={toggleModal} />
+              <Icon onClick={toggleModal} sx={{ fontSize: '1.5rem', color: '#000000', mt: 0.5}}>
+                help_outline
+              </Icon>
+            </IconButton>
               <IconButton
                 size="large"
                 disableRipple

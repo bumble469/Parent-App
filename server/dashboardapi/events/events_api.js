@@ -1,11 +1,10 @@
-require('../../../src/Global')
 const operations = require('./events_operations');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const router = express.Router(); // Use router instead of app
-
-// Middleware setup for the router
+const router = express.Router();
+const cookieParser = require('cookie-parser');
+router.use(cookieParser());
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 router.use(cors());
@@ -19,7 +18,8 @@ router.use((req, res, next) => {
 // Define the endpoint to get faculty details
 router.route('/events').get(async (req, res) => {
     try {
-        const result = await operations.getEvents(global.student_id);
+        const studentId = req.cookies.student_id ? parseInt(req.cookies.student_id, 10) : 1001;
+        const result = await operations.getEvents(studentId);
         console.log('Fetched data:', result);
         res.json(result);
     } catch (error) {

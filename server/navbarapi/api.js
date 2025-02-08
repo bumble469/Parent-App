@@ -1,11 +1,14 @@
-require('../../src/Global');
 const express = require('express');
 const router = express.Router();
 const { getStudentCurrentSemester } = require('./operations');
+const cookieParser = require('cookie-parser');
+
+router.use(cookieParser());
 
 router.get('/currentsemester', async (req, res) => {
     try {
-        const studentId = global.student_id;
+        const studentId = req.cookies.student_id ? parseInt(req.cookies.student_id, 10) : 1001;
+        console.log('Student ID: ', studentId);
         if (!studentId) {
             return res.status(400).json({ message: 'Student ID is missing in the session.' });
         }

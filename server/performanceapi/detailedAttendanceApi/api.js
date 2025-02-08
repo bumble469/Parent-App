@@ -1,11 +1,11 @@
-require('../../../src/Global')
 const express = require('express');
 const router = express.Router();
-const { getStudentDetailedAttendanceForPerformance } = require('./operations'); // Import the function from operations.js
-
+const cookieParser = require('cookie-parser');
+const { getStudentDetailedAttendanceForPerformance } = require('./operations');
+router.use(cookieParser());
 router.get('/student/detailedattendance', async (req, res) => {
     try {
-        const studentId = global.student_id;
+        const studentId = req.cookies.student_id ? parseInt(req.cookies.student_id, 10) : 1001;
         const { semester } = req.query;
 
         if (!studentId) {

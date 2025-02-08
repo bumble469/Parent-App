@@ -24,13 +24,13 @@ import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import { useTranslation } from 'react-i18next';
-import loading_image from '../../assets/images/icons8-loading.gif';  // Your loading spinner image
+import loading_image from '../../assets/images/icons8-loading.gif';
 
 function Chat() {
-  const [teachers, setTeachers] = useState([]); // State to hold teachers data
+  const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [loading, setLoading] = useState(true); // State for loading
-  const [error, setError] = useState(null); // State for error handling
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const { t } = useTranslation();
@@ -38,21 +38,21 @@ function Chat() {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await fetch('http://localhost:8001/api/chat/chat-list'); // Replace with your API URL
+        const response = await fetch('http://localhost:8001/api/chat/chat-list');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        setTeachers(data); // Set teachers data from the API
+        setTeachers(data);
       } catch (error) {
-        setError(error.message); // Set error if any
+        setError(error.message);
       } finally {
-        setLoading(false); // Set loading to false after fetching
+        setLoading(false);
       }
     };
 
     fetchTeachers();
-  }, []); // Empty dependency array to run only once when the component mounts
+  }, []);
 
   const chatMessages = [
     {
@@ -127,7 +127,7 @@ function Chat() {
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" sx={{ marginBottom: 2 }}>
-              Teachers
+              {t('teacher')}
             </Typography>
             <List>
               {loading ? (
@@ -208,8 +208,8 @@ function Chat() {
             },
           }}
         >
-          <Typography variant="h6" sx={{ marginBottom: 2 }}>
-            Teachers
+          <Typography variant="h5" sx={{ marginBottom: 2 }}>
+            {t('teacher')}
           </Typography>
           <List>
             {loading ? (

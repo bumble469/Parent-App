@@ -18,21 +18,35 @@ import Reporting from './layouts/reporting';
 import { useMaterialUIController, setMiniSidenav } from 'context';
 import { Typography, Icon } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+
+import { SessionProvider } from './context/SessionContext'; 
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, direction, layout, sidenavColor, darkMode } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  const { t,i18n } = useTranslation();
-  const isHindi = i18n.language != 'en';
-  useMemo(() => {
-    const cacheRtl = createCache({
-      key: 'rtl',
-      stylisPlugins: [rtlPlugin],
-    });
+  const { t, i18n } = useTranslation();
 
-    setRtlCache(cacheRtl);
+  const isHindi = useMemo(() => i18n.language !== 'en', [i18n.language]);
+
+  useEffect(() => {
+    document.body.setAttribute('dir', direction);
+  }, [direction]);
+
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+  }, [pathname]);
+
+  useMemo(() => {
+    setRtlCache(
+      createCache({
+        key: 'rtl',
+        stylisPlugins: [rtlPlugin],
+      })
+    );
   }, []);
 
   const handleOnMouseEnter = () => {
@@ -49,49 +63,21 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    document.body.setAttribute('dir', direction);
-  }, [direction]);
-
-  useEffect(() => {
-    document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-  }, [pathname]);
-
   const routes = [
-    {
-      type: 'title',
-      title: `${t('Home')}`,
-      key: 'home',
-    },
+    { type: 'title', title: t('Home'), key: 'home' },
     {
       type: 'collapse',
-      name: (
-        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
-          {t('Dashboard')}
-        </Typography>
-      ),
+      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Dashboard')}</Typography>,
       key: 'dashboard',
       icon: <Icon fontSize="small">dashboard</Icon>,
       route: '/dashboard',
       component: <Dashboard />,
     },
-    {
-      type: 'divider',
-      key: 'home-divider',
-    },
-    {
-      type: 'title',
-      title: `${t('Analytics')}`,
-      key: 'analytics',
-    },
+    { type: 'divider', key: 'home-divider' },
+    { type: 'title', title: t('Analytics'), key: 'analytics' },
     {
       type: 'collapse',
-      name: (
-        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
-          {t('Performance')}
-        </Typography>
-      ),
+      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Performance')}</Typography>,
       key: 'performance',
       icon: <Icon fontSize="small">bar_chart</Icon>,
       route: '/performance',
@@ -99,32 +85,17 @@ export default function App() {
     },
     {
       type: 'collapse',
-      name: (
-        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
-          {t('Predictions')}
-        </Typography>
-      ),
+      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Predictions')}</Typography>,
       key: 'predictions',
       icon: <Icon fontSize="small">show_chart</Icon>,
       route: '/predictions',
       component: <Predictions />,
     },
-    {
-      type: 'divider',
-      key: 'analytics-divider',
-    },
-    {
-      type: 'title',
-      title: `${t('Staff and Communication')}`,
-      key: 'communication',
-    },
+    { type: 'divider', key: 'analytics-divider' },
+    { type: 'title', title: t('Staff and Communication'), key: 'communication' },
     {
       type: 'collapse',
-      name: (
-        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
-          {t('Faculty')}
-        </Typography>
-      ),
+      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Faculty')}</Typography>,
       key: 'faculty',
       icon: <Icon fontSize="small">people</Icon>,
       route: '/faculty',
@@ -132,32 +103,17 @@ export default function App() {
     },
     {
       type: 'collapse',
-      name: (
-        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
-          {t('Chat')}
-        </Typography>
-      ),
+      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Chat')}</Typography>,
       key: 'chat',
       icon: <Icon fontSize="small">chat</Icon>,
       route: '/chat',
       component: <Chat />,
     },
-    {
-      type: 'divider',
-      key: 'communication-divider',
-    },
-    {
-      type: 'title',
-      title: `${t('Reports')}`,
-      key: 'summary-reports',
-    },
+    { type: 'divider', key: 'communication-divider' },
+    { type: 'title', title: t('Reports'), key: 'summary-reports' },
     {
       type: 'collapse',
-      name: (
-        <Typography sx={{ fontSize: isHindi?'1rem':'0.9rem' }}>
-          {t('Feedback')}
-        </Typography>
-      ),
+      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Feedback')}</Typography>,
       key: 'feedback',
       icon: <Icon fontSize="small">feedback</Icon>,
       route: '/feedback',
@@ -166,57 +122,51 @@ export default function App() {
   ];
 
   const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
-      if (route.collapse) {
-        return getRoutes(route.collapse); 
-      }
+    allRoutes
+      .filter((route) => route.route)
+      .map((route) => <Route key={route.key} exact path={route.route} element={route.component} />);
 
-      if (route.route) {
-        return (
-          <Route exact path={route.route} element={route.component} key={route.key} />
-        );
-      }
-
-      return null;
-    });
-
-  return direction === 'rtl' ? (
-    <CacheProvider value={rtlCache}>
-      <ThemeProvider theme={darkMode}>
-        <CssBaseline />
-        {layout === 'dashboard' && (
-          <Sidenav
-            color={sidenavColor}
-            brand={logo}
-            routes={routes} 
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
-          />
-        )}
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </ThemeProvider>
-    </CacheProvider>
-  ) : (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      {layout === 'dashboard' && (
-        <Sidenav
-          color={sidenavColor}
-          brand={logo}
-          brandName="SCAS"
-          routes={routes} 
-          onMouseEnter={handleOnMouseEnter}
-          onMouseLeave={handleOnMouseLeave}
-        />
+  return (
+    <SessionProvider> {/* Wrap the app with SessionProvider */}
+      {direction === 'rtl' ? (
+        <CacheProvider value={rtlCache}>
+          <ThemeProvider theme={darkMode}>
+            <CssBaseline />
+            {layout === 'dashboard' && (
+              <Sidenav
+                color={sidenavColor}
+                brand={logo}
+                routes={routes}
+                onMouseEnter={handleOnMouseEnter}
+                onMouseLeave={handleOnMouseLeave}
+              />
+            )}
+            <Routes>
+              {getRoutes(routes)}
+              <Route path="*" element={<Navigate to="/dashboard" />} />
+            </Routes>
+          </ThemeProvider>
+        </CacheProvider>
+      ) : (
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {layout === 'dashboard' && (
+            <Sidenav
+              color={sidenavColor}
+              brand={logo}
+              brandName="SCAS"
+              routes={routes}
+              onMouseEnter={handleOnMouseEnter}
+              onMouseLeave={handleOnMouseLeave}
+            />
+          )}
+          <Routes>
+            {getRoutes(routes)}
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+            <Route path="/profile" element={<Profile />} />
+          </Routes>
+        </ThemeProvider>
       )}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
-    </ThemeProvider>
+    </SessionProvider>
   );
 }

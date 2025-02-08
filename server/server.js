@@ -15,7 +15,7 @@ const getStudentDetailedAttendanceForPerformance = require('./performanceapi/det
 const getStudentDetailedMarksForPerformance = require('./performanceapi/detailedMarksApi/api');
 const getStudentDashboardAttendance = require('./dashboardapi/attendanceapi/api');
 const getLectureDetails = require('./performanceapi/lectureApi/api');
-
+const submitFeedback = require('./feedbackapi/api');
 const app = express();
 const port = process.env.PORT || 8001;
 
@@ -42,6 +42,7 @@ const loadRoutes = async () => {
         await loadRoute('/api/performance', getStudentDetailedAttendanceForPerformance);
         await loadRoute('/api/performance', getStudentDetailedMarksForPerformance);
         await loadRoute('/api', facultyRoutes);
+        await loadRoute('/api/feedback', submitFeedback);
         app.use('/api/chat', chatRoutes);
 
         console.log("Routes loaded successfully.");

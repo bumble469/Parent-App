@@ -25,11 +25,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace('/', '');
-  const [isModalOpen, setModalOpen] = useState(false);
 
-  const toggleModal = () => {
-    setModalOpen(!isModalOpen);
-  };
   const [student, setStudent] = useState(null);
   const { t, i18n } = useTranslation(); 
   const [isSpinning, setIsSpinning] = useState(true);
@@ -248,12 +244,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       >
         {t('AParentOrientedInitiative')}
       </MDBox>
-      <IconButton>
-        <GuidModal isOpen={isModalOpen} onClose={toggleModal} />
-        <Icon onClick={toggleModal} sx={{ fontSize: '1.5rem', color: '#000000' }}>
-          help_outline
-        </Icon>
-      </IconButton>
     </SidenavRoot>
   );
 }
