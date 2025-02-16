@@ -15,7 +15,6 @@ import StarHalfIcon from '@mui/icons-material/StarHalf';
 import SubjectDashboard from './data/strongweaksubjects';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import loading_image from '../../assets/images/icons8-loading.gif';
 function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,7 +52,6 @@ function Dashboard() {
     );
   }
 
-  // Default values in case of missing data
   const marksData = studentData?.map((item) => item.marks_obtained) || [];
   const totalMarksData = studentData?.map((item) => item.max_marks) || [];
   const attendanceData = studentData?.map((item) => item.total_lectures_attended) || [];
@@ -85,34 +83,34 @@ function Dashboard() {
     color: ''
   };
 
-  if (overallMarksFromAPI < 50) {
+  if (!overallMarksFromAPI || isNaN(overallMarksFromAPI)) {
+    labelMessageForOverallMarks.message = t("No marks records detected..");
+    labelMessageForOverallMarks.color = "info";
+  } else if (overallMarksFromAPI < 50) {
     labelMessageForOverallMarks.message = t("Needs Improvement!");
     labelMessageForOverallMarks.color = "error";
   } else if (overallMarksFromAPI < 75) {
     labelMessageForOverallMarks.message = t("Can do better..");
     labelMessageForOverallMarks.color = "warning";
-  } else if (overallMarksFromAPI >= 75 && overallMarksFromAPI <= 100){
+  } else {
     labelMessageForOverallMarks.message = t("Good, Keep It Up!");
     labelMessageForOverallMarks.color = "success";
-  } else{
-    labelMessageForOverallMarks.message = t("No marks records detected..");
-    labelMessageForOverallMarks.color = "info";
   }
-
-  if (overallAttendancePercentage < 50) {
+  
+  if (!overallAttendancePercentage || isNaN(overallAttendancePercentage)) {
+    labelMessageForOverallAttendance.message = t("No attendance records detected..");
+    labelMessageForOverallAttendance.color = "info";
+  } else if (overallAttendancePercentage < 50) {
     labelMessageForOverallAttendance.message = t("Needs Improvement!");
     labelMessageForOverallAttendance.color = "error";
   } else if (overallAttendancePercentage < 75) {
     labelMessageForOverallAttendance.message = t("Can do better..");
     labelMessageForOverallAttendance.color = "warning";
-  } else if (overallAttendancePercentage >= 75 && overallAttendancePercentage <= 100){
+  } else {
     labelMessageForOverallAttendance.message = t("Good, Keep It Up!");
     labelMessageForOverallAttendance.color = "success";
   }
-  else {
-    labelMessageForOverallAttendance.message = t("No attendance records detected..");
-    labelMessageForOverallAttendance.color = "info";
-  }
+  
 
   return(
     <DashboardLayout>
@@ -167,35 +165,39 @@ function Dashboard() {
           </Grid>
   
           {/* Rating */}
-          <Grid item xs={12} md={12} lg={4}>
-            <MDBox>
-              <ComplexStatisticsCard
-                color="warning"
-                icon="star"
-                title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Rating")}</span>}
-                count={<span>{starRating ? `${starRating}/5` : "N/A"}</span>}
-                percentage={{
-                  color: 'success',
-                  label: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{ratingMessage || "No data available"}</span>
-                }}
-              >
-                <MDBox
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-evenly"
-                  sx={{ pb: 1.45 }}
-                >
-                  {[...Array(fullStars || 0)].map((_, index) => (
-                    <StarIcon key={`full-${index}`} color="warning" />
-                  ))}
-                  {halfStar === 1 && <StarHalfIcon key="half" color="warning" />}
-                  {[...Array(emptyStars || 5)].map((_, index) => (
-                    <StarBorderIcon key={`empty-${index}`} color="action" />
-                  ))}
-                </MDBox>
-              </ComplexStatisticsCard>
-            </MDBox>
-          </Grid>
+          {/* Rating */}
+<Grid item xs={12} md={12} lg={4}>
+  <MDBox>
+    <ComplexStatisticsCard
+      color="warning"
+      icon="star"
+      title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Rating")}</span>}
+      count={<span>{(overallMarksFromAPI && averageAttendanceFromAPI) ? `${starRating}/5` : "NaN"}</span>}
+      percentage={{
+        color: (overallMarksFromAPI && averageAttendanceFromAPI) ? 'success' : 'info',
+        label: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>
+          {(overallMarksFromAPI && averageAttendanceFromAPI) ? ratingMessage || "No data available" : "NaN"}
+        </span>
+      }}
+    >
+      <MDBox
+        display="flex"
+        alignItems="center"
+        justifyContent="space-evenly"
+        sx={{ pb: 1.45 }}
+      >
+        {[...Array(fullStars || 0)].map((_, index) => (
+          <StarIcon key={`full-${index}`} color="warning" />
+        ))}
+        {halfStar === 1 && <StarHalfIcon key="half" color="warning" />}
+        {[...Array(emptyStars || 5)].map((_, index) => (
+          <StarBorderIcon key={`empty-${index}`} color="action" />
+        ))}
+      </MDBox>
+    </ComplexStatisticsCard>
+  </MDBox>
+</Grid>
+
         </Grid>
   
         <MDBox mt={5}>

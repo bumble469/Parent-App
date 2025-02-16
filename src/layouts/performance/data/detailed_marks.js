@@ -44,16 +44,16 @@ const MarksTable = ({ semester }) => {
     : {};
 
   const calculateGrade = (totalMarks, maxMarks) => {
+    if (isNaN(totalMarks) || isNaN(maxMarks) || maxMarks === 0) return 'NaN';
     const percentage = (totalMarks / maxMarks) * 100;
     if (percentage >= 80) return 'O';
-    if (percentage < 80 && percentage >= 75) return 'A+';
-    if (percentage < 75 && percentage >= 60) return 'A';
-    if (percentage < 60 && percentage >= 55) return 'B+';
-    if (percentage < 55 && percentage >= 50) return 'B';
-    if (percentage < 50 && percentage >= 45) return 'C';
-    if (percentage < 45 && percentage >= 35) return 'D';
-    if (percentage < 35) return "F: ATKT";
-    return 'F';
+    if (percentage >= 75) return 'A+';
+    if (percentage >= 60) return 'A';
+    if (percentage >= 55) return 'B+';
+    if (percentage >= 50) return 'B';
+    if (percentage >= 45) return 'C';
+    if (percentage >= 35) return 'D';
+    return "F: ATKT";
   };
 
   const marksTableData = Array.isArray(marksData)

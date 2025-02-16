@@ -166,8 +166,8 @@ const AttendanceTable = ({ semester }) => {
   return (
     <div style={{ overflowX: 'auto' }}>
       {loading ? (
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <img src={loading_image} alt="Loading..." />
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <img src={loading_image} alt="Loading..." style={{ width: '50px', height: '50px' }}/>
         </div>
       ) : (
         <>

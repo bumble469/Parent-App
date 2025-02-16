@@ -44,9 +44,9 @@ const ReportsLineChartWrapper = () => {
   }, [t]); // Empty dependency array ensures this effect runs only once on mount
 
   const rows = (marksData || []).map((data) => ({
-    subject: data.sub_name, // Display subject name
-    totalMarks: data.totalMarks, // Display attended lectures
-    totalPossibleMarks: data.totalPossibleMarks, // Display total lectures
+    subject: data.sub_name || NaN, // Display subject name
+    totalMarks: data.totalMarks || NaN, // Display attended lectures
+    totalPossibleMarks: data.totalPossibleMarks || NaN, // Display total lectures
   }));
 
   const columns = [
