@@ -15,17 +15,17 @@ router.use((req, res, next) => {
     next();
 });
 
-// Define the endpoint to get faculty details
+// Define the endpoint to get timetable (no student_id needed)
 router.route('/events').get(async (req, res) => {
     try {
-        const studentId = req.cookies.student_id ? parseInt(req.cookies.student_id, 10) : 1001;
-        const result = await operations.getEvents(studentId);
+        // Simply fetch timetable without using student_id
+        const result = await operations.getTimetable(); // No student_id passed
         console.log('Fetched data:', result);
         res.json(result);
     } catch (error) {
-        console.error('Error fetching faculty:', error);
+        console.error('Error fetching timetable:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-module.exports = router; // Export the router
+module.exports = router;

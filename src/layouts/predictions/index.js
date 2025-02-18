@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   LineElement,
@@ -18,13 +16,16 @@ import Footer from 'examples/Footer';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 import { PredictMarks } from './data/marksPredictions';
-
+import { PredictAttendance } from './data/attendancePrediction';
 function Prediction() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
         <Grid>
             <PredictMarks />
+        </Grid>
+        <Grid>
+          <PredictAttendance/>
         </Grid>
       <Footer />
     </DashboardLayout>
