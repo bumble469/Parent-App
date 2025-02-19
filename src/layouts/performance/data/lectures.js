@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import DataTable from 'examples/Tables/DataTable';
 import { useTranslation } from 'react-i18next';
 import loading_image from '../../../assets/images/icons8-loading.gif';
-
-const LectureViewTable = ({ semester }) => {
+import axios from 'axios';
+const LectureViewTable = ({ prn, semester }) => {
   const [lectureData, setLectureData] = useState({});
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState('');
@@ -13,14 +13,14 @@ const LectureViewTable = ({ semester }) => {
   const columnsPerPage = 5;
   const { t, i18n } = useTranslation();
   const isHindi = i18n.language !== 'en';
-
   const fetchDetailedLectureViews = async (semester) => {
     try {
       setIsLoading(true);  // Set loading to true when the fetch starts
-      const response = await fetch(
-        `http://localhost:8001/api/performance/student/lectureviews?semester=${semester}`
-      );
-      const data = await response.json();
+      const response = await axios.post('http://localhost:8001/api/performance/student/lectureviews',{
+        prn:prn,
+        semester:semester
+      });
+      const data = await response.data;
 
       const groupedData = data.reduce((acc, { subject_name, lecture_date, viewed_status, view_time }) => {
         const parsedDate = new Date(lecture_date);

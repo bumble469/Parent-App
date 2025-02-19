@@ -4,6 +4,7 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import MDBox from 'components/MDBox';
+import axios from 'axios';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
@@ -13,19 +14,20 @@ import PlatformSettings from 'layouts/profile/components/PlatformSettings';
 import { useTranslation } from 'react-i18next';
 import loading_image from '../../assets/images/icons8-loading.gif';
 import { Box } from '@mui/material';
+import Cookies from 'js-cookie';
 function Overview() {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
-
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
+  
   useEffect(() => {
-    const fetchStudentProfile = async () => {
+    const fetchStudentProfile = async (prn) => {
       try {
-        const response = await fetch('http://localhost:8001/api/student/profile');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
+        const response = await axios.post('http://localhost:8001/api/student/profile', {
+          prn: prn
+        });
+        const data = response.data;
         setStudent(data);
       } catch (error) {
         console.error('Error fetching student profile:', error);
@@ -34,8 +36,8 @@ function Overview() {
       }
     };
 
-    fetchStudentProfile();
-  }, []);
+    fetchStudentProfile(prn);
+  }, [prn]);
 
   if (loading) {
     return(

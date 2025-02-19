@@ -2,26 +2,26 @@ import React, { useEffect, useMemo, useState } from 'react';
 import DataTable from 'examples/Tables/DataTable';
 import { useTranslation } from 'react-i18next';
 import loading_image from '../../../assets/images/icons8-loading.gif';
-
-const AttendanceTable = ({ semester }) => {
-  const { t } = useTranslation(); // Hook for translations
+import axios from 'axios';
+const AttendanceTable = ({ prn, semester }) => {
+  const { t } = useTranslation();
 
   const [attendanceData, setAttendanceData] = useState({});
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(0);
-  const [loading, setLoading] = useState(true); // Loading state
-
+  const [loading, setLoading] = useState(true);
   const columnsPerPage = 8;
 
   const fetchDetailedAttendance = async (semester) => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:8001/api/performance/student/detailedattendance?semester=${semester}`
-      );
-      const data = await response.json();
+      const response = await axios.post('http://localhost:8001/api/performance/student/detailedattendance',{
+        prn:prn,
+        semester:semester
+      });
+      const data = response.data;
 
       const groupedData = data.reduce((acc, { subject_name, scan_time, is_present }) => {
         const parsedDate = new Date(scan_time);
@@ -41,7 +41,6 @@ const AttendanceTable = ({ semester }) => {
       setLoading(false); // Stop loading
     }
   };
-
   useEffect(() => {
     fetchDetailedAttendance(semester);
   }, [semester]);

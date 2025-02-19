@@ -5,10 +5,12 @@ import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import { useTranslation } from 'react-i18next'; 
 import loading_image from '../../../assets/images/icons8-loading.gif'; // Add the loading gif import
-
+import Cookies from "js-cookie";
+import axios from "axios";
 const generateMarksLineChartData = (currentMarksData, threshold) => {
   const minMarks = Math.min(...currentMarksData.map((data) => data.total));
   const {t} = useTranslation();
+  
   return useMemo(
     () => ({
       series: [
@@ -90,19 +92,19 @@ const generateMarksLineChartData = (currentMarksData, threshold) => {
   );
 };
 
-const LineGraph = ({ semester, threshold = 95 }) => {
+const LineGraph = ({ prn, semester, threshold = 95 }) => {
   const { t } = useTranslation(); 
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("All");
   const [loading, setLoading] = useState(true);  // Add loading state
-
   const fetchMarksData = async (semester) => {
     try {
       setLoading(true); // Set loading to true before fetching data
-      const response = await fetch(
-        `http://localhost:8001/api/performance/student/detailedmarks?semester=${semester}`
-      );
-      const data = await response.json();
+      const response = await axios.post('http://localhost:8001/api/performance/student/detailedmarks',{
+        prn:prn,
+        semester:semester
+      });
+      const data = await response.data;
 
       if (Array.isArray(data)) {
         setMarksData(data);

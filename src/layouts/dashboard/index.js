@@ -15,18 +15,22 @@ import StarHalfIcon from '@mui/icons-material/StarHalf';
 import SubjectDashboard from './data/strongweaksubjects';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import Cookies from 'js-cookie';
 function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [studentData, setStudentData] = useState(null);
   const { t, i18n } = useTranslation();
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
 
   const isHindi = i18n.language != 'en';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8001/api/dashboard/student/star');
+        const response = await axios.post('http://localhost:8001/api/dashboard/student/star',{
+          prn:prn
+        });
         setStudentData(response.data);
         setLoading(false);
       } catch (error) {

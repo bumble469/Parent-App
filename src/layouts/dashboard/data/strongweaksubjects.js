@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import MDTypography from 'components/MDTypography';
 import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { useTranslation } from 'react-i18next';
 import loading_image from '../../../assets/images/icons8-loading.gif';
 const SubjectDashboard = () => {
@@ -13,14 +14,16 @@ const SubjectDashboard = () => {
   const [lowAttendanceAlerts, setLowAttendanceAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
 
   const isHindi = i18n.language != 'en';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8001/api/dashboard/student/graph');
-        
+        const response = await axios.post('http://localhost:8001/api/dashboard/student/graph',{
+          prn:prn
+        });
         // Extract data from API response
         const subjects = response.data.map(item => item.sub_name);
         const attendedLectures = response.data.map(item => item.lectures_attended);

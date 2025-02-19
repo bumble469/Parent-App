@@ -8,22 +8,29 @@ import MDAvatar from 'components/MDAvatar';
 import backgroundImage from 'assets/images/campus.jpg';
 import { Divider } from '@mui/material';
 import bruceMars from '../../../../assets/images/bruce-mars.jpg';
-
+import Cookies from 'js-cookie';
+import axios from 'axios';
 function Header({ children }) {
   const [student, setStudent] = useState(null);
-
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
+  
   useEffect(() => {
-    // Fetch student data (you can replace this with your API call)
-    // Example:
-    fetch('http://localhost:8001/api/student/profile') // Change to your actual API endpoint
-      .then((response) => response.json())
-      .then((data) => {
-        setStudent(data); // Assuming the response structure contains student data
-      })
-      .catch((error) => {
+    const fetchStudentProfile = async () => {
+      try {
+        const response = await axios.post('http://localhost:8001/api/student/profile', {
+          prn:prn
+        });
+  
+        const data = await response.data;
+        setStudent(data);
+      } catch (error) {
         console.error('Error fetching student data:', error);
-      });
-  }, []);
+      }
+    };
+  
+    fetchStudentProfile();
+  }, [prn]); // Add `prn` as dependency
+    
 
   // Check if student data is available
   if (!student) {

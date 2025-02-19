@@ -5,8 +5,8 @@ import MDTypography from 'components/MDTypography';
 import { Card } from '@mui/material';
 import MDBox from 'components/MDBox';
 import loading_image from '../../../assets/images/icons8-loading.gif';
-
-const MarksTable = ({ semester }) => {
+import axios from 'axios';
+const MarksTable = ({ prn, semester }) => {
   const { t, i18n } = useTranslation(); 
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(t('All Subjects'));
@@ -14,8 +14,11 @@ const MarksTable = ({ semester }) => {
 
   const fetchMarksData = async (semester) => {
     try {
-      const response = await fetch(`http://localhost:8001/api/performance/student/detailedmarks?semester=${semester}`);
-      const data = await response.json();
+      const response = await axios.post('http://localhost:8001/api/performance/student/detailedmarks',{
+        prn:prn,
+        semester:semester
+      });
+      const data = await response.data;
 
       if (Array.isArray(data)) {
         setMarksData(data);
@@ -136,7 +139,6 @@ const MarksTable = ({ semester }) => {
         </MDTypography>
       </MDBox>
       <MDBox pt={2} px={2}>
-        {/* If loading, display the loading image */}
         {isLoading ? (
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             <img src={loading_image} alt={t('loading')} style={{ width: '50px', height: '50px' }} />

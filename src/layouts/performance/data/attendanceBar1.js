@@ -7,13 +7,14 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import loading_image from '../../../assets/images/icons8-loading.gif';
 import { Box } from '@mui/material';
-const ReportsBarChartWrapper = ({ semester }) => {
+import Cookies from 'js-cookie';
+const ReportsBarChartWrapper = ({ prn, semester }) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
-  
+
   const validSemester = semester >= 1 && semester <= 6 ? semester : 1;
 
   useEffect(() => {
@@ -22,7 +23,10 @@ const ReportsBarChartWrapper = ({ semester }) => {
         if (validSemester < 1 || validSemester > 6) {
           throw new Error("Invalid semester value");
         }
-        const response = await axios.get(`http://localhost:8001/api/performance/student/detailedattendance?semester=${validSemester}`);
+        const response = await axios.post('http://localhost:8001/api/performance/student/detailedattendance',{
+          prn:prn,
+          semester:validSemester
+        });
         if (Array.isArray(response.data)) {
           const subjectsData = response.data.reduce((acc, item) => {
             if (item.is_present !== null) { 
@@ -64,7 +68,7 @@ const ReportsBarChartWrapper = ({ semester }) => {
         setLoading(false);
       }
     };
-
+    console.log(`current semester value: ${validSemester}`)
     fetchData();
   }, [validSemester]); 
 

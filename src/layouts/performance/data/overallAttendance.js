@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import ComplexStatisticsCard from 'examples/Cards/StatisticsCards/ComplexStatisticsCard';
-
-function OverallAttendance({ semester, t, i18n }) {
+import Cookies from 'js-cookie';
+import axios from 'axios';
+function OverallAttendance({ prn, semester, t, i18n }) {
   const [overallAttendance, setOverallAttendance] = useState(0);
   const isHindi = i18n.language != 'en'
+
   useEffect(() => {
-    const fetchAttendanceData = async () => {
+    const fetchAttendanceData = async (semester) => {
       try {
-        const response = await fetch(`http://localhost:8001/api/performance/student/detailedattendance?semester=${semester}`);
-        const data = await response.json();
+        const response = await axios.post('http://localhost:8001/api/performance/student/detailedattendance',{
+          prn:prn,
+          semester:semester
+        });
+        const data = await response.data;
         
         // Calculate overall attendance
         const totalClasses = data.filter(item => item.is_present === true || item.is_present === false).length;
@@ -22,7 +27,7 @@ function OverallAttendance({ semester, t, i18n }) {
     };
 
     if (semester) {
-      fetchAttendanceData();
+      fetchAttendanceData(semester);
     }
   }, [semester]);
 

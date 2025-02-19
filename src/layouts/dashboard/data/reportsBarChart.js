@@ -6,17 +6,21 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import { useTranslation } from 'react-i18next';
 import loading_image from '../../../assets/images/icons8-loading.gif'
+import Cookies from 'js-cookie';
 const ReportsBarChartWrapper = () => {
   const { t } = useTranslation(); // Use the translation hook
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true); // State for loading
   const [error, setError] = useState(null); // State for errors
   const [attendanceData, setAttendanceData] = useState([]); 
-
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8001/api/dashboard/student/attendance');
+        const response = await axios.post('http://localhost:8001/api/dashboard/student/attendance',{
+          prn:prn
+        });
         if (Array.isArray(response.data)) {
           setAttendanceData(response.data);
         } else {

@@ -18,7 +18,8 @@ import LineGraph from './data/marksGraphs';
 import Footer from 'examples/Footer';
 import OverallAttendance from './data/overallAttendance';
 import { useTranslation } from 'react-i18next';
-
+import Cookies from 'js-cookie';
+import axios from 'axios';
 function Performance() {
   const [semester, setSemester] = useState(''); 
   const [semesters, setSemesters] = useState([]); 
@@ -29,12 +30,14 @@ function Performance() {
   const handleSemesterChange = (event) => {
     setSemester(event.target.value); 
   };
-
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8001/api/performance/student');
-        const data = await response.json();
+        const response = await axios.post('http://localhost:8001/api/performance/student',{
+          prn:prn
+        });
+        const data = response.data;
         const uniqueSemesters = Array.from(new Set(data.map(item => item.semester_id)))
           .map(id => ({
             id,
@@ -149,7 +152,7 @@ function Performance() {
           <Grid item xs={12}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <OverallAttendance semester={semester} t={t} i18n = {i18n} />
+                <OverallAttendance prn={prn} semester={semester} t={t} i18n = {i18n} />
               </Grid>
               <Grid item xs={12} md={4}>
                 <MDBox sx={{ height: '100%' }}>
@@ -229,7 +232,7 @@ function Performance() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <LectureViewTable semester={semester} />
+                <LectureViewTable prn={prn} semester={semester} />
               </MDBox>
             </Card>
           </Grid>
@@ -253,22 +256,22 @@ function Performance() {
                     </MDTypography>
                   </MDBox>
                   <MDBox pt={3}>
-                    <AttendanceTable semester={semester} />
+                    <AttendanceTable prn={prn} semester={semester} />
                   </MDBox>
                 </Card>
               </Grid>
               <Grid item xs={12} md={12} mt={1} mb={3}>
-                <ReportsBarChartWrapper semester={semester} />
+                <ReportsBarChartWrapper prn={prn} semester={semester} />
               </Grid>
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12} md={12} lg={12} mt={3} mb={2}>
-                <MarksTable semester={semester} />
+                <MarksTable prn={prn} semester={semester} />
               </Grid>
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12} md={12} lg={12} mt={4} mb={2}>
-                <LineGraph semester={semester} />
+                <LineGraph prn={prn} semester={semester} />
               </Grid>
             </Grid>
           </Grid>

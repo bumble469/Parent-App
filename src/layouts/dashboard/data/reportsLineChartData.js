@@ -6,18 +6,22 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import { useTranslation } from 'react-i18next'; // Import the useTranslation hook
 import loading_image from '../../../assets/images/icons8-loading.gif';
+import Cookies from 'js-cookie';
 const ReportsLineChartWrapper = () => {
   const [data, setData] = useState(null); // State to hold the fetched chart data
   const [loading, setLoading] = useState(true); // State for loading
   const [error, setError] = useState(null); // State for errors
   const [marksData, setMarksData] = useState([]);
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
   
   const { t } = useTranslation(); // Initialize the translation hook
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8001/api/dashboard/student/graph');
+        const response = await axios.post('http://localhost:8001/api/dashboard/student/graph',{
+          prn:prn
+        });
         if (Array.isArray(response.data)) {
           setMarksData(response.data);
         } else {

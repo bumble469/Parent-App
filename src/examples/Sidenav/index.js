@@ -5,13 +5,12 @@ import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import Icon from '@mui/material/Icon';
-import { IconButton } from "@mui/material";
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import SidenavCollapse from 'examples/Sidenav/SidenavCollapse';
 import SidenavRoot from 'examples/Sidenav/SidenavRoot';
 import { useTranslation } from 'react-i18next';
-import GuidModal from '../../components/Guide/index';
+import Cookies from 'js-cookie';
 import './styles/styles.css';
 import {
   useMaterialUIController,
@@ -29,7 +28,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [student, setStudent] = useState(null);
   const { t, i18n } = useTranslation(); 
   const [isSpinning, setIsSpinning] = useState(true);
-
+  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
   useEffect(() => {
     const timer = setTimeout(() => setIsSpinning(false), 2000);
     return () => clearTimeout(timer);
@@ -37,7 +36,11 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:8001/api/student/profile`);
+        const response = await fetch("http://localhost:8001/api/student/profile",{
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prn }),
+        });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
