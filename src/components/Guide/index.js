@@ -309,7 +309,7 @@ const GuideModal = ({ isOpen, onClose = () => {} }) => {
     >
       <DialogTitle sx={{ position: 'relative', paddingBottom: '16px' }}>
         <Typography variant="h5" fontWeight="bold" sx={{ textAlign: 'center', marginBottom: '1rem' }}>
-          Navigating Your Child's Progress: A Parent's Handbook
+        {t("Navigating Your Child's Progress: A Parent's Handbook")}
         </Typography>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Button 
