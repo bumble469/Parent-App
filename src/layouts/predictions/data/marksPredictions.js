@@ -42,50 +42,33 @@ export const PredictMarks = () => {
     { Header: 'Marks', accessor: 'marks' },
     { Header: 'Total Marks', accessor: 'totalMarks' },
     { Header: 'Percentage', accessor: 'percentage' },
-    { Header: 'Grade Range', accessor: 'gradeRange' },
+    { Header: 'Grade', accessor: 'grade' },
   ];
 
   const previousSemesters = [
     `Semester ${marks?.latest_sem - 2}`,
     `Semester ${marks?.latest_sem - 1}`,
-    `Semester ${marks?.latest_sem} Prediction`,
   ];
-
+  
   const filteredMarksTableData = [
     {
       id: 1,
       semester: previousSemesters[0],
-      marks: marks?.previous_sem_marks2 || 'N/A',
-      totalMarks: marks?.total_marks_previous_sem2 || 'N/A',  
-      percentage: marks?.previous_sem_marks2
-        ? `${((marks?.previous_sem_marks2 || 0) / (marks?.total_marks_previous_sem2 || 1)) * 100}%`
-        : 'N/A',
-      gradeRange: marks?.previous_sem_grade_range2 || 'N/A',
+      marks: marks?.prevsem2_marks || 'N/A',
+      totalMarks: marks?.prevsem2_total_obtainable || 'N/A',
+      percentage: marks?.prevsem2_perc ? `${marks?.prevsem2_perc.toFixed(2)}%` : 'N/A',
+      grade: marks?.prevsem2_grade || 'N/A',
     },
     {
       id: 2,
       semester: previousSemesters[1],
-      marks: marks?.previous_sem_marks1 || 'N/A',
-      totalMarks: marks?.total_marks_previous_sem1 || 'N/A',
-      percentage: marks?.previous_sem_marks1
-        ? `${((marks?.previous_sem_marks1 || 0) / (marks?.total_marks_previous_sem1 || 1)) * 100}%`
-        : 'N/A',
-      gradeRange: marks?.previous_sem_grade_range1 || 'N/A',
-    },
-    {
-      id: 3,
-      semester: previousSemesters[2],
-      marks: marks?.predicted_marks || 'N/A',
-      totalMarks: marks?.max_marks || 'N/A',  
-      percentage: marks?.predicted_marks
-        ? `${((marks?.predicted_marks || 0) / (marks?.max_marks || 1)) * 100}%`
-        : 'N/A',
-      gradeRange: marks?.grade_range || 'N/A',
-      // Unique styling for predicted data
-      isPrediction: true,
-    },
+      marks: marks?.prevsem1_marks || 'N/A',
+      totalMarks: marks?.prevsem1_total_obtainable || 'N/A',
+      percentage: marks?.prevsem1_perc ? `${marks?.prevsem1_perc.toFixed(2)}%` : 'N/A',
+      grade: marks?.prevsem1_grade || 'N/A',
+    }
   ];
-
+  
   const chartOptions = {
     chart: {
       type: 'line',
@@ -95,11 +78,11 @@ export const PredictMarks = () => {
       },
     },
     xaxis: {
-      categories: previousSemesters,  
+      categories: [...previousSemesters, 'Predicted'],  
     },
     stroke: {
       curve: 'smooth',
-      colors: ['#2196F3', '#FF9800'], // Blue for actual, Orange for predicted
+      colors: ['#2196F3', '#FF9800'], 
     },
     markers: {
       size: 5,
@@ -132,19 +115,13 @@ export const PredictMarks = () => {
     {
       name: 'Percentage Comparison',
       data: [
-        marks?.previous_sem_marks2 && marks?.total_marks_previous_sem2
-          ? ((marks?.previous_sem_marks2 / marks?.total_marks_previous_sem2) * 100).toFixed(2)
-          : 0,
-        marks?.previous_sem_marks1 && marks?.total_marks_previous_sem1
-          ? ((marks?.previous_sem_marks1 / marks?.total_marks_previous_sem1) * 100).toFixed(2)
-          : 0,
-        marks?.predicted_marks && marks?.max_marks
-          ? ((marks?.predicted_marks / marks?.max_marks) * 100).toFixed(2)
-          : 0,
+        marks?.prevsem2_perc ? marks?.prevsem2_perc.toFixed(2) : 0,
+        marks?.prevsem1_perc ? marks?.prevsem1_perc.toFixed(2) : 0,
+        marks?.predicted_perc ? marks?.predicted_perc.toFixed(2) : 0,
       ],
     },
   ];
-
+  
   return (
     <Card sx={{ p: 1, mt: 5, mb:3 }}>
       <MDBox
@@ -169,41 +146,32 @@ export const PredictMarks = () => {
           </div>
         ) : (
           <Grid container spacing={3}>
-            {/* Marks Comparison Table */}
             <Grid item xs={12} md={6}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Typography variant="h6" sx={{ textAlign: 'center' }}>
-                  Marks Comparison
-                </Typography>
-                <Box sx={{ flexGrow: 1 }}>
-                  <DataTable
-                    table={{ columns: marksColumns, rows: filteredMarksTableData }}
-                    isSorted={false}
-                    entriesPerPage={false}
-                    showTotalEntries={false}
-                    noEndBorder
-                    getRowProps={(row) => ({
-                      style: row.original.isPrediction ? { backgroundColor: '#FFEB3B' } : {}, // Yellow for prediction row
-                    })}
-                  />
-                </Box>
+              <Typography variant="h6" sx={{ textAlign: 'center' }}>
+                Marks Comparison
+              </Typography>
+              <DataTable
+                table={{ columns: marksColumns, rows: filteredMarksTableData }}
+                isSorted={false}
+                entriesPerPage={false}
+                showTotalEntries={false}
+                noEndBorder
+              />
+              <Box sx={{ mt: 2, textAlign: 'center', fontWeight: 'bold', fontSize: '1rem', color: 'black', mb:-2 }}>
+                Predicted Grade: {marks?.predicted_grade_range || 'N/A'} ({marks?.predicted_perc?.toFixed(2) || 'N/A'}%)
               </Box>
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Typography variant="h6" sx={{ textAlign: 'center' }}>
-                  Percentage Comparison Line Graph
-                </Typography>
-                <Box sx={{ flexGrow: 1 }}>
-                  <ApexCharts
-                    options={chartOptions}
-                    series={chartSeries}
-                    type="line"
-                    height={isMobile ? '300px' : '100%'}  
-                  />
-                </Box>
-              </Box>
+              <Typography variant="h6" sx={{ textAlign: 'center' }}>
+                Percentage Comparison Line Graph
+              </Typography>
+              <ApexCharts
+                options={chartOptions}
+                series={chartSeries}
+                type="line"
+                height={isMobile ? '300px' : '100%'}  
+              />
             </Grid>
           </Grid>
         )}

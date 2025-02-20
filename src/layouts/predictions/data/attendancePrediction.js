@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import loading_image from '../../../assets/images/icons8-loading.gif';
 import MDBox from 'components/MDBox';
 import ApexCharts from 'react-apexcharts';
+import { useTranslation } from 'react-i18next';
 
 export const PredictAttendance = () => {
   const [attendance, setAttendance] = useState(null);
@@ -14,7 +15,8 @@ export const PredictAttendance = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
-
+  const {t} = useTranslation();
+  
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
 
   const fetchAttendance = async (prn) => {

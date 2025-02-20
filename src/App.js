@@ -85,10 +85,10 @@ export default function App() {
     },
     {
       type: 'collapse',
-      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Predictions')}</Typography>,
-      key: 'predictions',
+      name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Future Insights')}</Typography>,
+      key: 'Future Insights',
       icon: <Icon fontSize="small">show_chart</Icon>,
-      route: '/predictions',
+      route: '/Future-Insights',
       component: <Predictions />,
     },
     { type: 'divider', key: 'analytics-divider' },

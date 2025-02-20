@@ -10,30 +10,43 @@ import {
   ListItemIcon,
   ListItemText,
   Avatar,
-  Fab,
-  Paper,
-  Drawer,
   IconButton,
-  useMediaQuery,
+  Paper,
   useTheme,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import MDBox from 'components/MDBox';
 import loading_image from '../../assets/images/icons8-loading.gif';
-
+import { useMediaQuery } from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import Drawer from '@mui/material/Drawer';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useSession } from '../../context/SessionContext';
 function Chat() {
+  const { session } = useSession();
+  const parentId = session.parentId || 0;
+  const theme = useTheme();
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const theme = useTheme();
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loadingTeachers, setLoadingTeachers] = useState(true);
+  const [errorTeachers, setErrorTeachers] = useState(null);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [errorMessages, setErrorMessages] = useState(null);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Define state for sidebar open/close
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const { t } = useTranslation();
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -45,341 +58,408 @@ function Chat() {
         const data = await response.json();
         setTeachers(data);
       } catch (error) {
-        setError(error.message);
+        setErrorTeachers(error.message);
       } finally {
-        setLoading(false);
+        setLoadingTeachers(false);
       }
     };
 
     fetchTeachers();
   }, []);
 
-  const chatMessages = [
-    {
-      sender: 'parent',
-      message: 'Hey, how is it going?',
-      time: '09:30',
-    },
-    {
-      sender: 'teacher',
-      message: 'Hello! All good here, how about you?',
-      time: '09:31',
-    },
-    // ... (other chat messages)
-  ];
+  const loadMessages = async (teacherId) => {
+    setLoadingMessages(true);
+    setErrorMessages(null);
+    try {
+      const response = await axios.get('http://localhost:8001/api/chat/chats', {
+        params: { parentId, teacherId },
+      });
+      setMessages(response.data);
+    } catch (error) {
+      setErrorMessages(error.message);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
 
-  const fileInputRef = useRef(null);
+  useEffect(() => {
+    if (selectedTeacher) {
+      loadMessages(selectedTeacher.teacher_id);
+    } else {
+      setMessages([]);
+    }
+  }, [selectedTeacher]);
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !selectedTeacher) return;
+
+    try {
+      await axios.post('http://localhost:8001/api/chat/chats', {
+        parentId,
+        teacherId: selectedTeacher.teacher_id,
+        senderType: 'Parent',
+        message: newMessage,
+        filePath: null,
+      });
+
+      setNewMessage('');
+      loadMessages(selectedTeacher.teacher_id);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
 
   const handleFileClick = () => {
-    fileInputRef.current.click(); // Trigger the file input click
+    fileInputRef.current.click();
   };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      console.log('Selected file:', file); // Handle file here
+      console.log('Selected file:', file);
     }
   };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Paper
-        elevation={3}
-        sx={{
-          margin: '10px auto', // Center the Paper by using auto margins
-          height: 'calc(100vh - 150px)', // Responsive height
-          display: 'flex',
-          overflow: 'hidden',
-          position: 'relative',
-          width: { xs: '95%', sm: '100%' }, // Adjust width for mobile
-          padding: 2
-        }}
-      >
-        <Drawer
-          variant="temporary"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              width: 240,
-              boxSizing: 'border-box',
-            },
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              padding: 2,
-              backgroundColor: 'grey'
-            }}
-          >
-            <IconButton
-              onClick={() => setDrawerOpen(false)}
-              sx={{ alignSelf: 'flex-end', color: 'text.primary' }}
+      <Box pt={2}>
+        <Grid container spacing={2} style={{ height: '90vh' }}>
+          <Grid item xs={12} style={{ height: 'fit-content' }}>
+            <Paper
+              style={{
+                padding: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                maxHeight: '90vh',
+                overflow: 'hidden',
+                borderRadius: '8px', // Added rounded corners
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Added subtle shadow
+              }}
             >
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h6" sx={{ marginBottom: 2 }}>
-              {t('teacher')}
-            </Typography>
-            <List>
-              {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
-                  <img src={loading_image} alt="Loading" style={{ width: '50px', height: '50px' }} />
-                </Box>
-              ) : error ? (
-                <Typography color="error">{error}</Typography>
-              ) : (
-                teachers.map((teacher, index) => (
-                  <ListItem
-                    button
-                    key={index}
-                    selected={selectedTeacher === teacher}
-                    onClick={() => {
-                      setSelectedTeacher(teacher);
-                    }}
-                    sx={{
-                      marginBottom: { xs: 2, sm: 0 },
-                    }}
-                  >
-                    <ListItemIcon>
-                      <Avatar
-                        alt={teacher.teacher_fullname}
-                        src={teacher.teacher_image ? teacher.teacher_image : 'default-image-url.jpg'} // Use the teacher's image
-                        sx={{ width: 50, height: 50 }}
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontSize: { xs: '1rem', sm: '0.9rem' },
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          {`${teacher.teacher_fullname}`}
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontSize: { xs: '0.9rem', sm: '0.8rem' },
-                          }}
-                        >
-                          {t('subject')}&nbsp;{teacher.subject_name || t('No subject available')}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                ))
-              )}
-            </List>
-          </Box>
-        </Drawer>
-
-        {/* Teacher List Section for Desktop View */}
-        <Box
-          sx={{
-            width: { xs: '100%', sm: '30%', md: '25%' }, // Responsive width
-            borderRight: '1px solid #ddd',
-            display: { xs: 'none', sm: 'flex' },
-            flexDirection: 'column',
-            padding: 2,
-            height: '100%',
-            overflowY: 'auto',
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: 'rgba(0, 0, 0, 0.1)', 
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'rgba(0, 0, 0, 0.3)', 
-              borderRadius: '10px', 
-            },
-          }}
-        >
-          <Typography variant="h5" sx={{ marginBottom: 2 }}>
-            {t('teacher')}
-          </Typography>
-          <List>
-            {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
-                <img src={loading_image} alt="Loading" style={{ width: '50px', height: '50px' }} />
-              </Box>
-            ) : error ? (
-              <Typography color="error">{error}</Typography>
-            ) : (
-              teachers.map((teacher, index) => (
-                <ListItem
-                  button
-                  key={index}
-                  selected={selectedTeacher === teacher}
-                  onClick={() => {
-                    setSelectedTeacher(teacher);
-                  }}
-                  sx={{
-                    marginBottom: 3,
-                    borderRadius: 2,
-                    backgroundColor: selectedTeacher === teacher ? '#e3f2fd !important' : 'inherit',
-                  }}
-                >
-                  <ListItemIcon>
-                    <Avatar
-                      alt={`${teacher.teacher_fullname}`}
-                      src={teacher.teacher_image ? teacher.teacher_image : 'default-image-url.jpg'}
-                      sx={{ width: 50, height: 50 }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: { xs: '1rem', sm: '0.9rem' },
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {`${teacher.teacher_fullname}`}
-                      </Typography>
-                    }
-                    secondary={
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontSize: { xs: '0.9rem', sm: '0.9rem', lg:'1rem' },
-                        }}
-                      >
-                        {t('subject')}:&nbsp;{teacher.subject_name || 'No subject available'}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-              ))
-            )}
-          </List>
-        </Box>
-
-        {/* Chat Section */}
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 2,
-            position: 'relative',
-          }}
-        >
-          <Box
-            sx={{
-              flex: 1,
-              overflowY: 'auto',
-              maxHeight: 'calc(100% - 60px)', 
-              paddingBottom: '16px',
-            }}
-          >
-            <List>
-              {selectedTeacher ? (
-                chatMessages.map((msg, index) => (
-                  <ListItem
-                    key={index}
-                    sx={{
-                      justifyContent: msg.sender === 'parent' ? 'flex-end' : 'flex-start',
-                      marginBottom: 1,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        backgroundColor: msg.sender === 'parent' ? '#f1f1f1' : '#e1f5fe',
-                        borderRadius: '8px',
-                        padding: 1,
-                        maxWidth: '60%',
-                        wordWrap: 'break-word',
+              <Grid container spacing={2}>
+              {isMobile ? (
+                  <>
+                    <IconButton
+                      onClick={toggleSidebar}
+                      style={{
+                        position: 'sticky',
+                        top: '2px', // Adjust position to your liking
+                        left: '0px',
+                        zIndex: 1,
+                        backgroundColor: 'grey', // Styling the button
+                        height: '1.35rem',
+                        width: '1.35rem',
+                        marginBottom:'0.3rem'
                       }}
                     >
-                      <Typography variant="body1"
-                      sx={{ fontSize: '0.85rem' }}>{msg.message}</Typography>
-                      <Typography variant="caption" sx={{ display: 'block', textAlign: 'right' }}>
-                        {msg.time}
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                ))
-              ) : (
-                <Box
+                      {sidebarOpen ? (
+                        <ArrowBackIcon style={{ color: 'white' }} /> // Arrow to collapse sidebar
+                      ) : (
+                        <ArrowForwardIcon style={{ color: 'white' }} /> // Arrow to open sidebar
+                      )}
+                    </IconButton>
+
+                    <Drawer
+                      anchor="left"
+                      open={sidebarOpen}
+                      onClose={toggleSidebar}
+                      sx={{
+                        display: { xs: 'block', sm: 'none' },
+                      }}
+                    >
+                      <Box p={2} style={{ width: '250px' }}>
+                        <Typography variant="h6">{t('Teacher List')}</Typography>
+                        <Divider style={{ margin: '8px 0' }} />
+                        {loadingTeachers ? (
+                          <div style={{ textAlign: 'center', padding: '50px' }}>
+                            <img
+                              src={loading_image}
+                              alt="Loading..."
+                              style={{ width: '50px', height: '50px' }}
+                            />
+                          </div>
+                        ) : errorTeachers ? (
+                          <Typography color="error">{errorTeachers}</Typography>
+                        ) : (
+                          <List style={{ flexGrow: 1, overflowY: 'auto' }}>
+                            {teachers.map((teacher) => (
+                              <div key={teacher.teacher_id}>
+                                <ListItem
+                                  button
+                                  selected={selectedTeacher && selectedTeacher.teacher_id === teacher.teacher_id}
+                                  onClick={() => {
+                                    setSelectedTeacher(teacher);
+                                    toggleSidebar(); // This will close the Drawer when a teacher is selected
+                                  }}
+                                  style={{ padding: '0.5rem 0.3rem' }}
+                                >
+                                  <ListItemIcon>
+                                    <Avatar
+                                      alt={teacher.teacher_fullname}
+                                      src={teacher.teacher_image || 'https://via.placeholder.com/40'}
+                                    />
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    primary={
+                                      <Typography variant="body2" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                                        {teacher.teacher_fullname}
+                                      </Typography>
+                                    }
+                                    secondary={
+                                      <MDBox>
+                                        <Typography
+                                          variant="caption"
+                                          color="textSecondary"
+                                          style={{ fontSize: '0.75rem', marginBottom: '4px' }}
+                                        >
+                                          <strong>Subject:</strong> {teacher.subject_name}
+                                        </Typography>
+                                        <br />
+                                        <Typography
+                                          variant="caption"
+                                          color="textSecondary"
+                                          style={{ fontSize: '0.75rem', marginBottom: '4px' }}
+                                        >
+                                          <strong>Type:</strong> {teacher.teacher_type}
+                                        </Typography>
+                                      </MDBox>
+                                    }
+                                  />
+                                </ListItem>
+                                <Divider style={{ margin: '4px 0' }} />
+                              </div>
+                            ))}
+                          </List>
+                        )}
+                      </Box>
+                    </Drawer>
+                  </>
+                ) : (
+                  // Teacher List Panel (Non-mobile version)
+                  <Grid
+                    item
+                    xs={12}
+                    md={3}
+                    sx={{
+                      maxHeight: 'calc(90vh - 64px)',
+                      overflowY: 'auto',
+                      '::-webkit-scrollbar': {
+                        width: '8px', // Width of the scrollbar
+                      },
+                      '::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#888', // Color of the scrollbar thumb
+                        borderRadius: '4px',
+                      },
+                      '::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: '#555', // Color on hover
+                      },
+                    }}
+                  >
+                    <Typography variant="h6">{t('Teacher List')}</Typography>
+                    <Divider style={{ margin: '8px 0' }} />
+                    {loadingTeachers ? (
+                      <div style={{ textAlign: 'center', padding: '50px' }}>
+                        <img
+                          src={loading_image}
+                          alt="Loading..."
+                          style={{ width: '50px', height: '50px' }}
+                        />
+                      </div>
+                    ) : errorTeachers ? (
+                      <Typography color="error">{errorTeachers}</Typography>
+                    ) : (
+                      <List style={{ flexGrow: 1, overflowY: 'auto' }}>
+                        {teachers.map((teacher) => (
+                          <div key={teacher.teacher_id}>
+                            <ListItem
+                              button
+                              selected={selectedTeacher && selectedTeacher.teacher_id === teacher.teacher_id}
+                              onClick={() => setSelectedTeacher(teacher)}
+                              style={{ paddingRight:'1rem', paddingTop:'0.3rem' }} // Reduced padding for tighter spacing
+                            >
+                              <ListItemIcon>
+                                <Avatar
+                                  alt={teacher.teacher_fullname}
+                                  src={teacher.teacher_image || 'https://via.placeholder.com/40'}
+                                />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="body2" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                                    {teacher.teacher_fullname}
+                                  </Typography>
+                                }
+                                secondary={
+                                  <MDBox>
+                                    <Typography
+                                      variant="caption"
+                                      color="textSecondary"
+                                      style={{ fontSize: '0.75rem', marginBottom: '4px' }} // Smaller text
+                                    >
+                                      <strong>Subject:</strong> {teacher.subject_name}
+                                    </Typography>
+                                    <br />
+                                    <Typography
+                                      variant="caption"
+                                      color="textSecondary"
+                                      style={{ fontSize: '0.75rem', marginBottom: '4px' }} // Smaller text
+                                    >
+                                      <strong>Type:</strong> {teacher.teacher_type}
+                                    </Typography>
+                                  </MDBox>
+                                }
+                              />
+                            </ListItem>
+                            <Divider style={{ margin: '4px 0' }} /> {/* Separator between items */}
+                          </div>
+                        ))}
+                      </List>
+                    )}
+                  </Grid>
+                )}
+
+                {/* Chat Panel */}
+                <Grid
+                  item
+                  xs={12}
+                  md={9}
                   sx={{
+                    height: 'calc(80vh - 15px)', // Adjust height for the chat container
                     display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    color: 'grey.500',
-                    marginTop: "7rem"
+                    flexDirection: 'column',
                   }}
                 >
-                  <Typography>Select a teacher to start chatting.</Typography>
-                </Box>
-              )}
-            </List>
-          </Box>
+                  {selectedTeacher ? (
+                    <>
+                      <Typography variant="h6">{`Chat with ${selectedTeacher.teacher_fullname}`}</Typography>
+                      <Divider style={{ margin: '8px 0' }} />
+                      
+                      {/* Chat messages area */}
+                      <Box
+                        sx={{
+                          flexGrow: 1, // Take remaining space above the input
+                          overflowY: 'auto', // Make the messages scrollable
+                          padding: 1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          '::-webkit-scrollbar': {
+                            width: '8px', // Width of the scrollbar
+                          },
+                          '::-webkit-scrollbar-thumb': {
+                            backgroundColor: '#888', // Color of the scrollbar thumb
+                            borderRadius: '4px',
+                          },
+                          '::-webkit-scrollbar-thumb:hover': {
+                            backgroundColor: '#555', // Color on hover
+                          },
+                                  }}
+                      >
+                        {loadingMessages ? (
+                          <Typography style={{ fontSize: '0.75rem' }}>{t('Loading messages...')}</Typography>
+                        ) : errorMessages ? (
+                          <Typography color="error" style={{ fontSize: '0.75rem' }}>
+                            {errorMessages}
+                          </Typography>
+                        ) : messages.length === 0 ? (
+                          <Typography style={{ fontSize: '0.9rem' }}>
+                            {t('No messages found. Start the conversation!')}
+                          </Typography>
+                        ) : (
+                          messages.map((msg) => (
+                            <Box
+                              key={msg.MessageID}
+                              mb={1}
+                              p={1}
+                              borderRadius={4}
+                              bgcolor={msg.SenderType === 'Parent' ? '#e0f7fa' : '#fce4ec'}
+                              style={{
+                                alignSelf: msg.SenderType === 'Parent' ? 'flex-end' : 'flex-start', // Use alignSelf for positioning
+                                maxWidth: '55%',
+                                marginBottom: '0.25rem',
+                              }}
+                            >
+                              <Typography variant="body2" style={{ fontSize: '0.9rem' }}>
+                                <strong>
+                                  {msg.SenderType === 'Parent' ? 'You' : selectedTeacher.teacher_fullname || 'Teacher'}
+                                </strong>{' '}
+                                <br />
+                                {msg.Message}
+                              </Typography>
+                              <Typography variant="caption" style={{ color: '#888', fontSize: '0.7rem' }}>
+                                {new Date(msg.Timestamp).toLocaleString()}
+                              </Typography>
+                            </Box>
+                          ))
+                        )}
+                      </Box>
 
-          <Divider />
+                      <Divider style={{ margin: '8px 0' }} />
 
-          {/* Input Field Section */}
-          <Grid container spacing={2} alignItems="center" sx={{ paddingTop: 2 }}>
-            <Grid item xs={8}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Type your message"
-                size="small"
-                sx={{
-                  backgroundColor: '#fff',
-                  borderRadius: '16px',
-                }}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <IconButton
-                  color="primary"
-                  onClick={handleFileClick}
-                  sx={{
-                    backgroundColor: '#e0e0e0',
-                    '&:hover': {
-                      backgroundColor: '#bdbdbd',
-                    },
-                  }}
-                >
-                  <AttachFileIcon />
-                </IconButton>
-                <Fab
-                  color="primary"
-                  size="small"
-                  onClick={() => alert('Send message functionality')}
-                >
-                  <SendIcon />
-                </Fab>
-              </Box>
-            </Grid>
+                      {/* Input and button area (fixed at the bottom) */}
+                      <Box 
+                        display="flex" 
+                        alignItems="center" 
+                        style={{
+                          position: 'sticky',
+                          bottom: 0,
+                          backgroundColor: theme.palette.background.paper,
+                          padding: '0.2rem',
+                          zIndex: 1,
+                        }}
+                      >
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          placeholder={t('Type your message...')}
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          style={{
+                            borderRadius: '1rem',
+                            marginRight: '1rem', // Space between input and buttons
+                          }}
+                        />
+                        <IconButton
+                          color="white"
+                          onClick={sendMessage}
+                          style={{
+                            borderRadius: '50%',
+                            backgroundColor: '#5dbea3',
+                            marginRight:'0.3rem'
+                          }}
+                        >
+                          <SendIcon />
+                        </IconButton>
+                        <IconButton
+                        color="white"
+                          onClick={handleFileClick}
+                          style={{
+                            borderRadius: '50%',
+                            backgroundColor: '#5783db',
+                          }}
+                        >
+                          <AttachFileIcon />
+                        </IconButton>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChange}
+                        />
+                      </Box>
+                    </>
+                  ) : (
+                    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                      <Typography variant="h6">{t('Select a teacher to start chatting')}</Typography>
+                    </Box>
+                  )}
+                </Grid>
+
+              </Grid>
+            </Paper>
           </Grid>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-          />
-        </Box>
-      </Paper>
+        </Grid>
+      </Box>
       <Footer />
     </DashboardLayout>
   );
