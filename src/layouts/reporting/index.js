@@ -5,8 +5,10 @@ import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import emailjs from 'emailjs-com';
 import { useTranslation } from 'react-i18next';
-
+import axios from 'axios';
+import { useSession } from '../../context/SessionContext';
 function FeedbackPage() {
+  const {session} = useSession();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [feedbackType, setFeedbackType] = useState('General Feedback');
@@ -15,7 +17,7 @@ function FeedbackPage() {
   const [errors, setErrors] = useState({});
   const { t, i18n } = useTranslation();
   const isHindi = i18n.language != 'en';
-  
+  const prn = session.studentId || 0;
   const sendEmail = (e) => {
     e.preventDefault();
     const templateParams = {
@@ -64,7 +66,6 @@ function FeedbackPage() {
     return Object.keys(newErrors).length === 0; 
   };
   
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -77,15 +78,13 @@ function FeedbackPage() {
         };
 
         try {
-            const response = await fetch('https://parent-rest-api.onrender.com/api/feedback/feedback-insert', { // Assuming '/api/feedback' is the endpoint
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(feedbackData),
+            // Fix the request to send prn and feedbackData in the correct structure
+            const response = await axios.post('https://parent-rest-api.onrender.com/api/feedback/feedback-insert', {
+                prn, // sending prn as separate field
+                feedbackData, // send feedback data as is
             });
 
-            if (response.ok) {
+            if (response.status === 200) {  // Checking the correct status code
                 sendEmail(e);
                 alert(t('Feedback sent successfully!'));
                 handleClear();
@@ -98,7 +97,6 @@ function FeedbackPage() {
         }
     }
 };
-  
 
   const handleClear = () => {
     setName('');

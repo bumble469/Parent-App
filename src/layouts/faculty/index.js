@@ -13,37 +13,46 @@ import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import axios from 'axios';
 import loading_image from '../../assets/images/icons8-loading.gif';
-
+import { useSession } from '../../context/SessionContext';
 function Faculty() {
+  const {session} = useSession();
   const { t } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
   const [staffData, setStaffData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const prn = session.studentId || 0;
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-
+  
       try {
         const apiUrl =
           tabValue === 0
             ? 'https://parent-rest-api.onrender.com/api/faculty'
             : 'https://parent-rest-api.onrender.com/api/chat/chat-list';
-
-        const response = await axios.get(apiUrl);
-        setStaffData(response.data);
+  
+        let response;
+  
+        if (tabValue === 0) {
+          response = await axios.get(apiUrl);
+          setStaffData(response.data); 
+        } else {
+          response = await axios.post(apiUrl, 
+            { prn, });
+          setStaffData(response.data); 
+        }
         setLoading(false);
       } catch (err) {
         setError(err.message);
         setLoading(false);
       }
     };
-
+  
     fetchData();
-  }, [tabValue]);
-
+  }, [tabValue, prn]);
+  
   const handleSetTabValue = (event, newValue) => {
     setTabValue(newValue);
   };
