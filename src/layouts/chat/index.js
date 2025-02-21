@@ -30,6 +30,7 @@ import { useSession } from '../../context/SessionContext';
 function Chat() {
   const { session } = useSession();
   const parentId = session.parentId || 0;
+  const prn = session.studentId || 0;
   const theme = useTheme();
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -48,11 +49,10 @@ function Chat() {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await fetch('http://localhost:8001/api/chat/chat-list');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
+        const response = await axios.post('https://parent-rest-api.onrender.com/api/chat/chat-list', {
+          prn,
+        });
+        const data = response.data;
         setTeachers(data);
       } catch (error) {
         setErrorTeachers(error.message);
@@ -68,7 +68,7 @@ function Chat() {
     setLoadingMessages(true);
     setErrorMessages(null);
     try {
-      const response = await axios.get('http://localhost:8001/api/chat/chats', {
+      const response = await axios.get('https://parent-rest-api.onrender.com/api/chat/chats', {
         params: { parentId, teacherId },
       });
       setMessages(response.data);
@@ -91,7 +91,7 @@ function Chat() {
     if (!newMessage.trim() || !selectedTeacher) return;
 
     try {
-      await axios.post('http://localhost:8001/api/chat/chats', {
+      await axios.post('https://parent-rest-api.onrender.com/api/chat/chats', {
         parentId,
         teacherId: selectedTeacher.teacher_id,
         senderType: 'Parent',
@@ -373,8 +373,8 @@ function Chat() {
                                 {msg.Message}
                               </Typography>
                               <Typography variant="caption" style={{ color: '#888', fontSize: '0.7rem' }}>
-                                {new Date(msg.Timestamp).toLocaleString()}
-                              </Typography>
+                                {msg.Timestamp.split("T")[0]} {msg.Timestamp.split("T")[1].split(".")[0]}
+                              </Typography>
                             </Box>
                           ))
                         )}

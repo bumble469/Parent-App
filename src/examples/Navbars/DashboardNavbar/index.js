@@ -112,7 +112,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:8001/api/student/currentsemester", {
+        const response = await fetch("https://parent-rest-api.onrender.com/api/student/currentsemester", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ prn }),
@@ -120,7 +120,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
         const studentData = await response.json();
         setStudent(studentData);
   
-        const notificationResponse = await fetch("http://localhost:8001/api/dashboard/student/graph",{
+        const notificationResponse = await fetch("https://parent-rest-api.onrender.com/api/dashboard/student/graph",{
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ prn }),

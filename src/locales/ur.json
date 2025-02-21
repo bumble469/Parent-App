@@ -237,6 +237,33 @@
         "Analyzes attendance patterns from previous weeks": "گزشتہ ہفتوں کی حاضری کے نمونوں کا تجزیہ کرتا ہے۔",
         "Predicts the likelihood of a student's presence for the upcoming timetable": "آنے والے ٹائم ٹیبل میں طالب علم کی موجودگی کے امکانات کی پیش گوئی کرتا ہے۔",
         "Estimation is based on available data and may vary": "تخمینہ دستیاب ڈیٹا پر مبنی ہوتا ہے اور یہ مختلف ہو سکتا ہے۔",
-          "Navigating Your Child's Progress: A Parent's Handbook": "آپ کے بچے کی ترقی کا سفر: والدین کے لیے رہنما کتاب"
-        }
-        
+          "Navigating Your Child's Progress: A Parent's Handbook": "آپ کے بچے کی ترقی کا سفر: والدین کے لیے رہنما کتاب",
+            "failed_to_fetch_attendance_data": "حاضری کا ڈیٹا حاصل کرنے میں ناکامی",
+            "day": "دن",
+            "predictions_chance_of_attending": "حاضری کی پیش گوئی (حاضری کا امکان)",
+            "current_attendance_percentage": "موجودہ حاضری (%)",
+            "if_attends_next_session": "اگر اگلی نشست میں شرکت کرے تو (%)",
+            "if_misses_next_session": "اگر اگلی نشست چھوٹ جائے تو (%)",
+            "attendance_prediction": "حاضری کی پیش گوئی",
+            "risk_level": "خطرہ سطح",
+            "attendance_forecasting_and_risk_assessment": "حاضری کی پیش گوئی اور خطرہ کا جائزہ",
+            "based_on_upcoming_week": "آنے والے ہفتے کی بنیاد پر",
+            "daily_attendance_forecasting": "روزانہ حاضری کی پیش گوئی",
+            "forecasting_bar_graph": "پیش گوئی کا بار گراف",
+            "subject_wise_attendance_details": "مضمون وار حاضری کی تفصیلات",
+            "page": "صفحہ",
+            "of": "کا",
+            "Marks Predictions": "نمبروں کی پیش گوئی",
+            "Marks Comparison": "نمبروں کا موازنہ",
+            "Percentage Comparison Line Graph": "فیصد کا موازنہ لائن گراف",
+            "This page allows parents to ocassionally connect with the current semester's faculty.": "یہ صفحہ والدین کو موجودہ سمسٹر کے فیکلٹی سے وقتاً فوقتاً جڑنے کی اجازت دیتا ہے۔",
+            "Details about the faculty are also shown such has which semesters they have taught, and which subjects.": "فیکلٹی کے بارے میں تفصیلات بھی دکھائی جاتی ہیں جیسے کہ انہوں نے کون سے سمسٹرز میں تدریس دی ہے، اور کون سے مضامین پڑھائے ہیں۔",
+            "It will highlights the student's participation in various extracurricular activities, showcasing their interests and skills outside the classroom.": "یہ طالب علم کی مختلف ہم نصابی سرگرمیوں میں شرکت کو اجاگر کرے گا، جو کلاس روم کے باہر ان کی دلچسپیوں اور مہارتوں کو دکھائے گا۔",
+            "It will display a detailed review of lectures for each subject as well as all subject, covering each week, months and the entire duration of the course.": "یہ ہر مضمون کے لیے اور تمام مضامین کا تفصیلی جائزہ دکھائے گا، جس میں ہر ہفتے، مہینے اور کورس کی پوری مدت کا احاطہ کیا جائے گا۔",
+            "Predicted Grade": "مفروضہ گریڈ",
+              "Marks": "نمبروں",
+              "Total Marks": "مجموعی نمبر",
+              "Percentage": "فیصد",
+              "Grade": "گریڈ"
+            }
+          

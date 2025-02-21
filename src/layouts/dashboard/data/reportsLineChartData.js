@@ -19,7 +19,7 @@ const ReportsLineChartWrapper = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('http://localhost:8001/api/dashboard/student/graph',{
+        const response = await axios.post('https://parent-rest-api.onrender.com/api/dashboard/student/graph',{
           prn:prn
         });
         if (Array.isArray(response.data)) {

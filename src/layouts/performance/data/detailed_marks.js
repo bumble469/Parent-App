@@ -14,7 +14,7 @@ const MarksTable = ({ prn, semester }) => {
 
   const fetchMarksData = async (semester) => {
     try {
-      const response = await axios.post('http://localhost:8001/api/performance/student/detailedmarks',{
+      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedmarks',{
         prn:prn,
         semester:semester
       });

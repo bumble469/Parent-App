@@ -34,7 +34,7 @@ function Performance() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('http://localhost:8001/api/performance/student',{
+        const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student',{
           prn:prn
         });
         const data = response.data;

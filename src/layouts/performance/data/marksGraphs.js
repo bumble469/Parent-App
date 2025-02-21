@@ -100,7 +100,7 @@ const LineGraph = ({ prn, semester, threshold = 95 }) => {
   const fetchMarksData = async (semester) => {
     try {
       setLoading(true); // Set loading to true before fetching data
-      const response = await axios.post('http://localhost:8001/api/performance/student/detailedmarks',{
+      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedmarks',{
         prn:prn,
         semester:semester
       });

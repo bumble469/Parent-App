@@ -36,7 +36,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        const response = await fetch("http://localhost:8001/api/student/profile",{
+        const response = await fetch("https://parent-rest-api.onrender.com/api/student/profile",{
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prn }),

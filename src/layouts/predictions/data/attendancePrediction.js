@@ -36,11 +36,11 @@ export const PredictAttendance = () => {
         }
       }
 
-      const response = await axios.post('http://localhost:5000/predict-attendance', { prn });
+      const response = await axios.post('https://parent-machinelearning.onrender.com/predict-attendance', { prn });
       localStorage.setItem(CACHE_KEY, JSON.stringify({ data: response.data, timestamp: Date.now() }));
       setAttendance(response.data);
     } catch (error) {
-      setError('Failed to fetch attendance data');
+      setError(t('failed_to_fetch_attendance_data'));
       console.error('Error fetching attendance:', error);
     } finally {
       setLoading(false);
@@ -62,15 +62,15 @@ export const PredictAttendance = () => {
   const goToNextPage = () => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1);
 
   const predictionColumns = [
-    { Header: 'Day', accessor: 'day_name' },
-    { Header: 'Predictions (Chance of attending)', accessor: 'average_prediction' },
+    { Header: t('day'), accessor: 'day_name' },
+    { Header: t('predictions_chance_of_attending'), accessor: 'average_prediction' },
   ];
 
   const attendanceChangesColumns = [
-    { Header: 'Subject', accessor: 'subject' },
-    { Header: 'Current Attendance (%)', accessor: 'attendance_percentage' },
-    { Header: 'If attends next session (%)', accessor: 'new_percentage_attend' },
-    { Header: 'If misses next session (%)', accessor: 'new_percentage_miss' },
+    { Header: t('subject'), accessor: 'subject' },
+    { Header: t('current_attendance_percentage'), accessor: 'attendance_percentage' },
+    { Header: t('if_attends_next_session'), accessor: 'new_percentage_attend' },
+    { Header: t('if_misses_next_session'), accessor: 'new_percentage_miss' },
   ];
   
   const attendanceData = attendance
@@ -140,35 +140,34 @@ export const PredictAttendance = () => {
   };
   
   const chartSeries = [
-    { name: 'Attendance Prediction', data: dailyPredictionData.map((prediction) => prediction.average_prediction) },
-    { name: 'Risk Level', data: dailyPredictionData.map((prediction) => prediction.risk_level) },
+    { name: t('attendance_prediction'), data: dailyPredictionData.map((prediction) => prediction.average_prediction) },
+    { name: t('risk_level'), data: dailyPredictionData.map((prediction) => prediction.risk_level) },
   ];
-   
 
   return (
     <Card sx={{ p: 1, mt: 5, mb: 3 }}>
       <MDBox mx={2} mt={-3} py={3} px={2} variant="gradient" bgColor="info" borderRadius="lg" coloredShadow="info">
         <Typography variant="h6" sx={{ color: 'white !important' }}>
-          Attendance Forecasting and Risk Assessment
+          {t('attendance_forecasting_and_risk_assessment')}
         </Typography>
-        <Typography variant="caption" sx={{ color: 'white !important' }}>Based on upcoming week</Typography>
+        <Typography variant="caption" sx={{ color: 'white !important' }}>{t('based_on_upcoming_week')}</Typography>
       </MDBox>
       <MDBox sx={{ mt: 3 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{ textAlign: "center", padding: "50px" }}>
-              <img src={loading_image} alt="Loading..." style={{ width: '50px', height: '50px' }} />
+              <img src={loading_image} alt={t('loading')} style={{ width: '50px', height: '50px' }} />
             </div>
           </Box>
         ) : error ? (
           <Typography variant="body1" color="error">
-            Error loading data: {error}
+            {t('error_loading_data')}: {error}
           </Typography>
         ) : (
           <>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" sx={{ textAlign: 'center' }}>Daily Attendance Forecasting</Typography>
+                <Typography variant="h6" sx={{ textAlign: 'center' }}>{t('daily_attendance_forecasting')}</Typography>
                 <DataTable
                   table={{ columns: predictionColumns, rows: dailyPredictionData }}
                   isSorted={false}
@@ -178,7 +177,7 @@ export const PredictAttendance = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" sx={{ textAlign: 'center' }}>Forecasting Bar Graph</Typography>
+                <Typography variant="h6" sx={{ textAlign: 'center' }}>{t('forecasting_bar_graph')}</Typography>
                 <ApexCharts
                   options={chartOptions}
                   series={chartSeries}
@@ -188,7 +187,7 @@ export const PredictAttendance = () => {
               </Grid>
             </Grid>
 
-            <Typography variant="h6" sx={{ mt: 3, textAlign: 'center' }}>Subject-wise Attendance Details</Typography>
+            <Typography variant="h6" sx={{ mt: 3, textAlign: 'center' }}>{t('subject_wise_attendance_details')}</Typography>
             <DataTable
               table={{ columns: attendanceChangesColumns, rows: attendanceData }}
               isSorted={false}
@@ -220,7 +219,7 @@ export const PredictAttendance = () => {
                   transition: 'background-color 0.3s ease',
                 }}
               >
-                Previous
+                {t('previous')}
               </button>
               <span
                 style={{
@@ -228,7 +227,7 @@ export const PredictAttendance = () => {
                   color: '#333',
                 }}
               >
-                Page {currentPage + 1} of {totalPages}
+                {t('page')} {currentPage + 1} {t('of')} {totalPages}
               </span>
               <button
                 onClick={goToNextPage}
@@ -244,7 +243,7 @@ export const PredictAttendance = () => {
                   transition: 'background-color 0.3s ease',
                 }}
               >
-                Next
+                {t('next')}
               </button>
             </div>
           </>

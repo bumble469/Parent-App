@@ -24,7 +24,7 @@ function Overview() {
   useEffect(() => {
     const fetchStudentProfile = async (prn) => {
       try {
-        const response = await axios.post('http://localhost:8001/api/student/profile', {
+        const response = await axios.post('https://parent-rest-api.onrender.com/api/student/profile', {
           prn: prn
         });
         const data = response.data;

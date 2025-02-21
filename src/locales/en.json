@@ -203,6 +203,30 @@
     "Analyzes attendance patterns from previous weeks": "Analyzes attendance patterns from previous weeks.",
     "Predicts the likelihood of a student's presence for the upcoming timetable": "Predicts the likelihood of a student's presence for the upcoming timetable.",
     "Estimation is based on available data and may vary": "Estimation is based on available data and may vary",
-    "Navigating Your Child's Progress: A Parent's Handbook": "Navigating Your Child's Progress: A Parent's Handbook"
-  }
-  
+    "Navigating Your Child's Progress: A Parent's Handbook": "Navigating Your Child's Progress: A Parent's Handbook",
+      "failed_to_fetch_attendance_data": "Failed to fetch attendance data",
+      "day": "Day",
+      "predictions_chance_of_attending": "Predictions (Chance of attending)",
+      "current_attendance_percentage": "Current Attendance (%)",
+      "if_attends_next_session": "If attends next session (%)",
+      "if_misses_next_session": "If misses next session (%)",
+      "attendance_prediction": "Attendance Prediction",
+      "risk_level": "Risk Level",
+      "attendance_forecasting_and_risk_assessment": "Attendance Forecasting and Risk Assessment",
+      "based_on_upcoming_week": "Based on upcoming week",
+      "daily_attendance_forecasting": "Daily Attendance Forecasting",
+      "forecasting_bar_graph": "Forecasting Bar Graph",
+      "subject_wise_attendance_details": "Subject-wise Attendance Details",
+      "page": "Page",
+      "of": "of",
+      "Marks Predicctions": "Marks Predictions",
+      "Marks Comparison": "Marks Comparison",
+      "Percentage Comparison Line Graph": "Percentage Comparison Line Graph",
+      "Predicted Grade": "Predicted Grade",
+      "This page allows parents to ocassionally connect with the current semester's faculty.":"This page allows parents to ocassionally connect with the current semester's faculty.",
+        "Marks": "Marks",
+        "Total Marks": "Total Marks",
+        "Percentage": "Percentage",
+        "Grade": "Grade"
+      }
+      

@@ -17,7 +17,7 @@ const AttendanceTable = ({ prn, semester }) => {
   const fetchDetailedAttendance = async (semester) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8001/api/performance/student/detailedattendance',{
+      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedattendance',{
         prn:prn,
         semester:semester
       });

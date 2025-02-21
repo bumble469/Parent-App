@@ -6,11 +6,13 @@ import axios from 'axios';
 import MDBox from 'components/MDBox';
 import Cookies from 'js-cookie';
 import loading_image from '../../../assets/images/icons8-loading.gif';
+import { useTranslation } from 'react-i18next';
 
 export const PredictMarks = () => {
   const [marks, setMarks] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const { t } = useTranslation();
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -18,10 +20,10 @@ export const PredictMarks = () => {
 
   const fetchMarks = async (prn) => {
     try {
-      const response = await axios.post('http://localhost:5000/predict-marks', { prn });
+      const response = await axios.post('https://parent-machinelearning.onrender.com/predict-marks', { prn });
       return response.data;
     } catch (error) {
-      console.error('There was an error fetching the marks:', error);
+      console.error(t('There was an error fetching the marks:'), error);
       return null;
     }
   };
@@ -35,40 +37,40 @@ export const PredictMarks = () => {
     };
 
     fetchData();
-  }, []); 
+  }, []);
 
   const marksColumns = [
-    { Header: 'Semester', accessor: 'semester' },
-    { Header: 'Marks', accessor: 'marks' },
-    { Header: 'Total Marks', accessor: 'totalMarks' },
-    { Header: 'Percentage', accessor: 'percentage' },
-    { Header: 'Grade', accessor: 'grade' },
+    { Header: t('Semester'), accessor: 'semester' },
+    { Header: t('Marks'), accessor: 'marks' },
+    { Header: t('Total Marks'), accessor: 'totalMarks' },
+    { Header: t('Percentage'), accessor: 'percentage' },
+    { Header: t('Grade'), accessor: 'grade' },
   ];
 
   const previousSemesters = [
-    `Semester ${marks?.latest_sem - 2}`,
-    `Semester ${marks?.latest_sem - 1}`,
+    `${t('Semester')} ${marks?.latest_sem - 2}`,
+    `${t('Semester')} ${marks?.latest_sem - 1}`,
   ];
-  
+
   const filteredMarksTableData = [
     {
       id: 1,
       semester: previousSemesters[0],
-      marks: marks?.prevsem2_marks || 'N/A',
-      totalMarks: marks?.prevsem2_total_obtainable || 'N/A',
-      percentage: marks?.prevsem2_perc ? `${marks?.prevsem2_perc.toFixed(2)}%` : 'N/A',
-      grade: marks?.prevsem2_grade || 'N/A',
+      marks: marks?.prevsem2_marks || t('N/A'),
+      totalMarks: marks?.prevsem2_total_obtainable || t('N/A'),
+      percentage: marks?.prevsem2_perc ? `${marks?.prevsem2_perc.toFixed(2)}%` : t('N/A'),
+      grade: marks?.prevsem2_grade || t('N/A'),
     },
     {
       id: 2,
       semester: previousSemesters[1],
-      marks: marks?.prevsem1_marks || 'N/A',
-      totalMarks: marks?.prevsem1_total_obtainable || 'N/A',
-      percentage: marks?.prevsem1_perc ? `${marks?.prevsem1_perc.toFixed(2)}%` : 'N/A',
-      grade: marks?.prevsem1_grade || 'N/A',
+      marks: marks?.prevsem1_marks || t('N/A'),
+      totalMarks: marks?.prevsem1_total_obtainable || t('N/A'),
+      percentage: marks?.prevsem1_perc ? `${marks?.prevsem1_perc.toFixed(2)}%` : t('N/A'),
+      grade: marks?.prevsem1_grade || t('N/A'),
     }
   ];
-  
+
   const chartOptions = {
     chart: {
       type: 'line',
@@ -78,7 +80,7 @@ export const PredictMarks = () => {
       },
     },
     xaxis: {
-      categories: [...previousSemesters, 'Predicted'],  
+      categories: [...previousSemesters, t('Predicted')],  
     },
     stroke: {
       curve: 'smooth',
@@ -110,10 +112,10 @@ export const PredictMarks = () => {
       },
     },
   };
-  
+
   const chartSeries = [
     {
-      name: 'Percentage Comparison',
+      name: t('Percentage Comparison'),
       data: [
         marks?.prevsem2_perc ? marks?.prevsem2_perc.toFixed(2) : 0,
         marks?.prevsem1_perc ? marks?.prevsem1_perc.toFixed(2) : 0,
@@ -121,7 +123,7 @@ export const PredictMarks = () => {
       ],
     },
   ];
-  
+
   return (
     <Card sx={{ p: 1, mt: 5, mb:3 }}>
       <MDBox
@@ -135,20 +137,20 @@ export const PredictMarks = () => {
         coloredShadow="success"
       >
         <Typography variant="h6" sx={{ color: 'white !important' }}>
-          Marks Predictions
+          {t('Marks Predictions')}
         </Typography>
       </MDBox>
 
       <MDBox sx={{ mt: 4 }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "50px" }}>
-            <img src={loading_image} alt="Loading..." style={{ width: '50px', height: '50px' }}/>
+            <img src={loading_image} alt={t('Loading...')} style={{ width: '50px', height: '50px' }}/>
           </div>
         ) : (
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Typography variant="h6" sx={{ textAlign: 'center' }}>
-                Marks Comparison
+                {t('Marks Comparison')}
               </Typography>
               <DataTable
                 table={{ columns: marksColumns, rows: filteredMarksTableData }}
@@ -158,13 +160,13 @@ export const PredictMarks = () => {
                 noEndBorder
               />
               <Box sx={{ mt: 2, textAlign: 'center', fontWeight: 'bold', fontSize: '1rem', color: 'black', mb:-2 }}>
-                Predicted Grade: {marks?.predicted_grade_range || 'N/A'} ({marks?.predicted_perc?.toFixed(2) || 'N/A'}%)
+                {t('Predicted Grade')}: {marks?.predicted_grade_range || t('N/A')} ({marks?.predicted_perc?.toFixed(2) || t('N/A')}%)
               </Box>
             </Grid>
 
             <Grid item xs={12} md={6}>
               <Typography variant="h6" sx={{ textAlign: 'center' }}>
-                Percentage Comparison Line Graph
+                {t('Percentage Comparison Line Graph')}
               </Typography>
               <ApexCharts
                 options={chartOptions}

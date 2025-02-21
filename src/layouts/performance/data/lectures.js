@@ -16,7 +16,7 @@ const LectureViewTable = ({ prn, semester }) => {
   const fetchDetailedLectureViews = async (semester) => {
     try {
       setIsLoading(true);  // Set loading to true when the fetch starts
-      const response = await axios.post('http://localhost:8001/api/performance/student/lectureviews',{
+      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/lectureviews',{
         prn:prn,
         semester:semester
       });

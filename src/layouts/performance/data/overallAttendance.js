@@ -10,7 +10,7 @@ function OverallAttendance({ prn, semester, t, i18n }) {
   useEffect(() => {
     const fetchAttendanceData = async (semester) => {
       try {
-        const response = await axios.post('http://localhost:8001/api/performance/student/detailedattendance',{
+        const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedattendance',{
           prn:prn,
           semester:semester
         });

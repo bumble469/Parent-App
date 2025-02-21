@@ -23,7 +23,7 @@ const ReportsBarChartWrapper = ({ prn, semester }) => {
         if (validSemester < 1 || validSemester > 6) {
           throw new Error("Invalid semester value");
         }
-        const response = await axios.post('http://localhost:8001/api/performance/student/detailedattendance',{
+        const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedattendance',{
           prn:prn,
           semester:validSemester
         });

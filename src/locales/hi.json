@@ -237,6 +237,31 @@
           "Analyzes attendance patterns from previous weeks": "पिछले सप्ताहों की उपस्थिति पैटर्न का विश्लेषण करता है।",
           "Predicts the likelihood of a student's presence for the upcoming timetable": "छात्र की आगामी टाइमटेबल में उपस्थिति की संभावना की भविष्यवाणी करता है।",
           "Estimation is based on available data and may vary": "उपलब्ध डेटा के आधार पर अनुमान लगाया जाता है और यह भिन्न हो सकता है।",
-            "Navigating Your Child's Progress: A Parent's Handbook": "आपके बच्चे की प्रगति को समझना: एक माता-पिता की मार्गदर्शिका"
-          }
-          
+            "Navigating Your Child's Progress: A Parent's Handbook": "आपके बच्चे की प्रगति को समझना: एक माता-पिता की मार्गदर्शिका",
+              "failed_to_fetch_attendance_data": "अटेंडेंस डेटा प्राप्त करने में विफल",
+              "day": "दिन",
+              "predictions_chance_of_attending": "भाग लेने का अनुमान (अटेंड करने का मौका)",
+              "current_attendance_percentage": "वर्तमान उपस्थिति (%)",
+              "if_attends_next_session": "अगले सत्र में भाग लेने पर (%)",
+              "if_misses_next_session": "अगले सत्र को मिस करने पर (%)",
+              "attendance_prediction": "उपस्थिति भविष्यवाणी",
+              "risk_level": "जोखिम स्तर",
+              "attendance_forecasting_and_risk_assessment": "उपस्थिति पूर्वानुमान और जोखिम मूल्यांकन",
+              "based_on_upcoming_week": "आगामी सप्ताह के आधार पर",
+              "daily_attendance_forecasting": "दैनिक उपस्थिति पूर्वानुमान",
+              "forecasting_bar_graph": "पूर्वानुमान बार ग्राफ",
+              "subject_wise_attendance_details": "विषय वार उपस्थिति विवरण",
+              "page": "पृष्ठ",
+              "of": "का",
+              "Marks Predictions": "अंकों की भविष्यवाणी",
+              "Marks Comparison": "अंकों की तुलना",
+              "Percentage Comparison Line Graph": "प्रतिशत तुलना रेखा ग्राफ",
+              "Predicted Grade": "पूर्वानुमानित ग्रेड",
+              "This page allows parents to ocassionally connect with the current semester's faculty.": "यह पृष्ठ माता-पिता को वर्तमान सेमेस्टर के फैकल्टी से कभी-कभी जुड़ने की अनुमति देता है।",
+                "Marks": "अंक",
+                "Total Marks": "कुल अंक",
+                "Percentage": "प्रतिशत",
+                "Grade": "ग्रेड"
+              }
+              
+            

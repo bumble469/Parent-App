@@ -6,18 +6,18 @@ import MDTypography from 'components/MDTypography';
 function Footer() {
   return (
     <MDBox
-      position="relative" // Fixes the footer to the bottom
+      position="relative"
       top={8}
-      bottom={0} // Aligns the footer to the bottom of the page
-      left={0} // Ensures the footer starts from the left edge
-      right={0} // Ensures the footer extends to the right edge
-      width="calc(100% - 0px)" // Adjust if needed to account for any potential sidebar width
+      bottom={0}
+      left={0}
+      right={0}
+      width="calc(100% - 0px)"
       display="flex"
       flexDirection={{ xs: 'column', lg: 'row' }}
       justifyContent="space-between"
       alignItems="center"
       borderRadius="3px"
-      sx={{ backgroundColor: '#ffffff', zIndex: 1100, margin: 0 }} // Light background color for the footer
+      sx={{ backgroundColor: '#ffffff', zIndex: 1100, margin: 0 }}
     >
       <MDBox
         display="flex"
@@ -25,34 +25,37 @@ function Footer() {
         alignItems="center"
         flexWrap="wrap"
         color="text"
-        fontSize="14px" // Adjusted font size
+        fontSize="14px"
         px={1.5}
         textAlign="center"
+        width="100%"
       >
-        &copy; {new Date().getFullYear()}{' '}
+        <MDTypography variant="body2" fontWeight="regular">
+          &copy; {new Date().getFullYear()}{' '}
+        </MDTypography>
+        {/* Add margin here to create space */}
         <Link href="https://www.yourcollege.edu" target="_blank">
-          <MDTypography variant="button" fontWeight="medium">
-            Your College Name
+          <MDTypography variant="button" fontWeight="medium" sx={{ marginLeft: 1 }}>
+            Kishinchand Chellaram College
           </MDTypography>
         </Link>
-        . All rights reserved.
+        .   All rights reserved by Group-6 
       </MDBox>
-      <MDBox display="flex" alignItems="center" justifyContent="center" mt={1} mb={0} p={0}>
-        <Link href="https://www.instagram.com/yourcollege" target="_blank" sx={{ mx: 2 }}>
-          <Icon fontSize="large" sx={{ color: '#E1306C' }}>
-            instagram
-          </Icon>
-        </Link>
+
+      <MDBox
+        display="flex"
+        alignItems="center"
+        justifyContent="flex-start"
+        mt={1}
+        mb={0}
+        p={0}
+      >
         <Link href="https://www.linkedin.com/school/yourcollege" target="_blank" sx={{ mx: 2 }}>
           <Icon fontSize="large" sx={{ color: '#0A66C2' }}>
             linkedin
           </Icon>
         </Link>
-        <Link href="https://www.facebook.com/yourcollege" target="_blank" sx={{ mx: 2 }}>
-          <Icon fontSize="large" sx={{ color: '#1877F2' }}>
-            facebook
-          </Icon>
-        </Link>
+        
       </MDBox>
     </MDBox>
   );

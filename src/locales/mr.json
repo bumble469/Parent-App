@@ -237,6 +237,30 @@
         "Analyzes attendance patterns from previous weeks": "मागील आठवड्यांच्या हजेरीच्या पद्धतींचे विश्लेषण करते.",
         "Predicts the likelihood of a student's presence for the upcoming timetable": "आगामी वेळापत्रकासाठी विद्यार्थ्याच्या उपस्थितीची शक्यता दर्शवते.",
         "Estimation is based on available data and may vary": "अंदाज उपलब्ध डेटावर आधारित असतो आणि तो बदलू शकतो.",
-          "Navigating Your Child's Progress: A Parent's Handbook": "तुमच्या मुलाच्या प्रगतीची दिशा: पालकांसाठी मार्गदर्शक"
-        }
-        
+          "Navigating Your Child's Progress: A Parent's Handbook": "तुमच्या मुलाच्या प्रगतीची दिशा: पालकांसाठी मार्गदर्शक",
+            "failed_to_fetch_attendance_data": "हजरदार डेटा मिळवण्यात अयशस्वी",
+            "day": "दिवस",
+            "predictions_chance_of_attending": "हजरदार अंदाज (हजेरीची शक्यता)",
+            "current_attendance_percentage": "सध्याची हजेरी (%)",
+            "if_attends_next_session": "जर पुढील सत्रात हजेरी दिली तर (%)",
+            "if_misses_next_session": "जर पुढील सत्र चुकले तर (%)",
+            "attendance_prediction": "हजरदार अंदाज",
+            "risk_level": "धोका पातळी",
+            "attendance_forecasting_and_risk_assessment": "हजरदार अंदाज आणि धोका मूल्यांकन",
+            "based_on_upcoming_week": "आगामी आठवड्याच्या आधारे",
+            "daily_attendance_forecasting": "दैनंदिन हजरदार अंदाज",
+            "forecasting_bar_graph": "अंदाज बार ग्राफ",
+            "subject_wise_attendance_details": "विषयानुसार हजरदार तपशील",
+            "page": "पृष्ठ",
+            "of": "चा",
+            "Marks Predictions": "अंकी भविष्यवाणी",
+            "Marks Comparison": "अंकी तुलना",
+            "Percentage Comparison Line Graph": "प्रतिशत तुलना रेखा ग्राफ",
+            "Predicted Grade": "भविष्यवाणी केलेला ग्रेड",
+            "This page allows parents to ocassionally connect with the current semester's faculty.": "हे पृष्ठ पालकांना सध्याच्या सेमिस्टरच्या शिक्षकांशी कधीकधी जोडण्याची परवानगी देते.",
+              "Marks": "अंके",
+              "Total Marks": "कुल अंक",
+              "Percentage": "टक्केवारी",
+              "Grade": "ग्रेड"
+            }
+            

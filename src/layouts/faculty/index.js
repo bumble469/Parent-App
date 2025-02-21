@@ -29,8 +29,8 @@ function Faculty() {
       try {
         const apiUrl =
           tabValue === 0
-            ? 'http://localhost:8001/api/faculty'
-            : 'http://localhost:8001/api/chat/chat-list';
+            ? 'https://parent-rest-api.onrender.com/api/faculty'
+            : 'https://parent-rest-api.onrender.com/api/chat/chat-list';
 
         const response = await axios.get(apiUrl);
         setStaffData(response.data);
