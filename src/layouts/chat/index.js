@@ -15,7 +15,6 @@ import {
   useTheme,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
@@ -41,12 +40,10 @@ function Chat() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [errorMessages, setErrorMessages] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Define state for sidebar open/close
+  const [sidebarOpen, setSidebarOpen] = useState(false); 
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const { t } = useTranslation();
-
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -106,17 +103,6 @@ function Chat() {
       loadMessages(selectedTeacher.teacher_id);
     } catch (error) {
       console.error('Error sending message:', error);
-    }
-  };
-
-  const handleFileClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      console.log('Selected file:', file);
     }
   };
 
@@ -420,32 +406,18 @@ function Chat() {
                           }}
                         />
                         <IconButton
-                          color="white"
-                          onClick={sendMessage}
-                          style={{
-                            borderRadius: '50%',
-                            backgroundColor: '#5dbea3',
-                            marginRight:'0.3rem'
-                          }}
-                        >
-                          <SendIcon />
-                        </IconButton>
-                        <IconButton
-                        color="white"
-                          onClick={handleFileClick}
-                          style={{
-                            borderRadius: '50%',
-                            backgroundColor: '#5783db',
-                          }}
-                        >
-                          <AttachFileIcon />
-                        </IconButton>
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          style={{ display: 'none' }}
-                          onChange={handleFileChange}
-                        />
+                        onClick={sendMessage}
+                        sx={{
+                          transition: 'transform 0.2s ease, color 0.2s ease',
+                          '&:hover': {
+                            transform: 'scale(1.2)',
+                            color: theme.palette.primary.main,
+                          },
+                        }}
+                      >
+                        <SendIcon />
+                      </IconButton>
+
                       </Box>
                     </>
                   ) : (

@@ -7,36 +7,48 @@ import loading_image from '../../../assets/images/icons8-loading.gif';
 import MDBox from 'components/MDBox';
 import ApexCharts from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 export const PredictAttendance = () => {
+  const theme = useTheme();
   const [attendance, setAttendance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
-  const {t} = useTranslation();
-  
+  const { t } = useTranslation();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));  
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
 
-  const fetchAttendance = async (prn) => {
+  const CACHE_KEY = `attendance_cache_${prn}`;
+  const CACHE_DURATION = 2*60;
+
+  const fetchAttendance = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:5000/predict-attendance', { prn });
-      return response.data;
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        if (Date.now() - parsedData.timestamp < CACHE_DURATION) {
+          setAttendance(parsedData.data);
+          setLoading(false);
+          return;
+        }
+      }
+
+      const response = await axios.post('http://localhost:5000/predict-attendance', { prn });
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ data: response.data, timestamp: Date.now() }));
+      setAttendance(response.data);
     } catch (error) {
-      console.error('There was an error fetching the data:', error);
-      return null;
+      setError('Failed to fetch attendance data');
+      console.error('Error fetching attendance:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const result = await fetchAttendance(prn);
-      setAttendance(result);
-      setLoading(false);
-    };
-    fetchData();
+    fetchAttendance();
   }, []);
 
   useEffect(() => {
@@ -46,13 +58,8 @@ export const PredictAttendance = () => {
     }
   }, [attendance]);
 
-  const goToPreviousPage = () => {
-    if (currentPage > 0) setCurrentPage(currentPage - 1);
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
-  };
+  const goToPreviousPage = () => currentPage > 0 && setCurrentPage(currentPage - 1);
+  const goToNextPage = () => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1);
 
   const predictionColumns = [
     { Header: 'Day', accessor: 'day_name' },
@@ -65,73 +72,86 @@ export const PredictAttendance = () => {
     { Header: 'If attends next session (%)', accessor: 'new_percentage_attend' },
     { Header: 'If misses next session (%)', accessor: 'new_percentage_miss' },
   ];
-
-  const attendanceData = attendance ? attendance.attendance_by_subject.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((subjectData) => ({
-    subject: subjectData.subject,
-    attendance_percentage: subjectData.attendance_percentage.toFixed(2),
-    new_percentage_attend: subjectData.new_percentage_attend.toFixed(2),
-    new_percentage_miss: subjectData.new_percentage_miss.toFixed(2),
-  })) : [];
-
-  const dailyPredictionData = attendance ? attendance.daily_predictions.map((prediction) => ({
-    day_name: prediction.day_name,
-    average_prediction: (prediction.average_prediction * 100).toFixed(2),
-  })) : [];
+  
+  const attendanceData = attendance
+    ? attendance.attendance_by_subject.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((subjectData) => {
+        const attendDiff = (subjectData.new_percentage_attend - subjectData.attendance_percentage).toFixed(2);
+        const missDiff = (subjectData.new_percentage_miss - subjectData.attendance_percentage).toFixed(2);
+  
+        return {
+          subject: subjectData.subject,
+          attendance_percentage: subjectData.attendance_percentage.toFixed(2),
+          new_percentage_attend: (
+            <>
+              {subjectData.new_percentage_attend.toFixed(2)}% 
+              <span style={{ color: attendDiff > 0 ? 'green' : 'red', marginLeft: '5px' }}>
+                {attendDiff > 0 ? '▲' : '▼'} {Math.abs(attendDiff)}
+              </span>
+            </>
+          ),
+          new_percentage_miss: (
+            <>
+              {subjectData.new_percentage_miss.toFixed(2)}% 
+              <span style={{ color: missDiff > 0 ? 'green' : 'red', marginLeft: '5px' }}>
+                {missDiff > 0 ? '▲' : '▼'} {Math.abs(missDiff)}
+              </span>
+            </>
+          ),
+        };
+      })
+    : [];  
+  
+  const dailyPredictionData = attendance
+  ? attendance.daily_predictions.map((prediction) => ({
+      day_name: prediction.day_name,
+      average_prediction: (prediction.average_prediction * 100).toFixed(2)+ '%',
+      risk_level: (100 - prediction.average_prediction * 100).toFixed(2),
+    }))
+  : [];
 
   const chartOptions = {
-    chart: {
-      type: 'bar',
-      height: '100%',
-      toolbar: { show: false },
+    chart: { 
+      type: 'bar', 
+      width: "100%", 
+      toolbar: { show: false } 
     },
-    xaxis: {
-      categories: dailyPredictionData.map((prediction) => prediction.day_name),
+    xaxis: { categories: dailyPredictionData.map((prediction) => prediction.day_name) },
+    plotOptions: { 
+      bar: { 
+        horizontal: false, 
+        columnWidth:'10rem', 
+        borderRadius: 2,
+        grouped: true,  
+      }
     },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: '10%',
-        borderRadius: 5,
-      },
+    yaxis: {
+      min: 0, 
+      max: 100,
+      labels: { formatter: (val) => `${val}%`, style: { fontSize: isMobile ? '10px' : '12px' } }
     },
-    colors: ['#2196F3'],
+    colors: ['#2196F3', '#FF0000'],
     dataLabels: {
       enabled: true,
-      formatter: function (val) {
-        return `${val}%`;
-      },
-      style: {
-        colors: ['#000'],
-        fontSize: '12px',
-      },
-      background: {
-        enabled: true,
-        foreColor: '#fff',
-        borderRadius: 3,
-        padding: 4,
-        opacity: 0.7,
-        color: '#2196F3',
-      },
+      formatter: (val) => `${val}%`,
+      style: { colors: ['#000'], fontSize: isMobile ? '10px' : '12px' },
+      background: { enabled: true, borderRadius: 2, padding: 4, opacity: 0.7 },
     },
-    tooltip: {
-      shared: true,
-      intersect: false,
-    },
+    tooltip: { shared: true, intersect: false },
   };
-
+  
   const chartSeries = [
-    {
-      name: 'Attendance Prediction',
-      data: dailyPredictionData.map((prediction) => prediction.average_prediction),
-    },
+    { name: 'Attendance Prediction', data: dailyPredictionData.map((prediction) => prediction.average_prediction) },
+    { name: 'Risk Level', data: dailyPredictionData.map((prediction) => prediction.risk_level) },
   ];
+   
 
   return (
     <Card sx={{ p: 1, mt: 5, mb: 3 }}>
       <MDBox mx={2} mt={-3} py={3} px={2} variant="gradient" bgColor="info" borderRadius="lg" coloredShadow="info">
         <Typography variant="h6" sx={{ color: 'white !important' }}>
-          Attendance Predictions
+          Attendance Forecasting and Risk Assessment
         </Typography>
+        <Typography variant="caption" sx={{ color: 'white !important' }}>Based on upcoming week</Typography>
       </MDBox>
       <MDBox sx={{ mt: 3 }}>
         {loading ? (
@@ -148,7 +168,7 @@ export const PredictAttendance = () => {
           <>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" sx={{ textAlign: 'center' }}>Daily Attendance Predictions</Typography>
+                <Typography variant="h6" sx={{ textAlign: 'center' }}>Daily Attendance Forecasting</Typography>
                 <DataTable
                   table={{ columns: predictionColumns, rows: dailyPredictionData }}
                   isSorted={false}
@@ -158,12 +178,12 @@ export const PredictAttendance = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" sx={{ textAlign: 'center' }}>Prediction Bar Graph</Typography>
+                <Typography variant="h6" sx={{ textAlign: 'center' }}>Forecasting Bar Graph</Typography>
                 <ApexCharts
                   options={chartOptions}
                   series={chartSeries}
                   type="bar"
-                  height="100%"
+                  height={isMobile ? '300px' : '100%'}  
                 />
               </Grid>
             </Grid>

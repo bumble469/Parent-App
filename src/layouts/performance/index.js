@@ -151,10 +151,10 @@ function Performance() {
 
           <Grid item xs={12}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={6}>
                 <OverallAttendance prn={prn} semester={semester} t={t} i18n = {i18n} />
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={6}>
                 <MDBox sx={{ height: '100%' }}>
                   <ComplexStatisticsCard
                     color="success"
@@ -173,41 +173,6 @@ function Performance() {
                         max={100}
                         style={{ width: '100%' }}
                       ></progress>
-                    </MDBox>
-                  </ComplexStatisticsCard>
-                </MDBox>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <MDBox sx={{ height: '100%' }}>
-                  <ComplexStatisticsCard
-                    color="warning"
-                    icon="star"
-                    title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t('Extra Curricular Activities')}</span>}
-                    percentage={{
-                      label: `Rank: 5`,
-                    }}
-                  >
-                    <MDBox
-                      sx={{
-                        maxHeight: '50px',
-                        overflowY: 'auto',
-                        padding: '8px',
-                        '::-webkit-scrollbar': {
-                          width: '8px',
-                        },
-                        '::-webkit-scrollbar-thumb': {
-                          backgroundColor: '#888',
-                          borderRadius: '4px',
-                        },
-                        '::-webkit-scrollbar-thumb:hover': {
-                          backgroundColor: '#555',
-                        },
-                      }}
-                    >
-                      <MDTypography variant="body2" color="textSecondary" fontSize="0.9rem">
-                        Debate Club, Chess Club, Volunteer Work, Art Workshop, Soccer, Coding Club,
-                        Music Band, Drama Society, Student Council, Photography Club
-                      </MDTypography>
                     </MDBox>
                   </ComplexStatisticsCard>
                 </MDBox>

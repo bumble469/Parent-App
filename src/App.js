@@ -86,7 +86,7 @@ export default function App() {
     {
       type: 'collapse',
       name: <Typography sx={{ fontSize: isHindi ? '1rem' : '0.9rem' }}>{t('Future Insights')}</Typography>,
-      key: 'Future Insights',
+      key: 'Future-Insights',
       icon: <Icon fontSize="small">show_chart</Icon>,
       route: '/Future-Insights',
       component: <Predictions />,

@@ -55,16 +55,19 @@ const AttendanceTable = ({ prn, semester }) => {
   const allDates = Object.values(attendanceData)
     .flat()
     .map((item) => item.date);
-  const uniqueDates = Array.from(
-    new Set(
-      allDates.map((date) => {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      })
-    )
-  );
+    const uniqueDates = Array.from(
+      new Set(
+        allDates
+          .sort((a, b) => a - b) // Sort dates in ascending order
+          .map((date) => {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+          })
+      )
+    );
+    
 
   const uniqueMonths = Array.from(
     new Set(
