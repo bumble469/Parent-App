@@ -13,10 +13,11 @@ const LectureViewTable = ({ prn, semester }) => {
   const columnsPerPage = 5;
   const { t, i18n } = useTranslation();
   const isHindi = i18n.language !== 'en';
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const fetchDetailedLectureViews = async (semester) => {
     try {
       setIsLoading(true);  // Set loading to true when the fetch starts
-      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/lectureviews',{
+      const response = await axios.post(`${REST_API_URL}/api/performance/student/lectureviews`,{
         prn:prn,
         semester:semester
       });

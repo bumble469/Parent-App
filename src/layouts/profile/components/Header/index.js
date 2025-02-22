@@ -13,11 +13,11 @@ import axios from 'axios';
 function Header({ children }) {
   const [student, setStudent] = useState(null);
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
-  
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/student/profile', {
+        const response = await axios.post(`${REST_API_URL}/api/student/profile`, {
           prn:prn
         });
   
@@ -29,12 +29,10 @@ function Header({ children }) {
     };
   
     fetchStudentProfile();
-  }, [prn]); // Add `prn` as dependency
+  }, [prn]); 
     
-
-  // Check if student data is available
   if (!student) {
-    return <div>Loading...</div>; // Loading state while waiting for data
+    return <div>Loading...</div>; 
   }
 
   return (
@@ -43,7 +41,7 @@ function Header({ children }) {
         display="flex"
         alignItems="center"
         position="relative"
-        minHeight="15rem" // Adjusted to make header shorter
+        minHeight="15rem"
         borderRadius="xl"
         marginTop="20px"
         sx={{

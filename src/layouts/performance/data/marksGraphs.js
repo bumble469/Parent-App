@@ -5,7 +5,6 @@ import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
 import { useTranslation } from 'react-i18next'; 
 import loading_image from '../../../assets/images/icons8-loading.gif'; // Add the loading gif import
-import Cookies from "js-cookie";
 import axios from "axios";
 const generateMarksLineChartData = (currentMarksData, threshold) => {
   const minMarks = Math.min(...currentMarksData.map((data) => data.total));
@@ -97,10 +96,11 @@ const LineGraph = ({ prn, semester, threshold = 95 }) => {
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("All");
   const [loading, setLoading] = useState(true);  // Add loading state
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const fetchMarksData = async (semester) => {
     try {
       setLoading(true); // Set loading to true before fetching data
-      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedmarks',{
+      const response = await axios.post(`${REST_API_URL}/api/performance/student/detailedmarks`,{
         prn:prn,
         semester:semester
       });

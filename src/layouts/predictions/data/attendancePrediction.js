@@ -20,7 +20,7 @@ export const PredictAttendance = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));  
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
-
+  const MACHINE_LEARNING_URL = process.env.REACT_APP_PARENT_MACHINE_LEARNING_URL;
   const CACHE_KEY = `attendance_cache_${prn}`;
   const CACHE_DURATION = 2*60;
 
@@ -36,7 +36,7 @@ export const PredictAttendance = () => {
         }
       }
 
-      const response = await axios.post('https://parent-machinelearning.onrender.com/predict-attendance', { prn });
+      const response = await axios.post(`${MACHINE_LEARNING_URL}/predict-attendance`, { prn });
       localStorage.setItem(CACHE_KEY, JSON.stringify({ data: response.data, timestamp: Date.now() }));
       setAttendance(response.data);
     } catch (error) {
@@ -75,15 +75,15 @@ export const PredictAttendance = () => {
   
   const attendanceData = attendance
     ? attendance.attendance_by_subject.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((subjectData) => {
-        const attendDiff = (subjectData.new_percentage_attend - subjectData.attendance_percentage).toFixed(2);
-        const missDiff = (subjectData.new_percentage_miss - subjectData.attendance_percentage).toFixed(2);
+      const attendDiff = subjectData.new_percentage_attend ? (subjectData.new_percentage_attend - subjectData.attendance_percentage).toFixed(2) : t('N/A');
+      const missDiff = subjectData.new_percentage_miss ? (subjectData.new_percentage_miss - subjectData.attendance_percentage).toFixed(2) : t('N/A');
   
         return {
-          subject: subjectData.subject,
-          attendance_percentage: subjectData.attendance_percentage.toFixed(2),
+          subject: subjectData.subject || t('N/A'),
+          attendance_percentage: subjectData.attendance_percentage ? subjectData.attendance_percentage.toFixed(2) : t('N/A'),
           new_percentage_attend: (
             <>
-              {subjectData.new_percentage_attend.toFixed(2)}% 
+              {subjectData.new_percentage_attend ? `${subjectData.new_percentage_attend.toFixed(2)}%` : t('N/A')} 
               <span style={{ color: attendDiff > 0 ? 'green' : 'red', marginLeft: '5px' }}>
                 {attendDiff > 0 ? '▲' : '▼'} {Math.abs(attendDiff)}
               </span>
@@ -91,7 +91,7 @@ export const PredictAttendance = () => {
           ),
           new_percentage_miss: (
             <>
-              {subjectData.new_percentage_miss.toFixed(2)}% 
+              {subjectData.new_percentage_miss ? `${subjectData.new_percentage_miss.toFixed(2)}%` : t('N/A')}
               <span style={{ color: missDiff > 0 ? 'green' : 'red', marginLeft: '5px' }}>
                 {missDiff > 0 ? '▲' : '▼'} {Math.abs(missDiff)}
               </span>
@@ -103,9 +103,9 @@ export const PredictAttendance = () => {
   
   const dailyPredictionData = attendance
   ? attendance.daily_predictions.map((prediction) => ({
-      day_name: prediction.day_name,
-      average_prediction: (prediction.average_prediction * 100).toFixed(2)+ '%',
-      risk_level: (100 - prediction.average_prediction * 100).toFixed(2),
+    day_name: prediction.day_name || t('N/A'),
+    average_prediction: prediction.average_prediction ? (prediction.average_prediction * 100).toFixed(2) + '%' : t('N/A'),
+    risk_level: prediction.average_prediction ? (100 - prediction.average_prediction * 100).toFixed(2) : t('N/A'),
     }))
   : [];
 
@@ -159,10 +159,6 @@ export const PredictAttendance = () => {
               <img src={loading_image} alt={t('loading')} style={{ width: '50px', height: '50px' }} />
             </div>
           </Box>
-        ) : error ? (
-          <Typography variant="body1" color="error">
-            {t('error_loading_data')}: {error}
-          </Typography>
         ) : (
           <>
             <Grid container spacing={2}>

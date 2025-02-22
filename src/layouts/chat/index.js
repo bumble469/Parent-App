@@ -42,14 +42,14 @@ function Chat() {
   const [errorMessages, setErrorMessages] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [sidebarOpen, setSidebarOpen] = useState(false); 
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const { t } = useTranslation();
 
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/chat/chat-list', {
+        const response = await axios.post(`${REST_API_URL}/api/chat/chat-list`, {
           prn,
         });
         const data = response.data;
@@ -68,7 +68,7 @@ function Chat() {
     setLoadingMessages(true);
     setErrorMessages(null);
     try {
-      const response = await axios.get('https://parent-rest-api.onrender.com/api/chat/chats', {
+      const response = await axios.get(`${REST_API_URL}/api/chat/chats`, {
         params: { parentId, teacherId },
       });
       setMessages(response.data);
@@ -91,7 +91,7 @@ function Chat() {
     if (!newMessage.trim() || !selectedTeacher) return;
 
     try {
-      await axios.post('https://parent-rest-api.onrender.com/api/chat/chats', {
+      await axios.post(`${REST_API_URL}/api/chat/chats`, {
         parentId,
         teacherId: selectedTeacher.teacher_id,
         senderType: 'Parent',

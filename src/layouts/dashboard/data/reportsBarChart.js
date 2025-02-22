@@ -14,11 +14,11 @@ const ReportsBarChartWrapper = () => {
   const [error, setError] = useState(null); // State for errors
   const [attendanceData, setAttendanceData] = useState([]); 
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
-  
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/dashboard/student/attendance',{
+        const response = await axios.post(`${REST_API_URL}/api/dashboard/student/attendance`,{
           prn:prn
         });
         if (Array.isArray(response.data)) {
@@ -38,7 +38,6 @@ const ReportsBarChartWrapper = () => {
             total: total_lects,
           },
         };
-        // Set the data for the chart
         setData(chartData);
         setLoading(false);
       } catch (error) {
@@ -49,12 +48,12 @@ const ReportsBarChartWrapper = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array ensures this effect runs only once on mount
+  }, []); 
 
   const rows = (attendanceData || []).map((data) => ({
-    subject: data.sub_name, // Display subject name
-    attendedLectures: data.lectures_attended, // Display attended lectures
-    totalLectures: data.lectures_total, // Display total lectures
+    subject: data.sub_name, 
+    attendedLectures: data.lectures_attended,
+    totalLectures: data.lectures_total, 
   }));
 
   const columns = [

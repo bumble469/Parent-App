@@ -11,10 +11,10 @@ const MarksTable = ({ prn, semester }) => {
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(t('All Subjects'));
   const [isLoading, setIsLoading] = useState(true); // New loading state
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const fetchMarksData = async (semester) => {
     try {
-      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedmarks',{
+      const response = await axios.post(`${REST_API_URL}/api/performance/student/detailedmarks`,{
         prn:prn,
         semester:semester
       });

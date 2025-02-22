@@ -21,6 +21,7 @@ function Faculty() {
   const [staffData, setStaffData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const prn = session.studentId || 0;
   useEffect(() => {
     const fetchData = async () => {
@@ -30,8 +31,8 @@ function Faculty() {
       try {
         const apiUrl =
           tabValue === 0
-            ? 'https://parent-rest-api.onrender.com/api/faculty'
-            : 'https://parent-rest-api.onrender.com/api/chat/chat-list';
+            ? `${REST_API_URL}/api/faculty`
+            : `${REST_API_URL}/api/chat/chat-list`;
   
         let response;
   

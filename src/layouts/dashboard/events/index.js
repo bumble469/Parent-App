@@ -13,8 +13,7 @@ export default function Data() {
   const [loading, setLoading] = useState(true); // State for loading status
   const [error, setError] = useState(null); // State for error handling
   const { t } = useTranslation();
-  
-  // Pagination state
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const [currentPage, setCurrentPage] = useState(0); // Initial page number
   const [rowsPerPage, setRowsPerPage] = useState(5); // Rows per page
   
@@ -22,7 +21,7 @@ export default function Data() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('https://parent-rest-api.onrender.com/api/events/events'); // Adjust the URL based on your API
+        const response = await axios.get(`${REST_API_URL}/api/events/events`); // Adjust the URL based on your API
         if (Array.isArray(response.data)) {
           setEvents(response.data);
         } else {

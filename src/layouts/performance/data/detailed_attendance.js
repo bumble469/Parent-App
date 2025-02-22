@@ -13,11 +13,11 @@ const AttendanceTable = ({ prn, semester }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(true);
   const columnsPerPage = 8;
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const fetchDetailedAttendance = async (semester) => {
     setLoading(true);
     try {
-      const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedattendance',{
+      const response = await axios.post(`${REST_API_URL}/api/performance/student/detailedattendance`,{
         prn:prn,
         semester:semester
       });

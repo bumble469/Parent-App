@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -28,7 +29,7 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const { t, i18n } = useTranslation();
-
+  const FLASK_ENC_API = process.env.REACT_APP_FLASK_ENC_API;
   const isHindi = useMemo(() => i18n.language !== 'en', [i18n.language]);
 
   useEffect(() => {
@@ -48,6 +49,21 @@ export default function App() {
       })
     );
   }, []);
+
+  useEffect(() => {
+    const wakeUpEncryptionAPI = async () => {
+      try {
+        console.log("Waking up Encryption API...");
+        await axios.get(FLASK_ENC_API, { timeout: 5000 });
+        console.log("Encryption API is awake!");
+      } catch (error) {
+        console.warn("Encryption API might still be sleeping, proceeding with request...");
+      }
+    };
+    if (FLASK_ENC_API) {
+      wakeUpEncryptionAPI();
+    }
+  }, [FLASK_ENC_API]);
 
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {

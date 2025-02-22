@@ -14,7 +14,7 @@ const ReportsBarChartWrapper = ({ prn, semester }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const validSemester = semester >= 1 && semester <= 6 ? semester : 1;
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const ReportsBarChartWrapper = ({ prn, semester }) => {
         if (validSemester < 1 || validSemester > 6) {
           throw new Error("Invalid semester value");
         }
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedattendance',{
+        const response = await axios.post(`${REST_API_URL}/api/performance/student/detailedattendance`,{
           prn:prn,
           semester:validSemester
         });

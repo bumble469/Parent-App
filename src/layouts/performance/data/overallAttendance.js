@@ -6,11 +6,11 @@ import axios from 'axios';
 function OverallAttendance({ prn, semester, t, i18n }) {
   const [overallAttendance, setOverallAttendance] = useState(0);
   const isHindi = i18n.language != 'en'
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   useEffect(() => {
     const fetchAttendanceData = async (semester) => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student/detailedattendance',{
+        const response = await axios.post(`${REST_API_URL}/api/performance/student/detailedattendance`,{
           prn:prn,
           semester:semester
         });

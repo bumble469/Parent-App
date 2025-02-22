@@ -18,6 +18,7 @@ function FeedbackPage() {
   const { t, i18n } = useTranslation();
   const isHindi = i18n.language != 'en';
   const prn = session.studentId || 0;
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const sendEmail = (e) => {
     e.preventDefault();
     const templateParams = {
@@ -79,7 +80,7 @@ function FeedbackPage() {
 
         try {
             // Fix the request to send prn and feedbackData in the correct structure
-            const response = await axios.post('https://parent-rest-api.onrender.com/api/feedback/feedback-insert', {
+            const response = await axios.post(`${REST_API_URL}/api/feedback/feedback-insert`, {
                 prn, // sending prn as separate field
                 feedbackData, // send feedback data as is
             });

@@ -12,7 +12,7 @@ export const PredictMarks = () => {
   const [marks, setMarks] = useState(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
-
+  const MACHINE_LEARNING_URL = process.env.REACT_APP_PARENT_MACHINE_LEARNING_URL;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -20,7 +20,7 @@ export const PredictMarks = () => {
 
   const fetchMarks = async (prn) => {
     try {
-      const response = await axios.post('https://parent-machinelearning.onrender.com/predict-marks', { prn });
+      const response = await axios.post(`${MACHINE_LEARNING_URL}/predict-marks`, { prn });
       return response.data;
     } catch (error) {
       console.error(t('There was an error fetching the marks:'), error);

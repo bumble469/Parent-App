@@ -13,13 +13,13 @@ const ReportsLineChartWrapper = () => {
   const [error, setError] = useState(null); // State for errors
   const [marksData, setMarksData] = useState([]);
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
-  
-  const { t } = useTranslation(); // Initialize the translation hook
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
+  const { t } = useTranslation(); 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/dashboard/student/graph',{
+        const response = await axios.post(`${REST_API_URL}/api/dashboard/student/graph`,{
           prn:prn
         });
         if (Array.isArray(response.data)) {

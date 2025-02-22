@@ -24,7 +24,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace('/', '');
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const [student, setStudent] = useState(null);
   const { t, i18n } = useTranslation(); 
   const [isSpinning, setIsSpinning] = useState(true);
@@ -36,7 +36,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   useEffect(() => {
     const fetchStudentProfile = async () => {
       try {
-        const response = await fetch("https://parent-rest-api.onrender.com/api/student/profile",{
+        const response = await fetch(`${REST_API_URL}}/api/student/profile`,{
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prn }),

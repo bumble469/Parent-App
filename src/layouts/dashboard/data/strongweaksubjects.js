@@ -15,13 +15,13 @@ const SubjectDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const isHindi = i18n.language != 'en';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/dashboard/student/graph',{
+        const response = await axios.post(`${REST_API_URL}/api/dashboard/student/graph`,{
           prn:prn
         });
         // Extract data from API response

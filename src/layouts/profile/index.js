@@ -20,11 +20,11 @@ function Overview() {
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
-  
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   useEffect(() => {
     const fetchStudentProfile = async (prn) => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/student/profile', {
+        const response = await axios.post(`${REST_API_URL}/api/student/profile`, {
           prn: prn
         });
         const data = response.data;

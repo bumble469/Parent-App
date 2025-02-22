@@ -27,6 +27,7 @@ function Performance() {
   const [averageMarks, setAverageMarks] = useState(0); 
   const { t, i18n } = useTranslation();
   const isHindi = i18n.language != 'en'
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const handleSemesterChange = (event) => {
     setSemester(event.target.value); 
   };
@@ -34,7 +35,7 @@ function Performance() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/performance/student',{
+        const response = await axios.post(`${REST_API_URL}/api/performance/student`,{
           prn:prn
         });
         const data = response.data;
