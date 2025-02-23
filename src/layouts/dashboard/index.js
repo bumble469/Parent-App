@@ -17,30 +17,37 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import Cookies from 'js-cookie';
 function Dashboard() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null);
   const [studentData, setStudentData] = useState(null);
   const { t, i18n } = useTranslation();
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
   const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const isHindi = i18n.language != 'en';
-
+  const timeoutReached = false;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post(`${REST_API_URL}/api/dashboard/student/star`,{
-          prn:prn
-        });
-        setStudentData(response.data);
-        setLoading(false);
+        const response = await axios.post(`${REST_API_URL}/api/dashboard/student/star`, { prn });
+        if (response.data && response.data.length > 0) {
+          setStudentData(response.data);
+        }
       } catch (error) {
         setError(error);
+      } finally {
         setLoading(false);
       }
     };
-
+    const timeout = setTimeout(() => {
+      setLoading(false);
+      setStudentData([]); 
+      timeoutReached = true;
+    }, 60000);
+  
     fetchData();
-  }, []);  
+    return () => clearTimeout(timeout);
+  }, []);
+  
   
   if (error) return <div>Error: {error.message}</div>;
 
@@ -49,7 +56,7 @@ function Dashboard() {
       <DashboardLayout>
         <DashboardNavbar />
         <MDBox py={2} mt={3} mb={2}>
-          <div style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{t('No data available to display.')}</div>
+          <div style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{timeoutReached? t('No data available to display.') : "Activating API's and Encrypting Data.."}</div>
         </MDBox>
         <Footer />
       </DashboardLayout>
@@ -131,7 +138,9 @@ function Dashboard() {
                 count={<span>{averageAttendanceFromAPI ? `${averageAttendanceFromAPI.toFixed(2)}%` : "N/A"}</span>}
                 percentage={{
                   color: labelMessageForOverallAttendance.color,
-                  amount: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{labelMessageForOverallAttendance.message || "No data available"}</span>
+                  amount: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>
+                    {labelMessageForOverallAttendance.message || t('No data available to display.')}
+                    </span>
                 }}
               >
                 <MDBox width="100%">
@@ -154,7 +163,7 @@ function Dashboard() {
                 count={<span>{overallMarksFromAPI ? `${overallMarksFromAPI.toFixed(2)}%` : "N/A"}</span>}
                 percentage={{
                   color: labelMessageForOverallMarks.color,
-                  amount: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{labelMessageForOverallMarks.message || "No data available"}</span>
+                  amount: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{labelMessageForOverallMarks.message || t('No data available to display.')}</span>
                 }}
               >
                 <MDBox width="100%">
@@ -169,38 +178,37 @@ function Dashboard() {
           </Grid>
   
           {/* Rating */}
-          {/* Rating */}
-<Grid item xs={12} md={12} lg={4}>
-  <MDBox>
-    <ComplexStatisticsCard
-      color="warning"
-      icon="star"
-      title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Rating")}</span>}
-      count={<span>{(overallMarksFromAPI && averageAttendanceFromAPI) ? `${starRating}/5` : "NaN"}</span>}
-      percentage={{
-        color: (overallMarksFromAPI && averageAttendanceFromAPI) ? 'success' : 'info',
-        label: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>
-          {(overallMarksFromAPI && averageAttendanceFromAPI) ? ratingMessage || "No data available" : "NaN"}
-        </span>
-      }}
-    >
-      <MDBox
-        display="flex"
-        alignItems="center"
-        justifyContent="space-evenly"
-        sx={{ pb: 1.45 }}
-      >
-        {[...Array(fullStars || 0)].map((_, index) => (
-          <StarIcon key={`full-${index}`} color="warning" />
-        ))}
-        {halfStar === 1 && <StarHalfIcon key="half" color="warning" />}
-        {[...Array(emptyStars || 5)].map((_, index) => (
-          <StarBorderIcon key={`empty-${index}`} color="action" />
-        ))}
-      </MDBox>
-    </ComplexStatisticsCard>
-  </MDBox>
-</Grid>
+          <Grid item xs={12} md={12} lg={4}>
+            <MDBox>
+              <ComplexStatisticsCard
+                color="warning"
+                icon="star"
+                title={<span style={{ fontSize: isHindi ? '1.1rem' : '1rem' }}>{t("Rating")}</span>}
+                count={<span>{(overallMarksFromAPI && averageAttendanceFromAPI) ? `${starRating}/5` : "NaN"}</span>}
+                percentage={{
+                  color: (overallMarksFromAPI && averageAttendanceFromAPI) ? 'success' : 'info',
+                  label: <span style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>
+                    {(overallMarksFromAPI && averageAttendanceFromAPI) ? ratingMessage || "No data available" : "NaN"}
+                  </span>
+                }}
+              >
+                <MDBox
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-evenly"
+                  sx={{ pb: 1.45 }}
+                >
+                  {[...Array(fullStars || 0)].map((_, index) => (
+                    <StarIcon key={`full-${index}`} color="warning" />
+                  ))}
+                  {halfStar === 1 && <StarHalfIcon key="half" color="warning" />}
+                  {[...Array(emptyStars || 5)].map((_, index) => (
+                    <StarBorderIcon key={`empty-${index}`} color="action" />
+                  ))}
+                </MDBox>
+              </ComplexStatisticsCard>
+            </MDBox>
+          </Grid>
 
         </Grid>
   
