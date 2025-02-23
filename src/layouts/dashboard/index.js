@@ -55,8 +55,14 @@ function Dashboard() {
     return (
       <DashboardLayout>
         <DashboardNavbar />
-        <MDBox py={2} mt={3} mb={2}>
-          <div style={{ fontSize: isHindi ? '1rem' : 'inherit' }}>{timeoutReached? t('No data available to display.') : "Activating API's and Encrypting Data.."}</div>
+        <MDBox py={2} mt={3} mb={2} style={{ textAlign: 'center', backgroundColor: '#f4f4f4', borderRadius: '8px', padding: '10px' }}>
+          <div style={{ fontSize: isHindi ? '1rem' : 'inherit', color: '#333', fontWeight: '500' }}>
+            {timeoutReached ? (
+              <span style={{ color: '#ff4d4d',fontWeight:'bold' ,fontSize:'1.15rem' }}>{t('No data available to display.')}</span>
+            ) : (
+              <span style={{ color: '#4CAF50' ,fontWeight:'bold' ,fontSize:'1.15rem' }}>Activating API's, Starting Machine Learning and Encryption processes..</span>
+            )}
+          </div>
         </MDBox>
         <Footer />
       </DashboardLayout>
@@ -129,7 +135,7 @@ function Dashboard() {
       <MDBox py={2} mt={3} mb={2}>
         <Grid container spacing={1}>
           {/* Overall Attendance */}
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6} lg={4} sx={{ mb: { xs:2 } }}>
             <MDBox>
               <ComplexStatisticsCard
                 color="success"
@@ -155,7 +161,7 @@ function Dashboard() {
           </Grid>
   
           {/* Overall Performance */}
-          <Grid className="Overall-Marks" item xs={12} md={6} lg={4}>
+          <Grid className="Overall-Marks" item xs={12} md={6} lg={4} sx={{ mb: { xs:2 } }}>
             <MDBox>
               <ComplexStatisticsCard
                 icon="leaderboard"
@@ -178,7 +184,7 @@ function Dashboard() {
           </Grid>
   
           {/* Rating */}
-          <Grid item xs={12} md={12} lg={4}>
+          <Grid item xs={12} md={12} lg={4} sx={{ mb: { xs:2 } }}>
             <MDBox>
               <ComplexStatisticsCard
                 color="warning"

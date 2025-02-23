@@ -29,7 +29,8 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const { t, i18n } = useTranslation();
-  const FLASK_ENC_API = process.env.REACT_APP_FLASK_ENC_API;
+  const FLASK_ENC_API = process.env.REACT_APP_PARENT_FLASK_ENC_URL;
+  const MACHINE_LEARNING_API = process.env.REACT_APP_PARENT_MACHINE_LEARNING_URL;
   const isHindi = useMemo(() => i18n.language !== 'en', [i18n.language]);
 
   useEffect(() => {
@@ -51,19 +52,20 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const wakeUpEncryptionAPI = async () => {
+    const wakeUpEncryptionApi = async () => {
       try {
-        console.log("Waking up Encryption API...");
-        await axios.get(FLASK_ENC_API, { timeout: 5000 });
-        console.log("Encryption API is awake!");
+        const response = await axios.get(`${FLASK_ENC_API}/wakeup`);
+        const response1 = await axios.get(`${MACHINE_LEARNING_API}`);
+        console.log("Encryption API Wakeup:", response.data);
+        console.log("Machine Learning API Wakeup:", response1.data);
       } catch (error) {
-        console.warn("Encryption API might still be sleeping, proceeding with request...");
+        console.error("Error waking up API", error);
       }
     };
-    if (FLASK_ENC_API) {
-      wakeUpEncryptionAPI();
-    }
-  }, [FLASK_ENC_API]);
+    wakeUpEncryptionApi();
+    const intervalId = setInterval(wakeUpEncryptionApi, 60000);
+    return () => clearInterval(intervalId);
+  }, [FLASK_ENC_API]);  
 
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
