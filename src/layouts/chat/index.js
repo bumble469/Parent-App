@@ -27,6 +27,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Drawer from '@mui/material/Drawer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSession } from '../../context/SessionContext';
+
 function Chat() {
   const { session } = useSession();
   const parentId = session.parentId || 0;
@@ -42,14 +43,28 @@ function Chat() {
   const [errorMessages, setErrorMessages] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [sidebarOpen, setSidebarOpen] = useState(false); 
-  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const { t } = useTranslation();
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    // Convert hours from 24-hour format to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // The hour '0' should be '12'
+    const minutesFormatted = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero for minutes if needed
+  
+    return `${hours}:${minutesFormatted} ${ampm}`;
+  };
+
 
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await axios.post(`${REST_API_URL}/api/chat/chat-list`, {
+        const response = await axios.post('https://parent-rest-api.onrender.com/api/chat/chat-list', {
           prn,
         });
         const data = response.data;
@@ -68,7 +83,7 @@ function Chat() {
     setLoadingMessages(true);
     setErrorMessages(null);
     try {
-      const response = await axios.get(`${REST_API_URL}/api/chat/chats`, {
+      const response = await axios.get('https://parent-rest-api.onrender.com/api/chat/chats', {
         params: { parentId, teacherId },
       });
       setMessages(response.data);
@@ -91,7 +106,7 @@ function Chat() {
     if (!newMessage.trim() || !selectedTeacher) return;
 
     try {
-      await axios.post(`${REST_API_URL}/api/chat/chats`, {
+      await axios.post('https://parent-rest-api.onrender.com/api/chat/chats', {
         parentId,
         teacherId: selectedTeacher.teacher_id,
         senderType: 'Parent',
@@ -124,7 +139,7 @@ function Chat() {
               }}
             >
               <Grid container spacing={2}>
-              {isMobile ? (
+                {isMobile ? (
                   <>
                     <IconButton
                       onClick={toggleSidebar}
@@ -136,7 +151,7 @@ function Chat() {
                         backgroundColor: 'grey', // Styling the button
                         height: '1.35rem',
                         width: '1.35rem',
-                        marginBottom:'0.3rem'
+                        marginBottom: '0.3rem'
                       }}
                     >
                       {sidebarOpen ? (
@@ -262,12 +277,22 @@ function Chat() {
                               button
                               selected={selectedTeacher && selectedTeacher.teacher_id === teacher.teacher_id}
                               onClick={() => setSelectedTeacher(teacher)}
-                              style={{ paddingRight:'1rem', paddingTop:'0.3rem' }} // Reduced padding for tighter spacing
+                              sx={{
+                                paddingRight: '1rem',
+                                paddingTop: '0.3rem', // Reduced padding for tighter spacing
+                                paddingTop: '0.3rem', // Reduced padding for tighter spacing
+                                borderRadius: '8px', // Add rounded corners
+                                marginBottom: '8px', // Space between items (optional)
+                              }}
                             >
                               <ListItemIcon>
                                 <Avatar
                                   alt={teacher.teacher_fullname}
                                   src={teacher.teacher_image || 'https://via.placeholder.com/40'}
+                                  sx={{
+                                    marginLeft: '8px', // Move it a bit to the right
+                                    marginTop: '-4px', // Move it a bit up
+                                  }}
                                 />
                               </ListItemIcon>
                               <ListItemText
@@ -297,7 +322,8 @@ function Chat() {
                                 }
                               />
                             </ListItem>
-                            <Divider style={{ margin: '4px 0' }} /> {/* Separator between items */}
+
+                            <Divider style={{ margin: '4px 0' }} />
                           </div>
                         ))}
                       </List>
@@ -320,27 +346,33 @@ function Chat() {
                     <>
                       <Typography variant="h6">{`Chat with ${selectedTeacher.teacher_fullname}`}</Typography>
                       <Divider style={{ margin: '8px 0' }} />
-                      
+
                       {/* Chat messages area */}
-                      <Box
-                        sx={{
-                          flexGrow: 1, // Take remaining space above the input
-                          overflowY: 'auto', // Make the messages scrollable
-                          padding: 1,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          '::-webkit-scrollbar': {
-                            width: '8px', // Width of the scrollbar
-                          },
-                          '::-webkit-scrollbar-thumb': {
-                            backgroundColor: '#888', // Color of the scrollbar thumb
-                            borderRadius: '4px',
-                          },
-                          '::-webkit-scrollbar-thumb:hover': {
-                            backgroundColor: '#555', // Color on hover
-                          },
-                                  }}
-                      >
+                        <Box
+                          sx={{
+                            flexGrow: 1, // Take remaining space above the input
+                            padding: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            backgroundColor: 'rgba(0, 0, 0, 0.05)', // Slightly darkened background color
+                            borderRadius: '8px', // Optional: Add border radius for rounded corners
+                            boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.1)', // Optional: Inner shadow for better visual separation
+                            height: 'calc(80vh - 50px)', // Adjust height so it fits within the available space
+                            overflowY: 'auto', // Enable vertical scrolling when the content exceeds the height
+                            overflowX: 'hidden', 
+                            scrollbarWidth: 'thin', // Optional: Makes the scrollbar thinner (Firefox)
+                            '::-webkit-scrollbar': {
+                              width: '8px', // Width of the scrollbar
+                            },
+                            '::-webkit-scrollbar-thumb': {
+                              backgroundColor: '#888', // Color of the scrollbar thumb
+                              borderRadius: '4px',
+                            },
+                            '::-webkit-scrollbar-thumb:hover': {
+                              backgroundColor: '#555', // Color of the scrollbar thumb when hovered
+                            },
+                          }}
+                          >
                         {loadingMessages ? (
                           <Typography style={{ fontSize: '0.75rem' }}>{t('Loading messages...')}</Typography>
                         ) : errorMessages ? (
@@ -356,85 +388,127 @@ function Chat() {
                             <Box
                               key={msg.MessageID}
                               mb={1}
-                              p={1}
-                              borderRadius={4}
-                              bgcolor={msg.SenderType === 'Parent' ? '#e0f7fa' : '#fce4ec'}
+                              p={2}
+                              borderRadius={2}
+                              bgcolor={msg.SenderType === 'Parent' ? '#a8e0a1' : '#ffffff'} // WhatsApp-like colors
                               style={{
-                                alignSelf: msg.SenderType === 'Parent' ? 'flex-end' : 'flex-start', // Use alignSelf for positioning
-                                maxWidth: '55%',
-                                marginBottom: '0.25rem',
+                                alignSelf: msg.SenderType === 'Teacher' ? 'flex-start' : 'flex-end', // Align Teacher's messages to the left and Parent's to the right
+                                width: 'auto', // Width adjusts to content
+                                minWidth: '100px', // Ensure the message box does not shrink too much
+                                maxWidth: '70%', // Prevents it from growing too large
+                                position: 'relative',
+                                wordWrap: 'break-word', // Ensure long text breaks properly
+                                flexDirection: 'column', // Flex to keep the timestamp at the bottom
+                                padding: '10px', // Consistent padding
                               }}
                             >
-                              <Typography variant="body2" style={{ fontSize: '0.9rem' }}>
-                                <strong>
-                                  {msg.SenderType === 'Parent' ? 'You' : selectedTeacher.teacher_fullname || 'Teacher'}
-                                </strong>{' '}
-                                <br />
+                              {/* Message Content */}
+                              <Typography
+                                variant="body2"
+                                style={{
+                                  fontSize: '0.8rem',
+                                  marginBottom: '1px', // Control the margin to avoid overlapping
+                                  position: 'relative', // Required for positioning the message inside the box
+                                  top: '-5px', // This moves the message slightly upwards inside the box
+                                }}
+                              >
                                 {msg.Message}
                               </Typography>
-                              <Typography variant="caption" style={{ color: '#888', fontSize: '0.7rem' }}>
-                                {msg.Timestamp.split("T")[0]} {msg.Timestamp.split("T")[1].split(".")[0]}
-                              </Typography>
+
+                              {/* Timestamp */}
+                              <Typography
+                                variant="caption"
+                                style={{
+                                  position: 'absolute',
+                                  bottom: -1, // Position timestamp at the bottom of the box
+                                  right: 5,
+                                  color: '#888',
+                                  fontSize: '0.7rem',
+                                  padding: '0.2rem', // Added padding to make it more spaced out
+                                }}
+                              >{formatTimestamp(msg.Timestamp)}
+                              </Typography>
+
+                              {/* Arrow Indicator */}
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  top: '25%',
+                                  transform: 'translateY(-50%)',
+                                  [msg.SenderType === 'Teacher' ? 'left' : 'right']: '-10px', // Place the arrow to the left for Teacher and right for Parent
+                                  width: 0,
+                                  height: 0,
+                                  borderLeft: msg.SenderType === 'Teacher' ? '10px solid transparent' : 'none',
+                                  borderRight: msg.SenderType === 'Parent' ? '10px solid transparent' : 'none',
+                                  borderTop: `10px solid ${msg.SenderType === 'Teacher' ? '#ffffff' : '#a8e0a1'}`, // Arrow color matches message background
+                                }}
+                              />
                             </Box>
                           ))
                         )}
                       </Box>
 
-                      <Divider style={{ margin: '8px 0' }} />
-
-                      {/* Input and button area (fixed at the bottom) */}
-                      <Box 
-                        display="flex" 
-                        alignItems="center" 
+                      <Divider
                         style={{
-                          position: 'sticky',
-                          bottom: 0,
-                          backgroundColor: theme.palette.background.paper,
-                          padding: '0.2rem',
-                          zIndex: 1,
+                          margin: '8px 0',
+                          background: 'linear-gradient(to right, rgba(0, 0, 0, 0) 0%, #333 50%, rgba(51, 51, 51, 0) 100%)', // Gradient from transparent to dark and back to transparent
+                          height: '2px', // Divider thickness
                         }}
-                      >
-                        <TextField
-                          fullWidth
-                          variant="outlined"
-                          placeholder={t('Type your message...')}
-                          value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
+                      />
+
+
+                        {/* Input and button area (fixed at the bottom) */}
+                        <Box 
+                          display="flex" 
+                          alignItems="center" 
                           style={{
-                            borderRadius: '1rem',
-                            marginRight: '1rem', // Space between input and buttons
+                            position: 'sticky',
+                            bottom: 0,
+                            backgroundColor: theme.palette.background.paper,
+                            padding: '0.2rem',
+                            zIndex: 1,
                           }}
-                        />
-                        <IconButton
-                        onClick={sendMessage}
-                        sx={{
-                          transition: 'transform 0.2s ease, color 0.2s ease',
-                          '&:hover': {
-                            transform: 'scale(1.2)',
-                            color: theme.palette.primary.main,
-                          },
-                        }}
-                      >
-                        <SendIcon />
-                      </IconButton>
-
+                        >
+                          <TextField
+                            fullWidth
+                            variant="outlined"
+                            placeholder={t('Type your message...')}
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            style={{
+                              borderRadius: '1rem',
+                              marginRight: '1rem', // Space between input and buttons
+                            }}
+                          />
+                          <IconButton
+                            onClick={sendMessage}
+                            sx={{
+                              transition: 'transform 0.2s ease, color 0.2s ease',
+                              '&:hover': {
+                                transform: 'scale(1.2)',
+                                color: theme.palette.primary.main,
+                              },
+                            }}
+                          >
+                            <SendIcon />
+                          </IconButton>
+                        </Box>
+                      </>
+                    ) : (
+                      <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                        <Typography variant="h6">{t('Select a teacher to start chatting')}</Typography>
                       </Box>
-                    </>
-                  ) : (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                      <Typography variant="h6">{t('Select a teacher to start chatting')}</Typography>
-                    </Box>
-                  )}
+                    )}
+                  </Grid>
+
                 </Grid>
-
-              </Grid>
-            </Paper>
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
-      </Box>
-      <Footer />
-    </DashboardLayout>
-  );
-}
+        </Box>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
 
-export default Chat;
+  export default Chat;
