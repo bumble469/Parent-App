@@ -23,11 +23,9 @@ import axios from 'axios';
 import MDBox from 'components/MDBox';
 import loading_image from '../../assets/images/icons8-loading.gif';
 import { useMediaQuery } from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Drawer from '@mui/material/Drawer';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSession } from '../../context/SessionContext';
-
+import rightslideicon from '../../assets/images/right-slide-chat.png';
 function Chat() {
   const { session } = useSession();
   const parentId = session.parentId || 0;
@@ -43,28 +41,18 @@ function Chat() {
   const [errorMessages, setErrorMessages] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [sidebarOpen, setSidebarOpen] = useState(false); 
-
+  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const { t } = useTranslation();
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    let hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    
-    // Convert hours from 24-hour format to 12-hour format
-    hours = hours % 12;
-    hours = hours ? hours : 12; // The hour '0' should be '12'
-    const minutesFormatted = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero for minutes if needed
-  
-    return `${hours}:${minutesFormatted} ${ampm}`;
-  };
-
-
+  function adjustTime(timestamp) {
+    const time = new Date(timestamp);
+    time.setHours(time.getHours() + 6); // Adjust for 6 hours behind
+    return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await axios.post('https://parent-rest-api.onrender.com/api/chat/chat-list', {
+        const response = await axios.post(`${REST_API_URL}/api/chat/chat-list`, {
           prn,
         });
         const data = response.data;
@@ -83,7 +71,7 @@ function Chat() {
     setLoadingMessages(true);
     setErrorMessages(null);
     try {
-      const response = await axios.get('https://parent-rest-api.onrender.com/api/chat/chats', {
+      const response = await axios.get(`${REST_API_URL}/api/chat/chats`, {
         params: { parentId, teacherId },
       });
       setMessages(response.data);
@@ -106,7 +94,7 @@ function Chat() {
     if (!newMessage.trim() || !selectedTeacher) return;
 
     try {
-      await axios.post('https://parent-rest-api.onrender.com/api/chat/chats', {
+      await axios.post(`${REST_API_URL}/api/chat/chats`, {
         parentId,
         teacherId: selectedTeacher.teacher_id,
         senderType: 'Parent',
@@ -142,25 +130,26 @@ function Chat() {
                 {isMobile ? (
                   <>
                     <IconButton
-                      onClick={toggleSidebar}
-                      style={{
-                        position: 'sticky',
-                        top: '2px', // Adjust position to your liking
-                        left: '0px',
-                        zIndex: 1,
-                        backgroundColor: 'grey', // Styling the button
-                        height: '1.35rem',
-                        width: '1.35rem',
-                        marginBottom: '0.3rem'
-                      }}
-                    >
-                      {sidebarOpen ? (
-                        <ArrowBackIcon style={{ color: 'white' }} /> // Arrow to collapse sidebar
-                      ) : (
-                        <ArrowForwardIcon style={{ color: 'white' }} /> // Arrow to open sidebar
-                      )}
-                    </IconButton>
-
+                        onClick={toggleSidebar}
+                        sx={{
+                          position: 'sticky',
+                          top: '2px', 
+                          left: '0px',
+                          zIndex: 1,
+                          backgroundColor: 'transparent', 
+                          height: '1.35rem',
+                          width: '1.35rem',
+                          marginBottom: '0.3rem',
+                        }}
+                      >
+                        <img 
+                          src={rightslideicon} 
+                          height={15}
+                          width={15}
+                          className="responsive-icon" 
+                          style={{background: 'transparent'}} 
+                        />
+                      </IconButton>
                     <Drawer
                       anchor="left"
                       open={sidebarOpen}
@@ -426,7 +415,8 @@ function Chat() {
                                   fontSize: '0.7rem',
                                   padding: '0.2rem', // Added padding to make it more spaced out
                                 }}
-                              >{formatTimestamp(msg.Timestamp)}
+                              >
+                                {adjustTime(msg.Timestamp)}
                               </Typography>
 
                               {/* Arrow Indicator */}
