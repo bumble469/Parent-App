@@ -13,7 +13,6 @@ import Header from 'layouts/profile/components/Header';
 import PlatformSettings from 'layouts/profile/components/PlatformSettings';
 import { useTranslation } from 'react-i18next';
 import loading_image from '../../assets/images/icons8-loading.gif';
-import { Box } from '@mui/material';
 import Cookies from 'js-cookie';
 function Overview() {
   const [student, setStudent] = useState(null);
@@ -38,23 +37,15 @@ function Overview() {
 
     fetchStudentProfile(prn);
   }, [prn]);
-
-  if (loading) {
-    return(
-      <Box sx={{
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '100vh',
-        padding: 2
-      }}>
-        <img src={loading_image} alt="Loading" style={{ width: '40px', height: '40px' }} />
-      </Box>
-    );
-  }
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      {loading?(
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <img src={loading_image} style={{ width: '50px', height: '50px' }}/>
+        </div>
+      ):(
+      <>
       <MDBox mb={1} />
       <Header>
         <MDBox mt={5} mb={1}>
@@ -120,6 +111,8 @@ function Overview() {
           </Grid>
         </MDBox>
       </Header>
+      </>
+      )}
       <Footer />
     </DashboardLayout>
   );

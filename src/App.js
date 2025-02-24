@@ -54,14 +54,17 @@ export default function App() {
   useEffect(() => {
     const wakeUpEncryptionApi = async () => {
       try {
-        const response = await axios.get(`${FLASK_ENC_API}/wakeup`);
-        const response1 = await axios.get(`${MACHINE_LEARNING_API}`);
+        const [response, response1] = await Promise.all([
+          axios.get(`${FLASK_ENC_API}/wakeup`),
+          axios.get(`${MACHINE_LEARNING_API}`)
+        ]);
+    
         console.log("Encryption API Wakeup:", response.data);
         console.log("Machine Learning API Wakeup:", response1.data);
       } catch (error) {
         console.error("Error waking up API", error);
       }
-    };
+    };    
     wakeUpEncryptionApi();
     const intervalId = setInterval(wakeUpEncryptionApi, 60000);
     return () => clearInterval(intervalId);
