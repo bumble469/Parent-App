@@ -17,57 +17,84 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import Cookies from 'js-cookie';
 function Dashboard() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null);
-  const [studentData, setStudentData] = useState(null);
-  const { t, i18n } = useTranslation();
-  const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
-  const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
-  const isHindi = i18n.language != 'en';
-  const timeoutReached = false;
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post(`${REST_API_URL}/api/dashboard/student/star`, { prn });
-        if (response.data && response.data.length > 0) {
-          setStudentData(response.data);
-        }
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    const timeout = setTimeout(() => {
-      setLoading(false);
-      setStudentData([]); 
-      timeoutReached = true;
-    }, 60000);
-  
-    fetchData();
-    return () => clearTimeout(timeout);
-  }, []);
-  
-  
-  if (error) return <div>Error: {error.message}</div>;
+  const [loading, setLoading] = useState(true);
+const [progress, setProgress] = useState(0);
+const [message, setMessage] = useState("Activating API's..");
+const [timeoutReached, setTimeoutReached] = useState(false);
+const [error, setError] = useState(null);
+const [studentData, setStudentData] = useState(null);
+const { t, i18n } = useTranslation();
+const prn = Cookies.get("student_id") ? parseInt(Cookies.get("student_id"), 10) : 1001;
+const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
+const isHindi = i18n.language !== "en";
 
-  if (!studentData || studentData.length === 0) {
-    return (
-      <DashboardLayout>
-        <DashboardNavbar />
-        <MDBox py={2} mt={3} mb={2} style={{ textAlign: 'center', backgroundColor: '#f4f4f4', borderRadius: '8px', padding: '10px' }}>
-          <div style={{ fontSize: isHindi ? '1rem' : 'inherit', color: '#333', fontWeight: '500' }}>
-            {timeoutReached ? (
-              <span style={{ color: '#ff4d4d',fontWeight:'bold' ,fontSize:'1.15rem' }}>{t('No data available to display.')}</span>
-            ) : (
-              <span style={{ color: '#4CAF50' ,fontWeight:'bold' ,fontSize:'1.15rem' }}>Activating API's, Starting Machine Learning and Encryption processes..</span>
-            )}
-          </div>
-        </MDBox>
-        <Footer />
-      </DashboardLayout>
-    );
-  }
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setProgress(33); 
+      setMessage("Activating API's..");
+
+      const response = await axios.post(`${REST_API_URL}/api/dashboard/student/star`, { prn });
+
+      if (response.data && response.data.length > 0) {
+        setTimeout(() => {
+          setProgress(66);
+          setMessage("Generating Insights..");
+        }, 500);
+
+        setTimeout(() => {
+          setProgress(100);
+          setMessage("Encrypting Data..");
+        }, 1000);
+
+        setStudentData(response.data);
+      } else {
+        setStudentData([]);
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  };
+
+  fetchData();
+}, []);
+
+
+if (error) return <div>Error: {error.message}</div>;
+
+if (!studentData || studentData.length === 0) {
+  return (
+    <DashboardLayout>
+      <DashboardNavbar />
+      <MDBox py={2} mt={3} mb={2} style={{ textAlign: "center", backgroundColor: "#f4f4f4", borderRadius: "8px", padding: "10px", display: "flex", justifyContent:'center', alignItems: "center", flexDirection: "column", minHeight: "100vh" }}> 
+        {loading ? (
+          <>
+            <div style={{ fontSize: isHindi ? "1rem" : "1rem", fontWeight: "bold", textAlign: "left" }}>{message}</div>
+            <progress
+              value={progress}
+              style={{
+                height: "8px",
+                borderRadius: "4px",
+                marginBottom: "10px",
+                width: "calc(100% - 40px)",
+                backgroundColor: "#e0e0e0", 
+                border: "none", 
+                overflow: "hidden", 
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", 
+              }}
+            />
+          </>
+        ) : timeoutReached ? (
+          <span style={{ color: "#ff4d4d", fontWeight: "bold", fontSize: "1.15rem" }}>{t("No data available to display.")}</span>
+        ) : null}
+      </MDBox>
+    </DashboardLayout>
+  );
+}
 
   const marksData = studentData?.map((item) => item.marks_obtained) || [];
   const totalMarksData = studentData?.map((item) => item.max_marks) || [];

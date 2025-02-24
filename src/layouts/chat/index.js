@@ -46,7 +46,7 @@ function Chat() {
   const { t } = useTranslation();
   function adjustTime(timestamp) {
     const time = new Date(timestamp);
-    time.setHours(time.getHours() + 6); // Adjust for 6 hours behind
+    time.setHours(time.getHours() + 6);
     return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
   useEffect(() => {
