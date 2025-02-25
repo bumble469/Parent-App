@@ -446,7 +446,6 @@ function Chat() {
                         }}
                       />
 
-
                         {/* Input and button area (fixed at the bottom) */}
                         <Box 
                           display="flex" 
