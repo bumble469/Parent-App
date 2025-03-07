@@ -82,13 +82,15 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "ajv": "^7.2.4",
-    "eslint": "^8.57.1",
-    "eslint-plugin-unused-imports": "^4.1.4",
-    "prettier": "^3.5.2"
-  },
   "overrides": {
     "svgo": "3.0.2"
-  }
+  },
+  "devDependencies": {
+  "typescript": "^4.5.0",
+  "ajv": "^7.2.4",
+  "eslint": "^8.57.1",
+  "eslint-plugin-unused-imports": "^4.1.4",
+  "prettier": "^3.5.2"
+}
+
 }
