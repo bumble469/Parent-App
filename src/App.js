@@ -9,18 +9,19 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import logo from 'assets/images/logo.png';
-import Profile from './layouts/profile'; 
-import Dashboard from './layouts/dashboard'; 
-import Performance from './layouts/performance'; 
-import Predictions from './layouts/predictions'; 
-import Faculty from './layouts/faculty'; 
-import Chat from './layouts/chat'; 
-import Reporting from './layouts/reporting'; 
+import Profile from './layouts/profile';
+import Dashboard from './layouts/dashboard';
+import Performance from './layouts/performance';
+import Predictions from './layouts/predictions';
+import Faculty from './layouts/faculty';
+import Chat from './layouts/chat';
+import Reporting from './layouts/reporting';
 import { useMaterialUIController, setMiniSidenav } from 'context';
 import { Typography, Icon } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import LoadingScreen from './components/LoadingScreen';
 
-import { SessionProvider } from './context/SessionContext'; 
+import { SessionProvider } from './context/SessionContext';
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -32,6 +33,8 @@ export default function App() {
   const FLASK_ENC_API = process.env.REACT_APP_PARENT_FLASK_ENC_URL;
   const MACHINE_LEARNING_API = process.env.REACT_APP_PARENT_MACHINE_LEARNING_URL;
   const isHindi = useMemo(() => i18n.language !== 'en', [i18n.language]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("Activating API's");
 
   useEffect(() => {
     document.body.setAttribute('dir', direction);
@@ -51,24 +54,56 @@ export default function App() {
     );
   }, []);
 
+  const alternateMessages = () => {
+    const messages = ["Activating API's", "Generating AI Insights", "Encrypting Data"];
+    let index = 0;
+
+    const interval = setInterval(() => {
+      setMessage(messages[index]);
+      index = (index + 1) % messages.length;
+    }, 2500);
+
+    return interval;
+  };
+
   useEffect(() => {
     const wakeUpEncryptionApi = async () => {
       try {
+        setLoading(true);
         const [response, response1] = await Promise.all([
           axios.get(`${FLASK_ENC_API}/wakeup`),
-          axios.get(`${MACHINE_LEARNING_API}`)
+          axios.get(`${MACHINE_LEARNING_API}/wakeup`),
         ]);
-    
-        console.log("Encryption API Wakeup:", response.data);
-        console.log("Machine Learning API Wakeup:", response1.data);
+
+        if (response.status === 200 && response1.status === 200) {
+          setMessage("All Set!");
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500);
+        } else {
+          throw new Error('One or more APIs failed');
+        }
       } catch (error) {
         console.error("Error waking up API", error);
+        setLoading(false);
       }
-    };    
-    wakeUpEncryptionApi();
-    const intervalId = setInterval(wakeUpEncryptionApi, 60000);
-    return () => clearInterval(intervalId);
-  }, [FLASK_ENC_API]);  
+    };
+
+    const wakeUpEncryptionApiWithInterval = () => {
+      wakeUpEncryptionApi();
+      const intervalId = setInterval(wakeUpEncryptionApi, 60000);
+
+      return intervalId;
+    };
+
+    const messageInterval = alternateMessages();
+    const apiInterval = wakeUpEncryptionApiWithInterval();
+
+    return () => {
+      clearInterval(messageInterval);
+      clearInterval(apiInterval);
+    };
+  }, [FLASK_ENC_API]);
 
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
@@ -148,45 +183,51 @@ export default function App() {
       .map((route) => <Route key={route.key} exact path={route.route} element={route.component} />);
 
   return (
-    <SessionProvider> {/* Wrap the app with SessionProvider */}
-      {direction === 'rtl' ? (
-        <CacheProvider value={rtlCache}>
-          <ThemeProvider theme={darkMode}>
-            <CssBaseline />
-            {layout === 'dashboard' && (
-              <Sidenav
-                color={sidenavColor}
-                brand={logo}
-                routes={routes}
-                onMouseEnter={handleOnMouseEnter}
-                onMouseLeave={handleOnMouseLeave}
-              />
-            )}
-            <Routes>
-              {getRoutes(routes)}
-              <Route path="*" element={<Navigate to="/dashboard" />} />
-            </Routes>
-          </ThemeProvider>
-        </CacheProvider>
+    <SessionProvider>
+      {loading ? (
+        <LoadingScreen message={message} />
       ) : (
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {layout === 'dashboard' && (
-            <Sidenav
-              color={sidenavColor}
-              brand={logo}
-              brandName="SCAS"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-            />
+        <>
+          {direction === 'rtl' ? (
+            <CacheProvider value={rtlCache}>
+              <ThemeProvider theme={darkMode}>
+                <CssBaseline />
+                {layout === 'dashboard' && (
+                  <Sidenav
+                    color={sidenavColor}
+                    brand={logo}
+                    routes={routes}
+                    onMouseEnter={handleOnMouseEnter}
+                    onMouseLeave={handleOnMouseLeave}
+                  />
+                )}
+                <Routes>
+                  {getRoutes(routes)}
+                  <Route path="*" element={<Navigate to="/dashboard" />} />
+                </Routes>
+              </ThemeProvider>
+            </CacheProvider>
+          ) : (
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              {layout === 'dashboard' && (
+                <Sidenav
+                  color={sidenavColor}
+                  brand={logo}
+                  brandName="SCAS"
+                  routes={routes}
+                  onMouseEnter={handleOnMouseEnter}
+                  onMouseLeave={handleOnMouseLeave}
+                />
+              )}
+              <Routes>
+                {getRoutes(routes)}
+                <Route path="*" element={<Navigate to="/dashboard" />} />
+                <Route path="/profile" element={<Profile />} />
+              </Routes>
+            </ThemeProvider>
           )}
-          <Routes>
-            {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-            <Route path="/profile" element={<Profile />} />
-          </Routes>
-        </ThemeProvider>
+        </>
       )}
     </SessionProvider>
   );

@@ -65,37 +65,6 @@ useEffect(() => {
 
 
 if (error) return <div>Error: {error.message}</div>;
-
-if (!studentData || studentData.length === 0) {
-  return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <MDBox py={2} mt={3} mb={2} style={{ textAlign: "center", backgroundColor: "#f4f4f4", borderRadius: "8px", padding: "10px", display: "flex", justifyContent:'center', alignItems: "center", flexDirection: "column", minHeight: "100vh" }}> 
-        {loading ? (
-          <>
-            <div style={{ fontSize: isHindi ? "1rem" : "1rem", fontWeight: "bold", textAlign: "left" }}>{message}</div>
-            <progress
-              value={progress}
-              style={{
-                height: "8px",
-                borderRadius: "4px",
-                marginBottom: "10px",
-                width: "calc(100% - 40px)",
-                backgroundColor: "#e0e0e0", 
-                border: "none", 
-                overflow: "hidden", 
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", 
-              }}
-            />
-          </>
-        ) : timeoutReached ? (
-          <span style={{ color: "#ff4d4d", fontWeight: "bold", fontSize: "1.15rem" }}>{t("No data available to display.")}</span>
-        ) : null}
-      </MDBox>
-    </DashboardLayout>
-  );
-}
-
   const marksData = studentData?.map((item) => item.marks_obtained) || [];
   const totalMarksData = studentData?.map((item) => item.max_marks) || [];
   const attendanceData = studentData?.map((item) => item.total_lectures_attended) || [];

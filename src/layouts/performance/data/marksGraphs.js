@@ -8,8 +8,9 @@ import loading_image from '../../../assets/images/icons8-loading.gif'; // Add th
 import axios from "axios";
 const generateMarksLineChartData = (currentMarksData, threshold) => {
   const minMarks = Math.min(...currentMarksData.map((data) => data.total));
-  const {t} = useTranslation();
-  
+  const maxMarks = Math.max(...currentMarksData.map((data) => data.total));
+  const { t } = useTranslation();
+
   return useMemo(
     () => ({
       series: [
@@ -45,8 +46,8 @@ const generateMarksLineChartData = (currentMarksData, threshold) => {
             style: { fontSize: "0.8rem", fontWeight: 500 },
           },
           tickAmount: 15,
-          max: 145, 
-          min: minMarks - 30, 
+          max: Math.min(145, maxMarks), // Ensure max is capped at 145
+          min: Math.max(0, minMarks - 5), // Ensure min is not less than 0
         },
         colors: ["#1E90FF"],
         dataLabels: {
@@ -79,8 +80,8 @@ const generateMarksLineChartData = (currentMarksData, threshold) => {
                   fontSize: "12px",
                   padding: { top: 3, bottom: 3, left: 3, right: 3 },
                 },
-                offsetX: -10, 
-                offsetY: -30, 
+                offsetX: -10,
+                offsetY: -30,
               },
             },
           ],

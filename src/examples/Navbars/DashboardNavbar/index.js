@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import loading_image from '../../../assets/images/icons8-loading.gif';
 import Cookies from 'js-cookie';
 import GuidModal from '../../../components/Guide/index';
+import {toast, ToastContainer} from 'react-toastify';
 import {
   navbar,
   navbarContainer,
@@ -88,14 +89,18 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleLogout = () => {
     setLogoutDialogOpen(true);
   };
-
+  
+  let logoutToast;
   const handleConfirmLogout = () => {
-    sessionStorage.clear();
-    Cookies.remove('student_id');
-    alert('Logged out');
-    setLogoutDialogOpen(false);
-    navigate('/login');
-  }
+      sessionStorage.clear();
+      Cookies.remove('student_id');
+      logoutToast = toast.loading(t('loggingOut'), { position: 'top-center', autoClose: false });
+      setLogoutDialogOpen(false);
+      setTimeout(() => {
+          toast.dismiss(logoutToast);
+          navigate('/dashboard');
+      }, 2000);
+  };
 
   const handleCancelLogout = () => {
     setLogoutDialogOpen(false);
@@ -182,6 +187,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       <Toolbar sx={(theme) => navbarContainer(theme)}>
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
+          <ToastContainer/>
           <MDBox pr={1} mt={2}>
               <MDTypography
                 color="textSecondary"

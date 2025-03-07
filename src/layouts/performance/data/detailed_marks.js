@@ -6,18 +6,22 @@ import { Card } from '@mui/material';
 import MDBox from 'components/MDBox';
 import loading_image from '../../../assets/images/icons8-loading.gif';
 import axios from 'axios';
+
 const MarksTable = ({ prn, semester }) => {
   const { t, i18n } = useTranslation(); 
   const [marksData, setMarksData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(t('All Subjects'));
-  const [isLoading, setIsLoading] = useState(true); // New loading state
+  const [isLoading, setIsLoading] = useState(true);
   const REST_API_URL = process.env.REACT_APP_PARENT_REST_API_URL;
+
   const fetchMarksData = async (semester) => {
+    setIsLoading(true);
     try {
-      const response = await axios.post(`${REST_API_URL}/api/performance/student/detailedmarks`,{
-        prn:prn,
-        semester:semester
+      const response = await axios.post(`${REST_API_URL}/api/performance/student/detailedmarks`, {
+        prn: prn,
+        semester: semester
       });
+
       const data = await response.data;
 
       if (Array.isArray(data)) {
@@ -25,13 +29,12 @@ const MarksTable = ({ prn, semester }) => {
       } else {
         console.error("Fetched data is not an array:", data);
       }
-      setIsLoading(false); // Set loading to false once data is fetched
     } catch (error) {
       console.error("Error fetching marks data:", error);
-      setIsLoading(false); // Set loading to false even if there's an error
+    } finally {
+      setIsLoading(false);
     }
   };
-
   useEffect(() => {
     fetchMarksData(semester);
   }, [semester]);

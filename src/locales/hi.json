@@ -123,6 +123,7 @@
   "cancel": "रद्द करें",
   "studentProfile":"छात्र प्रोफ़ाइल",
   "logout":"लॉगआउट",
+  "loggingOut":"आपको लॉग आउट किया जा रहा है...",
   "notifications": "सूचनाएं",
   "loadingNotifications": "सूचनाएं लोड हो रही हैं...",
   "noNotifications": "कोई सूचनाएं नहीं हैं",

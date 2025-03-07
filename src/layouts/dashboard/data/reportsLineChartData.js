@@ -101,7 +101,6 @@ const ReportsLineChartWrapper = () => {
                 },
               }}
             >
-              <MDTypography sx={{fontSize:"0.9rem"}}>{t('outOf145')}</MDTypography>
               <DataTable
                 table={{ columns, rows }}
                 showTotalEntries={false}

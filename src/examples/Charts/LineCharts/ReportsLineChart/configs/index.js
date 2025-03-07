@@ -14,6 +14,9 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartDataLabels);
 
 function configs(labels, datasets) {
+  const dataValues = datasets.data;
+  const minValue = Math.min(...dataValues) - 10; // Adjust this subtraction if needed
+  const maxValue = Math.max(...dataValues) + 10;
   return {
     data: {
       labels,
@@ -77,8 +80,8 @@ function configs(labels, datasets) {
               lineHeight: 2,
             },
           },
-          max: 135,
-          min:80
+          min: minValue+5, // Dynamic min value
+          max: maxValue-5,
         },
         x: {
           grid: {

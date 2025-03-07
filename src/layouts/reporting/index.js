@@ -7,6 +7,7 @@ import emailjs from 'emailjs-com';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { useSession } from '../../context/SessionContext';
+import { toast, ToastContainer } from 'react-toastify';
 function FeedbackPage() {
   const {session} = useSession();
   const [name, setName] = useState('');
@@ -30,10 +31,8 @@ function FeedbackPage() {
     };
     emailjs.send('service_85cp6qt', 'template_zu5zdkd', templateParams, '24y_NZ0sWWKtDZw3J')
       .then((result) => {
-        alert(t('Feedback send!'));
       })
       .catch((error) => {
-        alert(t('some error occurred! please try again later:('));
       });
   };
 
@@ -66,10 +65,10 @@ function FeedbackPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; 
   };
-  
+  let toastMailSent;
+  let toastMailFailed;
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (validateForm()) {
         const feedbackData = {
             feedbackType,
@@ -79,22 +78,21 @@ function FeedbackPage() {
         };
 
         try {
-            // Fix the request to send prn and feedbackData in the correct structure
             const response = await axios.post(`${REST_API_URL}/api/feedback/feedback-insert`, {
-                prn, // sending prn as separate field
-                feedbackData, // send feedback data as is
+                prn,
+                feedbackData,
             });
-
-            if (response.status === 200) {  // Checking the correct status code
+            if (response.status === 200) { 
                 sendEmail(e);
-                alert(t('Feedback sent successfully!'));
+                toastMailSent = toast.success(t("thankYouMessage"),{ position: 'top-center', autoClose: 2000 })
                 handleClear();
             } else {
-                alert(t('Failed to send feedback. Please try again later.'));
+                toastMailFailed = toast.error(t("errorMessage"),{ position: 'top-center', autoClose: 2000 })
             }
         } catch (error) {
+            let toastError;
             console.error('Error sending feedback:', error);
-            alert(t('some error occurred! please try again later:('));
+            toastError = toast.error(t("errorMessage"),{ position: 'top-center', autoClose: false });
         }
     }
 };

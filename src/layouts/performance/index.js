@@ -54,10 +54,9 @@ function Performance() {
       }
     };
     fetchData();
-  }, [t]); // Adding t as a dependency to ensure translations are updated
+  }, [t]); 
 
   useEffect(() => {
-    // Calculate average marks for the selected semester
     const filteredMarks = marksData.filter(item => item.semester_id === semester);
 
     const marksBySubject = filteredMarks.reduce((acc, item) => {
