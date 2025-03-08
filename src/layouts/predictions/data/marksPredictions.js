@@ -21,6 +21,7 @@ export const PredictMarks = () => {
   const fetchMarks = async (prn) => {
     try {
       const response = await axios.post(`${MACHINE_LEARNING_URL}/predict-marks`, { prn });
+      console.log('API Response:', response.data);
       return response.data;
     } catch (error) {
       console.error(t('There was an error fetching the marks:'), error);
@@ -56,18 +57,18 @@ export const PredictMarks = () => {
     {
       id: 1,
       semester: previousSemesters[0],
-      marks: marks?.prevsem2_marks || t('N/A'),
-      totalMarks: marks?.prevsem2_total_obtainable || t('N/A'),
-      percentage: marks?.prevsem2_perc ? `${marks?.prevsem2_perc.toFixed(2)}%` : t('N/A'),
-      grade: marks?.prevsem2_grade || t('N/A'),
+      marks: marks?.prev_sem2_marks || t('N/A'),
+      totalMarks: marks?.prev_sem2_total_obtainable || t('N/A'),
+      percentage: marks?.prev_sem2_perc ? `${marks?.prev_sem2_perc.toFixed(2)}%` : t('N/A'),
+      grade: marks?.prev_sem2_grade || t('N/A'),
     },
     {
       id: 2,
       semester: previousSemesters[1],
-      marks: marks?.prevsem1_marks || t('N/A'),
-      totalMarks: marks?.prevsem1_total_obtainable || t('N/A'),
-      percentage: marks?.prevsem1_perc ? `${marks?.prevsem1_perc.toFixed(2)}%` : t('N/A'),
-      grade: marks?.prevsem1_grade || t('N/A'),
+      marks: marks?.prev_sem1_marks || t('N/A'),
+      totalMarks: marks?.prev_sem1_total_obtainable || t('N/A'),
+      percentage: marks?.prev_sem1_perc ? `${marks?.prev_sem1_perc.toFixed(2)}%` : t('N/A'),
+      grade: marks?.prev_sem1_grade || t('N/A'),
     }
   ];
 
