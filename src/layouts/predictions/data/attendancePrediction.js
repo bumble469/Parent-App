@@ -22,7 +22,7 @@ export const PredictAttendance = () => {
   const prn = Cookies.get('student_id') ? parseInt(Cookies.get('student_id'), 10) : 1001;
   const MACHINE_LEARNING_URL = process.env.REACT_APP_PARENT_MACHINE_LEARNING_URL;
   const CACHE_KEY = `attendance_cache_${prn}`;
-  const CACHE_DURATION = 2*60;
+  const CACHE_DURATION = 120 * 1000; 
 
   const fetchAttendance = async () => {
     try {

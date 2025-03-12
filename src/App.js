@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
@@ -20,7 +20,6 @@ import { useMaterialUIController, setMiniSidenav } from 'context';
 import { Typography, Icon } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import LoadingScreen from './components/LoadingScreen';
-
 import { SessionProvider } from './context/SessionContext';
 
 export default function App() {
@@ -32,9 +31,11 @@ export default function App() {
   const { t, i18n } = useTranslation();
   const FLASK_ENC_API = process.env.REACT_APP_PARENT_FLASK_ENC_URL;
   const MACHINE_LEARNING_API = process.env.REACT_APP_PARENT_MACHINE_LEARNING_URL;
+  const REST_API = process.env.REACT_APP_PARENT_REST_API_URL;
   const isHindi = useMemo(() => i18n.language !== 'en', [i18n.language]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("Activating API's");
+  const apiActivated = useRef(false); 
 
   useEffect(() => {
     document.body.setAttribute('dir', direction);
@@ -67,12 +68,17 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (apiActivated.current) return;
+
+    apiActivated.current = true; 
+
     const wakeUpEncryptionApi = async () => {
       try {
         setLoading(true);
         const [response, response1] = await Promise.all([
           axios.get(`${FLASK_ENC_API}/wakeup`),
           axios.get(`${MACHINE_LEARNING_API}/wakeup`),
+          axios.get(`${REST_API}`),
         ]);
 
         if (response.status === 200 && response1.status === 200) {
@@ -89,21 +95,13 @@ export default function App() {
       }
     };
 
-    const wakeUpEncryptionApiWithInterval = () => {
-      wakeUpEncryptionApi();
-      const intervalId = setInterval(wakeUpEncryptionApi, 60000);
-
-      return intervalId;
-    };
-
     const messageInterval = alternateMessages();
-    const apiInterval = wakeUpEncryptionApiWithInterval();
+    wakeUpEncryptionApi();
 
     return () => {
       clearInterval(messageInterval);
-      clearInterval(apiInterval);
     };
-  }, [FLASK_ENC_API]);
+  }, []);
 
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
@@ -188,45 +186,24 @@ export default function App() {
         <LoadingScreen message={message} />
       ) : (
         <>
-          {direction === 'rtl' ? (
-            <CacheProvider value={rtlCache}>
-              <ThemeProvider theme={darkMode}>
-                <CssBaseline />
-                {layout === 'dashboard' && (
-                  <Sidenav
-                    color={sidenavColor}
-                    brand={logo}
-                    routes={routes}
-                    onMouseEnter={handleOnMouseEnter}
-                    onMouseLeave={handleOnMouseLeave}
-                  />
-                )}
-                <Routes>
-                  {getRoutes(routes)}
-                  <Route path="*" element={<Navigate to="/dashboard" />} />
-                </Routes>
-              </ThemeProvider>
-            </CacheProvider>
-          ) : (
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              {layout === 'dashboard' && (
-                <Sidenav
-                  color={sidenavColor}
-                  brand={logo}
-                  brandName="SCAS"
-                  routes={routes}
-                  onMouseEnter={handleOnMouseEnter}
-                  onMouseLeave={handleOnMouseLeave}
-                />
-              )}
-              <Routes>
-                {getRoutes(routes)}
-                <Route path="*" element={<Navigate to="/dashboard" />} />
-                <Route path="/profile" element={<Profile />} />
-              </Routes>
-            </ThemeProvider>
-          )}
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {layout === 'dashboard' && (
+              <Sidenav
+                color={sidenavColor}
+                brand={logo}
+                brandName="SCAS"
+                routes={routes}
+                onMouseEnter={handleOnMouseEnter}
+                onMouseLeave={handleOnMouseLeave}
+              />
+            )}
+            <Routes>
+              {getRoutes(routes)}
+              <Route path="*" element={<Navigate to="/dashboard" />} />
+              <Route path="/profile" element={<Profile />} />
+            </Routes>
+          </ThemeProvider>
         </>
       )}
     </SessionProvider>

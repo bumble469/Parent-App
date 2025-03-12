@@ -8,6 +8,9 @@ import Cookies from 'js-cookie';
 import loading_image from '../../../assets/images/icons8-loading.gif';
 import { useTranslation } from 'react-i18next';
 
+const CACHE_DURATION = 120 * 1000;
+const CACHE_KEY = 'marks_cache';
+
 export const PredictMarks = () => {
   const [marks, setMarks] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,16 +32,30 @@ export const PredictMarks = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  // Retrieve data from cache or API
+  const getData = async () => {
+    const cachedData = JSON.parse(localStorage.getItem(CACHE_KEY));
+    const cacheTime = localStorage.getItem(`${CACHE_KEY}_time`);
+
+    // If data exists in cache and is still valid (within CACHE_DURATION)
+    if (cachedData && cacheTime && Date.now() - cacheTime < CACHE_DURATION) {
+      setMarks(cachedData);
+      setLoading(false);
+    } else {
+      // If no valid cache, fetch from API
       const result = await fetchMarks(prn);
       setMarks(result);
       setLoading(false);
-    };
 
-    fetchData();
-  }, []);
+      // Cache the fetched data with current time
+      localStorage.setItem(CACHE_KEY, JSON.stringify(result));
+      localStorage.setItem(`${CACHE_KEY}_time`, Date.now().toString());
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, [prn]); // Add prn as a dependency to re-fetch if the prn changes
 
   const marksColumns = [
     { Header: t('Semester'), accessor: 'semester' },
@@ -118,8 +135,8 @@ export const PredictMarks = () => {
     {
       name: t('Percentage Comparison'),
       data: [
-        marks?.prevsem2_perc ? marks?.prevsem2_perc.toFixed(2) : 0,
-        marks?.prevsem1_perc ? marks?.prevsem1_perc.toFixed(2) : 0,
+        marks?.prev_sem2_perc ? marks?.prev_sem2_perc.toFixed(2) : 0,
+        marks?.prev_sem1_perc ? marks?.prev_sem1_perc.toFixed(2) : 0,
         marks?.predicted_perc ? marks?.predicted_perc.toFixed(2) : 0,
       ],
     },
