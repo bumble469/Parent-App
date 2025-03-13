@@ -21,7 +21,7 @@
     "@emotion/styled": "^11.10.8",
     "@minchat/react": "^3.3.0",
     "@mui/icons-material": "5.11.16",
-    "@mui/material": "^5.12.3",
+    "@mui/material": "^5.16.14",
     "@mui/x-charts": "^7.22.3",
     "apexcharts": "^4.1.0",
     "axios": "^1.7.7",
@@ -45,10 +45,10 @@
     "node-cache": "^5.1.2",
     "nodemailer": "^6.9.16",
     "prop-types": "^15.8.1",
-    "react": "18.2.0",
+    "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "18.2.0",
+    "react-dom": "^18.2.0",
     "react-github-btn": "1.4.0",
     "react-i18next": "^15.2.0",
     "react-router-dom": "6.11.0",
@@ -86,11 +86,10 @@
     "svgo": "3.0.2"
   },
   "devDependencies": {
-  "typescript": "^4.5.0",
-  "ajv": "^7.2.4",
-  "eslint": "^8.57.1",
-  "eslint-plugin-unused-imports": "^4.1.4",
-  "prettier": "^3.5.2"
-}
-
+    "ajv": "^7.2.4",
+    "eslint": "^8.57.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "prettier": "^3.5.2",
+    "typescript": "^5.8.2"
+  }
 }
